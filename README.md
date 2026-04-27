@@ -1,0 +1,2 @@
+# teamparikh.ai
+Real Estate 
