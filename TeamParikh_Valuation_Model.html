@@ -1663,9 +1663,13 @@ function applyGlobalDateRange(showToast=true){
   };
   el('db-status').textContent=`${MONTHS[sm-1]} ${sy} – ${MONTHS[em-1]} ${ey}`;
   if(showToast) toast(`Date filter: ${MONTHS[sm-1]} ${sy} – ${MONTHS[em-1]} ${ey}`,'ok');
-  // Re-render active city pane if open
-  const active=document.querySelector('.tn-btn.tn-city.active');
-  if(active) renderCityPane(active.dataset.tab);
+  // Re-render whichever tab is active
+  if(activeTab==='intel') renderMarketIntel();
+  else if(activeTab==='opps') runOpportunityScanner();
+  else {
+    const active=document.querySelector('.cb-btn.cb-city.active');
+    if(active) renderCityPane(active.dataset.city);
+  }
 }
 
 function clearGlobalDateRange(){
@@ -1679,8 +1683,12 @@ function clearGlobalDateRange(){
     el('dr-em').value=12; el('dr-ey').value=Math.max(...years);
   }
   toast('Date filter cleared — showing all dates','inf');
-  const active=document.querySelector('.tn-btn.tn-city.active');
-  if(active) renderCityPane(active.dataset.tab);
+  if(activeTab==='intel') renderMarketIntel();
+  else if(activeTab==='opps') runOpportunityScanner();
+  else {
+    const active=document.querySelector('.cb-btn.cb-city.active');
+    if(active) renderCityPane(active.dataset.city);
+  }
 }
 
 // ═══════════════════════════════════
@@ -2886,9 +2894,20 @@ function renderMarketIntel(){
 
   const inScope = A.intelScope==='all' ? A.listings : A.listings.filter(l=>l.city===A.intelScope);
   const gdr = A.globalDateRange;
+
+  // ── DATE FILTER ──────────────────────────────────────────────────────────
+  // FIXED: SLD records without a closeDate are EXCLUDED when a date filter is
+  // active. Previously they bypassed the filter entirely, flooding metrics with
+  // undated historical records (many from the 2023-2024 hot market).
   const filtered = inScope.filter(l=>{
-    if(gdr.start && l.status==='SLD' && l.closeDate && l.closeDate < gdr.start) return false;
-    if(gdr.end   && l.status==='SLD' && l.closeDate && l.closeDate > gdr.end)   return false;
+    if(l.status==='SLD'){
+      // If date filter is active, require a close date to be present and in range
+      if(gdr.start||gdr.end){
+        if(!l.closeDate) return false; // exclude undated sold when filter is set
+        if(gdr.start && l.closeDate < gdr.start) return false;
+        if(gdr.end   && l.closeDate > gdr.end)   return false;
+      }
+    }
     return true;
   });
 
@@ -2896,8 +2915,7 @@ function renderMarketIntel(){
   const actv = filtered.filter(l=>l.status==='ACTV');
   const pend = filtered.filter(l=>l.status==='PEND');
 
-  // FIX 1: recency windows use RAW in-scope sold data (NOT filtered by date range bar)
-  // so "Sold · 30 Days" always reflects actual recent activity regardless of the date filter
+  // Recency windows always use raw real-time data regardless of date filter
   const soldInScope = inScope.filter(l=>l.status==='SLD');
   const byWindow = (days) => {
     const cutoff = new Date(NOW.getTime() - days*864e5);
@@ -2905,49 +2923,78 @@ function renderMarketIntel(){
   };
   const w30 = byWindow(30), w60 = byWindow(60), w90 = byWindow(90);
 
-  const medDOM   = S.median(sold.map(l=>l.dom).filter(x=>x>0)); // exclude 0 (data artifacts/blank fields)
+  // ── TIME PERIOD (for rate normalization) ──────────────────────────────────
+  // How many months does the current sold pool span? Used to normalize rates.
+  const periodMonths = (()=>{
+    if(gdr.start && gdr.end){
+      const ms = gdr.end.getTime() - gdr.start.getTime();
+      return Math.max(1, ms / (864e5*30.44));
+    }
+    if(sold.length && sold.some(l=>l.closeDate)){
+      const dates = sold.filter(l=>l.closeDate).map(l=>l.closeDate.getTime());
+      const spanDays = (Math.max(...dates) - Math.min(...dates)) / 864e5;
+      return Math.max(1, spanDays / 30.44);
+    }
+    return 12; // fallback
+  })();
+
+  const medDOM   = S.median(sold.map(l=>l.dom).filter(x=>x>0));
   const medCDOM  = S.median(sold.map(l=>l.cdom||l.dom).filter(x=>x>0));
   const splp     = sold.filter(l=>l.sp&&l.lp).map(l=>l.sp/l.lp);
   const medSPLP  = S.median(splp);
   const medPPSF  = S.median(sold.filter(l=>l.ppsf).map(l=>l.ppsf));
   const medActPPSF = S.median(actv.filter(l=>l.listPPSF||(l.lp&&l.sqft)).map(l=>l.listPPSF||l.lp/l.sqft));
+
+  // ── ABSORPTION: months of supply ─────────────────────────────────────────
+  // FIXED: old formula (sold/active) was not time-normalized. With 18 months
+  // of sold data vs a snapshot of active listings, it showed 10-25× (extreme
+  // seller's market) when the market is actually balanced or favoring buyers.
+  // Correct formula: months_of_supply = active / (sold_per_month)
+  // Interpretation: <3mo = seller's, 3-6mo = balanced, >6mo = buyer's market
+  const soldPerMonth = sold.length / periodMonths;
+  const monthsOfSupply = (soldPerMonth > 0 && actv.length > 0)
+    ? actv.length / soldPerMonth : null;
+  // Keep a raw ratio for legacy display
   const absorption = actv.length ? (sold.length/actv.length) : null;
+
   const medSP = S.median(sold.filter(l=>l.sp).map(l=>l.sp));
 
-  // ── SELLER METRICS ──────────────────────────────────────────
-  // Over-ask sale rate
+  // ── SELLER METRICS ────────────────────────────────────────────────────────
   const soldWithRatio = sold.filter(l=>l.sp&&l.lp);
   const overAsk = soldWithRatio.filter(l=>l.sp>l.lp).length;
   const overAskRate = soldWithRatio.length ? (overAsk/soldWithRatio.length*100) : null;
 
-  // List-to-close timeline: DOM (list→contract) + escrow (contract→close)
+  // List-to-close timeline
   const ltcSold = sold.filter(l=>l.closeDate&&l.listDate&&l.dom>=0);
   const escrowDays = ltcSold.map(l=>{
     const totalDays = Math.round((l.closeDate-l.listDate)/(864e5));
     return Math.max(0, totalDays - l.dom);
   }).filter(x=>x>0&&x<120);
   const medEscrow = S.median(escrowDays);
-  const medLTC    = medDOM!=null&&medEscrow!=null ? Math.round(medDOM)+Math.round(medEscrow) : null;
+  const medLTC = medDOM!=null&&medEscrow!=null ? Math.round(medDOM)+Math.round(medEscrow) : null;
 
-  // PPSF trend by month (last 12 months)
+  // PPSF trend by month
   const ppsfByMonth = {};
   sold.filter(l=>l.closeDate&&l.ppsf>0).forEach(l=>{
     const key = `${l.closeDate.getFullYear()}-${String(l.closeDate.getMonth()+1).padStart(2,'0')}`;
-    if(!ppsfByMonth[key]) ppsfByMonth[key]={sum:0,cnt:0,vals:[]};
+    if(!ppsfByMonth[key]) ppsfByMonth[key]={vals:[]};
     ppsfByMonth[key].vals.push(l.ppsf);
-    ppsfByMonth[key].cnt++;
   });
   const trendMonths = Object.keys(ppsfByMonth).sort().slice(-12);
   const trendPPSF   = trendMonths.map(k=>Math.round(S.median(ppsfByMonth[k].vals)));
   const trendLabels = trendMonths.map(k=>{const[y,m]=k.split('-');return MONTHS[parseInt(m)-1]+" '"+y.slice(2);});
 
-  // Inventory velocity: new listings (actv+pend) vs sold in period
-  const invVel = sold.length ? ((actv.length+pend.length)/Math.max(1,sold.length)) : null;
-  const invVelLbl = invVel==null?'—':invVel<0.5?'Absorbing Fast':invVel<1?'Balanced':invVel<1.5?'Slight Buildup':'Building Up';
-  const invVelCls = invVel==null?'':invVel<0.5?'up':invVel<1?'':invVel<1.5?'':'down';
+  // ── INVENTORY VELOCITY ────────────────────────────────────────────────────
+  // FIXED: old formula (actv+pend)/sold ignored time period. Using sold/month.
+  // Now shows: how many months of current active supply exists at current sales pace.
+  const invVelLbl = monthsOfSupply==null?'—'
+    :monthsOfSupply<2?'Very Low Supply':monthsOfSupply<3?'Low Supply'
+    :monthsOfSupply<4?'Balanced':monthsOfSupply<6?'Moderate Supply':'High Supply';
+  const invVelCls = monthsOfSupply==null?''
+    :monthsOfSupply<2?'up':monthsOfSupply<3?'up'
+    :monthsOfSupply<5?'':monthsOfSupply<7?'down':'down';
 
-  // ── BUYER METRICS ──────────────────────────────────────────
-  // Competitive Offer Index (estimated based on DOM + over-ask rate)
+  // ── BUYER METRICS ─────────────────────────────────────────────────────────
   const compIdx = (()=>{
     if(!medDOM||overAskRate==null) return null;
     const domFactor = Math.max(0,1-(medDOM/30)*0.3);
@@ -2956,7 +3003,7 @@ function renderMarketIntel(){
     return Math.max(1,Math.min(12,raw));
   })();
 
-  // Best Time to Buy — monthly median SP grouped by calendar month (all years)
+  // Best Time to Buy heatmap
   const byCalMonth = Array(12).fill(null).map(()=>[]);
   soldInScope.filter(l=>l.closeDate&&l.sp>0).forEach(l=>{
     byCalMonth[l.closeDate.getMonth()].push(l.sp);
@@ -2966,30 +3013,36 @@ function renderMarketIntel(){
   const hmMin = validMedians.length?Math.min(...validMedians):0;
   const hmMax = validMedians.length?Math.max(...validMedians):1;
 
-  // Negotiation Leverage Score — composite (0–100, higher = more buyer power)
+  // ── NEGOTIATION LEVERAGE SCORE ────────────────────────────────────────────
+  // FIXED: thresholds now use months_of_supply (standard real estate metric)
+  // instead of raw sold/active ratio which was not time-normalized.
+  // <3 months supply = seller's market; 3-6 = balanced; >6 = buyer's market
   const leverageScore = (()=>{
     let score=50;
-    if(absorption!=null){
-      if(absorption>3) score-=20;
-      else if(absorption>1.5) score-=8;
-      else if(absorption<0.5) score+=20;
-      else score+=8;
+    if(monthsOfSupply!=null){
+      if(monthsOfSupply<1)       score-=25; // extreme seller's market
+      else if(monthsOfSupply<2)  score-=18;
+      else if(monthsOfSupply<3)  score-=8;  // seller's market
+      else if(monthsOfSupply<4)  score+=2;  // slight buyer lean
+      else if(monthsOfSupply<6)  score+=10; // balanced-to-buyer
+      else if(monthsOfSupply<9)  score+=18; // buyer's market
+      else                       score+=25; // strong buyer's market
     }
     if(medDOM!=null){
-      if(medDOM<10) score-=15;
-      else if(medDOM<20) score-=6;
-      else if(medDOM>45) score+=15;
-      else if(medDOM>30) score+=6;
+      if(medDOM<10)       score-=15;
+      else if(medDOM<20)  score-=6;
+      else if(medDOM>45)  score+=15;
+      else if(medDOM>30)  score+=6;
     }
     if(overAskRate!=null){
-      if(overAskRate>70) score-=15;
-      else if(overAskRate>50) score-=6;
-      else if(overAskRate<30) score+=12;
-      else if(overAskRate<20) score+=18;
+      if(overAskRate>70)       score-=15;
+      else if(overAskRate>50)  score-=6;
+      else if(overAskRate<30)  score+=12;
+      else if(overAskRate<20)  score+=18;
     }
     return Math.max(5,Math.min(95,score));
   })();
-  const levCls  = leverageScore>=60?'lev-hi':leverageScore>=35?'lev-mod':'lev-low';
+  const levCls   = leverageScore>=60?'lev-hi':leverageScore>=35?'lev-mod':'lev-low';
   const levLabel = leverageScore>=60?'HIGH':leverageScore>=35?'MODERATE':'LOW';
   const levNote  = leverageScore>=60
     ? `Buyers hold meaningful negotiating power. Absorption is low, homes sit longer, and fewer are selling over ask. Use this data to anchor offers strategically below list.`
@@ -3049,9 +3102,10 @@ function renderMarketIntel(){
     if(overShare>35) insights.push(`Of <strong>${acc.valued} active listings</strong> we could value, <strong>${overShare.toFixed(0)}% are overpriced</strong> vs comps.`);
     else if(overShare<15) insights.push(`Only <strong>${overShare.toFixed(0)}% of ${acc.valued} active listings</strong> are overpriced — sellers are reading the market well.`);
   }
-  if(absorption!==null){
-    if(absorption>3) insights.push(`Absorption of <strong>${absorption.toFixed(1)}× sold per active</strong> indicates strong demand.`);
-    else if(absorption<1) insights.push(`Absorption of <strong>${absorption.toFixed(1)}× sold per active</strong> means inventory is accumulating. Buyer leverage is increasing.`);
+  if(monthsOfSupply!==null){
+    if(monthsOfSupply<2) insights.push(`Only <strong>${monthsOfSupply.toFixed(1)} months of supply</strong> at current sales pace — strong seller conditions. Buyers should expect competition.`);
+    else if(monthsOfSupply>6) insights.push(`<strong>${monthsOfSupply.toFixed(1)} months of supply</strong> — inventory is building up. Buyers have negotiating leverage; sellers should price aggressively.`);
+    else if(monthsOfSupply>=3&&monthsOfSupply<=5) insights.push(`<strong>${monthsOfSupply.toFixed(1)} months of supply</strong> — balanced market conditions. Neither buyers nor sellers hold dominant leverage.`);
   }
   if(insights.length<3) insights.push(`Add more sold and active listings to surface stronger statistical patterns. Currently working with ${sold.length} sold and ${actv.length} active.`);
 
@@ -3116,9 +3170,11 @@ function renderMarketIntel(){
             <div class="mi-stat-sub">${sold.length?fmt(S.median(sold.filter(l=>l.sp).map(l=>l.sp)))+' median sale':'—'}</div>
           </div>
           <div class="mi-stat">
-            <div class="mi-stat-lbl">Absorption ${tip('How many homes sold for every one currently active. Above 1× means the market is absorbing listings faster than they accumulate — a seller\'s market signal.')}</div>
-            <div class="mi-stat-val ${absorption&&absorption>2?'up':absorption&&absorption<1?'down':''}">${absorption?absorption.toFixed(1)+'×':'—'}</div>
-            <div class="mi-stat-sub">sold per active</div>
+            <div class="mi-stat-lbl">Months of Supply ${tip('How many months it would take to sell all current active listings at the current sales pace. Under 3 months = seller\'s market. 3–6 months = balanced. Over 6 months = buyer\'s market. This is the industry-standard absorption metric.')}</div>
+            <div class="mi-stat-val ${monthsOfSupply!=null&&monthsOfSupply<3?'up':monthsOfSupply!=null&&monthsOfSupply>6?'down':''}">
+              ${monthsOfSupply!=null?monthsOfSupply.toFixed(1)+'mo':'—'}
+            </div>
+            <div class="mi-stat-sub">${monthsOfSupply!=null?(monthsOfSupply<3?"Seller's Market":monthsOfSupply>6?"Buyer's Market":'Balanced Market'):'—'}<br><span style="font-size:9px;color:var(--txt3)">${soldPerMonth.toFixed(0)} sales/mo · ${actv.length} active</span></div>
           </div>
         </div>
       </div>
@@ -3264,7 +3320,7 @@ function renderMarketIntel(){
         <div style="margin-top:14px">
           <div style="font-size:11px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Inventory Velocity</div>
           <div style="font-family:var(--fm);font-size:22px;font-weight:500" class="${invVelCls}">${invVelLbl}</div>
-          <div style="font-size:11px;color:var(--txt2);margin-top:3px">${invVel!=null?`${(actv.length+pend.length)} supply · ${sold.length} sold in period`:'—'}</div>
+          <div style="font-size:11px;color:var(--txt2);margin-top:3px">${monthsOfSupply!=null?monthsOfSupply.toFixed(1)+' months of supply at current pace':'—'}</div>
         </div>
       </div>
     </div>
@@ -3290,7 +3346,7 @@ function renderMarketIntel(){
         </div>
         <div class="lev-detail">${levNote}</div>
         <div class="expl-card" style="margin-top:8px"><strong>Components</strong>
-          Absorption (${absorption?absorption.toFixed(1)+'×':'n/a'}) · Median DOM (${medDOM?Math.round(medDOM)+' days':'n/a'}) · Over-ask rate (${overAskRate!=null?overAskRate.toFixed(0)+'%':'n/a'})
+          Months of Supply (${monthsOfSupply!=null?monthsOfSupply.toFixed(1)+'mo':'n/a'}) · Median DOM (${medDOM?Math.round(medDOM)+' days':'n/a'}) · Over-ask rate (${overAskRate!=null?overAskRate.toFixed(0)+'%':'n/a'})
         </div>
       </div>
 
