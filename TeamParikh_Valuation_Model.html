@@ -2555,11 +2555,12 @@ function handleFile(file,isModal){
           const cd=r.cdCoverage||{};
           const cdPct=cd.total>0?Math.round(cd.resolved/cd.total*100):100;
           const cdColor=cdPct>=90?'var(--grn)':cdPct>=70?'var(--gold)':'var(--red)';
+          const unknownBadge=cd.unknown>0?' · <b style="color:var(--red)">'+cd.unknown+' UNKNOWN — re-export with date fields</b>':'';
           const cdDetail=cd.total>0
-            ?`<br><span style="font-size:10px;color:var(--txt2)">Close date sources — M1 Exact: <b style="color:var(--grn)">${cd.m1||0}</b> · M2 Status Date: <b style="color:var(--blue)">${cd.m2||0}</b> · M3 Pending+25d: <b style="color:var(--gold)">${cd.m3||0}</b> · M4 Off-Mkt+25d: <b style="color:var(--pur)">${cd.m4||0}</b> · M5 List+DOM: <b style="color:var(--org)">${cd.m5||0}</b>${cd.unknown>0?` · <b style="color:var(--red)">${cd.unknown} UNKNOWN — re-export with date fields</b>`:''}</span>`
+            ?'<br><span style="font-size:10px;color:var(--txt2)">Close date sources — M1 Exact: <b style="color:var(--grn)">'+(cd.m1||0)+'</b> · M2 Status Date: <b style="color:var(--blue)">'+(cd.m2||0)+'</b> · M3 Pending+25d: <b style="color:var(--gold)">'+(cd.m3||0)+'</b> · M4 Off-Mkt+25d: <b style="color:var(--pur)">'+(cd.m4||0)+'</b> · M5 List+DOM: <b style="color:var(--org)">'+(cd.m5||0)+'</b>'+unknownBadge+'</span>'
             :'';
-          dh.innerHTML=`${rangeStr}<br>🏙 Cities: <strong style="color:var(--txt)">${citiesArr.map(c=>toTitle(c)).join(', ')}</strong>${r.pruned?`<br>🗑 <span style="color:var(--org)">${r.pruned} old records pruned</span>`:''}<br>📅 Close date coverage: <strong style="color:${cdColor}">${cdPct}% (${(cd.resolved||0).toLocaleString()} / ${(cd.total||0).toLocaleString()} closed records)</strong>${cdDetail}`;
-        }
+          const pruneNote=r.pruned?'<br>🗑 <span style="color:var(--org)">'+r.pruned+' old records pruned</span>':'';
+          dh.innerHTML=rangeStr+'<br>🏙 Cities: <strong style="color:var(--txt)">'+citiesArr.map(c=>toTitle(c)).join(', ')+'</strong>'+pruneNote+'<br>📅 Close date coverage: <strong style="color:'+cdColor+'">'+cdPct+'% ('+(cd.resolved||0).toLocaleString()+' / '+(cd.total||0).toLocaleString()+' closed records)</strong>'+cdDetail;
         }
       }else{
         el('welcome').style.display='none';el('app').classList.add('show');
