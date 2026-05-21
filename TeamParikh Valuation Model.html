@@ -860,8 +860,8 @@ function fromRow(r){
     stories:r.stories||'', listPPSF:r.list_ppsf, salePPSF:r.sale_ppsf,
     ppsf:r.ppsf,
     // Add T12:00:00 so date parsing is timezone-safe
-    closeDate:r.close_date?new Date(r.close_date+'T12:00:00'):null,
-    listDate:r.list_date?new Date(r.list_date+'T12:00:00'):null,
+    closeDate:r.close_date?parseDate(r.close_date+''):null, // reuse robust parseDate
+    listDate:r.list_date?parseDate(r.list_date+''):null,
     lat:r.lat, lng:r.lng,
   };
 }
@@ -1018,7 +1018,41 @@ const S = {
 };
 
 // Date utilities
-function parseDate(s){if(!s||!s.trim())return null;const p=s.trim().split('/');if(p.length!==3)return null;const d=new Date(parseInt(p[2]),parseInt(p[0])-1,parseInt(p[1]));return isNaN(d.getTime())?null:d;}
+function parseDate(s){
+  if(!s||!s.trim())return null;
+  let raw=s.trim();
+  // Strip any time component ("4/15/2025 12:00:00 AM" → "4/15/2025")
+  raw=raw.split(' ')[0].split('T')[0];
+  // Try M/D/YYYY or MM/DD/YYYY
+  if(raw.includes('/')){
+    const p=raw.split('/');
+    if(p.length===3){
+      let yr=parseInt(p[2]);
+      if(yr<100)yr+=yr<50?2000:1900; // 2-digit year
+      const d=new Date(yr,parseInt(p[0])-1,parseInt(p[1]));
+      return isNaN(d.getTime())?null:d;
+    }
+  }
+  // Try YYYY-MM-DD (ISO) or MM-DD-YYYY
+  if(raw.includes('-')){
+    const p=raw.split('-');
+    if(p.length===3){
+      // YYYY-MM-DD
+      if(p[0].length===4){
+        const d=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
+        return isNaN(d.getTime())?null:d;
+      }
+      // MM-DD-YYYY
+      if(p[2].length===4){
+        const d=new Date(parseInt(p[2]),parseInt(p[0])-1,parseInt(p[1]));
+        return isNaN(d.getTime())?null:d;
+      }
+    }
+  }
+  // Try native Date parsing as last resort
+  const d=new Date(raw);
+  return isNaN(d.getTime())?null:d;
+}
 function fmtDate(d){if(!d)return'—';return`${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`;}
 const TODAY=new Date();
 
@@ -2733,6 +2767,7 @@ function classifyVariance(pct){
 }
 
 function renderMarketIntel(){
+  const NOW = new Date(); // always fresh — not cached from script load
   if(!A.listings.length){
     el('mi-content').innerHTML = `<div class="mi-empty">Load MLS data to view market intelligence.<br>Trends, pricing accuracy, and liquidity diagnostics appear here.</div>`;
     populateIntelCityPills();
@@ -2756,13 +2791,13 @@ function renderMarketIntel(){
   // so "Sold · 30 Days" always reflects actual recent activity regardless of the date filter
   const soldInScope = inScope.filter(l=>l.status==='SLD');
   const byWindow = (days) => {
-    const cutoff = new Date(TODAY.getTime() - days*864e5);
+    const cutoff = new Date(NOW.getTime() - days*864e5);
     return soldInScope.filter(l=>l.closeDate && l.closeDate >= cutoff);
   };
   const w30 = byWindow(30), w60 = byWindow(60), w90 = byWindow(90);
 
-  const medDOM   = S.median(sold.map(l=>l.dom).filter(x=>x>=0));
-  const medCDOM  = S.median(sold.map(l=>l.cdom||l.dom).filter(x=>x>=0));
+  const medDOM   = S.median(sold.map(l=>l.dom).filter(x=>x>0)); // exclude 0 (data artifacts/blank fields)
+  const medCDOM  = S.median(sold.map(l=>l.cdom||l.dom).filter(x=>x>0));
   const splp     = sold.filter(l=>l.sp&&l.lp).map(l=>l.sp/l.lp);
   const medSPLP  = S.median(splp);
   const medPPSF  = S.median(sold.filter(l=>l.ppsf).map(l=>l.ppsf));
@@ -3011,10 +3046,10 @@ function renderMarketIntel(){
           <div class="mi-stat">
             <div class="mi-stat-lbl">Sold · 30 Days ${tip('Homes that closed escrow in the last 30 days. Always relative to today — unaffected by the date range filter above.')}</div>
             <div class="mi-stat-val ${w30.length>0?'up':''}">${w30.length}</div>
-            <div class="mi-stat-sub">${w30.length?'med $'+Math.round(S.median(w30.filter(l=>l.ppsf).map(l=>l.ppsf))||0)+'/sqft':'no recent closings'}</div>
+            <div class="mi-stat-sub">${w30.length?'med $'+Math.round(S.median(w30.filter(l=>l.ppsf).map(l=>l.ppsf))||0)+'/sqft':'no closings found'}</div>
           </div>
           <div class="mi-stat">
-            <div class="mi-stat-lbl">Sold · 60 Days ${tip('Homes closed in the last 60 days. A growing number here vs. 30 days shows increasing market activity.')}</div>
+            <div class="mi-stat-lbl">Sold · 60 Days ${tip('Homes closed in the last 60 days.')}</div>
             <div class="mi-stat-val">${w60.length}</div>
             <div class="mi-stat-sub">${w60.length?'med $'+Math.round(S.median(w60.filter(l=>l.ppsf).map(l=>l.ppsf))||0)+'/sqft':'—'}</div>
           </div>
@@ -3024,11 +3059,32 @@ function renderMarketIntel(){
             <div class="mi-stat-sub">${w90.length?'med $'+Math.round(S.median(w90.filter(l=>l.ppsf).map(l=>l.ppsf))||0)+'/sqft':'—'}</div>
           </div>
           <div class="mi-stat">
-            <div class="mi-stat-lbl">SP/LP · 90d ${tip('Sale-to-list ratio for the last 90 days only. More current than the full-period ratio — useful for detecting recent market shifts.')}</div>
+            <div class="mi-stat-lbl">SP/LP · 90d ${tip('Sale-to-list ratio for the last 90 days only.')}</div>
             <div class="mi-stat-val">${(()=>{const a=w90.filter(l=>l.sp&&l.lp).map(l=>l.sp/l.lp);return a.length?(S.median(a)*100).toFixed(1)+'%':'—';})()}</div>
             <div class="mi-stat-sub">recent ratio</div>
           </div>
         </div>
+        ${(()=>{
+          // Data diagnostics — always show so user knows exactly what's in the DB
+          const soldWithDate = soldInScope.filter(l=>l.closeDate);
+          const soldNoDate   = soldInScope.filter(l=>!l.closeDate);
+          const latestClose  = soldWithDate.length
+            ? new Date(Math.max(...soldWithDate.map(l=>l.closeDate.getTime())))
+            : null;
+          const daysSinceLatest = latestClose
+            ? Math.round((NOW.getTime()-latestClose.getTime())/(864e5))
+            : null;
+          const warn = !latestClose || daysSinceLatest > 90;
+          return \`<div style="margin-top:9px;padding:8px 10px;background:rgba(\${warn?'238,94,94':'56,198,139'},.06);border:1px solid rgba(\${warn?'238,94,94':'56,198,139'},.2);border-radius:5px;font-size:10.5px;line-height:1.8;color:var(--txt2)">
+            <span style="font-weight:700;color:var(--\${warn?'red':'grn'})">📅 Data diagnostic</span><br>
+            Today: <strong style="color:var(--txt)">\${NOW.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</strong> &nbsp;·&nbsp;
+            Latest closeDate in scope: <strong style="color:var(--txt)">\${latestClose?latestClose.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'None found'}</strong>
+            \${daysSinceLatest!=null?' ('+daysSinceLatest+' days ago)':''}<br>
+            Records with closeDate: <strong style="color:var(--txt)">\${soldWithDate.length}</strong> &nbsp;·&nbsp;
+            Missing closeDate: <strong style="color:\${soldNoDate.length>0?'var(--org)':'var(--txt)'}">\${soldNoDate.length}</strong>
+            \${soldNoDate.length>0?' ← <span style="color:var(--org)">Upload a fresh CSV to fix missing dates</span>':''}
+          </div>\`;
+        })()}
       </div>
 
       <div class="mi-card">
