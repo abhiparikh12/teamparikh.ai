@@ -445,14 +445,12 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
 <!-- WELCOME -->
 <div id="welcome">
   <div class="wl-logo">Team Parikh <em>Valuation Model</em></div>
-  <p class="wl-sub">Appraiser-grade valuations with time-adjusted comps, dynamic method weighting, reconciliation narratives, market diagnostics, and mispricing detection — powered by your MLS export. All analysis runs locally. Data auto-maintains a rolling 3-year window.</p>
+  <p class="wl-sub">Appraiser-grade valuations with time-adjusted comps, dynamic method weighting, reconciliation narratives, market diagnostics, and mispricing detection.</p>
   <div id="wl-loading" style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:40px 0">
     <div style="width:44px;height:44px;border:2px solid rgba(201,168,76,.2);border-top-color:#C9A84C;border-radius:50%;animation:spin .9s linear infinite"></div>
-    <div id="wl-load-msg" style="font-size:14px;color:rgba(221,229,240,.6);letter-spacing:.5px">Connecting to database…</div>
-    <div id="wl-load-sub" style="font-size:11px;color:rgba(160,175,204,.45)">Loading your MLS data</div>
-    <button id="wl-skip-btn" onclick="skipToCache()" style="display:none;margin-top:4px;padding:7px 20px;background:transparent;border:1px solid rgba(201,168,76,.35);border-radius:6px;color:rgba(201,168,76,.7);font-family:var(--ff);font-size:12px;cursor:pointer">
-      Use cached data instead →
-    </button>
+    <div id="wl-load-msg" style="font-size:14px;color:rgba(221,229,240,.6);letter-spacing:.5px">Connecting to database...</div>
+    <div id="wl-load-sub" style="font-size:11px;color:rgba(160,175,204,.45)">Fetching MLS data from the cloud</div>
+    <button id="wl-skip-btn" onclick="useCacheNow()" style="display:none;padding:6px 18px;background:transparent;border:1px solid rgba(201,168,76,.5);border-radius:6px;color:var(--gold);font-family:var(--ff);font-size:12px;cursor:pointer">Use cached data instead</button>
   </div>
   <div class="drop-hero" id="wdrop" style="display:none" onclick="document.getElementById('wfile').click()">
     <div class="dh-icon">📂</div>
@@ -870,26 +868,23 @@ function fromRow(r){
   };
 }
 
-// Fetch ALL listings from Supabase (paginates 1 000 rows at a time)
-// 12-second timeout per page — if Supabase is unreachable, fails fast to cache
-async function fetchFromSupabase(timeoutMs=12000){
-  let all=[], from=0;
-  const PAGE=1000;
+// Fetch ALL listings from Supabase with timeout
+async function fetchFromSupabase(timeoutMs){
+  if(timeoutMs===undefined)timeoutMs=12000;
+  var all=[], from=0, PAGE=1000;
   while(true){
-    const controller=new AbortController();
-    const timer=setTimeout(()=>controller.abort(),timeoutMs);
-    let resp;
+    var controller=new AbortController();
+    var timer=setTimeout(function(){controller.abort();},timeoutMs);
+    var resp;
     try{
-      resp=await fetch(
-        `${SB_URL}/rest/v1/listings?select=*&order=mls_no`,
-        {headers:{...SB_HDR,'Range-Unit':'items','Range':`${from}-${from+PAGE-1}`},
-         signal:controller.signal}
-      );
+      resp=await fetch(SB_URL+'/rest/v1/listings?select=*&order=mls_no',
+        {headers:Object.assign({},SB_HDR,{'Range-Unit':'items','Range':from+'-'+(from+PAGE-1)}),
+         signal:controller.signal});
     }finally{clearTimeout(timer);}
-    if(!resp.ok) throw new Error(`DB fetch failed (${resp.status})`);
-    const rows=await resp.json();
+    if(!resp.ok)throw new Error('DB fetch failed ('+resp.status+')');
+    var rows=await resp.json();
     all=all.concat(rows);
-    if(rows.length<PAGE) break;
+    if(rows.length<PAGE)break;
     from+=PAGE;
   }
   return all.map(fromRow);
@@ -1072,115 +1067,109 @@ function haversine(la1,lo1,la2,lo2){const R=3958.8,r=Math.PI/180,dl=(la2-la1)*r,
 // ═══════════════════════════════════
 // STORAGE
 // ═══════════════════════════════════
-// Loads the local cache into A.listings without hitting Supabase
 function loadFromCache(){
-  try{
-    const r=localStorage.getItem(STORAGE);
-    if(r){
-      A.listings=JSON.parse(r);
-      A.listings.forEach(l=>{
-        if(l.closeDate&&typeof l.closeDate==='string')l.closeDate=new Date(l.closeDate);
-        if(l.listDate&&typeof l.listDate==='string')l.listDate=new Date(l.listDate);
-      });
-    }
-  }catch(e){console.warn('Cache load error:',e);}
-  try{const g=localStorage.getItem(GEO_K);if(g)A.geoCache=JSON.parse(g);}catch(e){}
+  try{var r=localStorage.getItem(STORAGE);if(!r)return;
+    A.listings=JSON.parse(r);
+    A.listings.forEach(function(l){
+      if(l.closeDate&&typeof l.closeDate==='string')l.closeDate=new Date(l.closeDate);
+      if(l.listDate&&typeof l.listDate==='string')l.listDate=new Date(l.listDate);
+    });
+  }catch(ex){console.warn('cache error',ex);}
+  try{var g=localStorage.getItem(GEO_K);if(g)A.geoCache=JSON.parse(g);}catch(ex){}
 }
+function save(){
+  try{localStorage.setItem(STORAGE,JSON.stringify(A.listings.map(function(l){
+    return Object.assign({},l,{closeDate:l.closeDate?l.closeDate.toISOString():null,listDate:l.listDate?l.listDate.toISOString():null});
+  })));}catch(ex){}
+}
+function saveGeo(){try{localStorage.setItem(GEO_K,JSON.stringify(A.geoCache));}catch(ex){}}
 
-// Called when user clicks "Use cached data instead →"
-function skipToCache(){
-  _skipLoad=true; // signal load() to abort its wait
-}
-let _skipLoad=false;
+var _cancelLoad=false;
+function useCacheNow(){_cancelLoad=true;}
 
 async function load(){
-  _skipLoad=false;
-  const wlLoad=el('wl-loading'),wDrop=el('wdrop');
-  const loadMsg=el('wl-load-msg'),loadSub=el('wl-load-sub'),skipBtn=el('wl-skip-btn');
-  if(wlLoad) wlLoad.style.display='flex';
-  if(wDrop)  wDrop.style.display='none';
+  _cancelLoad=false;
+  var wlLoad=el('wl-loading'),wDrop=el('wdrop');
+  var loadMsg=el('wl-load-msg'),loadSub=el('wl-load-sub'),skipBtn=el('wl-skip-btn');
 
-  // Check if local cache exists — if so show skip button after 3 seconds
-  const hasCache=!!localStorage.getItem(STORAGE);
-  const skipTimer=hasCache?setTimeout(()=>{
-    if(skipBtn) skipBtn.style.display='block';
-    if(loadSub) loadSub.textContent='Taking longer than usual — or use your cached data below';
-  },3000):null;
-
-  // Show "skip" option more prominently after 8 seconds
-  const urgentTimer=hasCache?setTimeout(()=>{
-    if(loadMsg) loadMsg.textContent='Still connecting…';
-    if(loadSub) loadSub.textContent='Supabase may be slow. Your cached data is available now.';
-    if(skipBtn){skipBtn.style.borderColor='rgba(201,168,76,.7)';skipBtn.style.color='#C9A84C';}
-  },8000):null;
-
-  // Race: Supabase fetch vs user clicking Skip vs 15s hard timeout
-  try{
-    const supabasePromise=fetchFromSupabase(12000);
-    // Poll _skipLoad flag every 200ms so skip button works
-    const skipPromise=new Promise(resolve=>{
-      const poll=setInterval(()=>{if(_skipLoad){clearInterval(poll);resolve('skip');}},200);
-    });
-    const hardTimeout=new Promise((_,reject)=>setTimeout(()=>reject(new Error('timeout')),15000));
-
-    const result=await Promise.race([
-      supabasePromise.then(r=>({rows:r})),
-      skipPromise.then(()=>({skip:true})),
-      hardTimeout,
-    ]);
-
-    clearTimeout(skipTimer);clearTimeout(urgentTimer);
-
-    if(result.skip){
-      // User clicked skip — use cache
-      loadFromCache();
-      if(wlLoad) wlLoad.style.display='none';
-      if(wDrop)  wDrop.style.display='';
-      setTimeout(()=>toast('Using cached data — cloud sync will resume on next upload','warn'),300);
-    } else if(result.rows){
-      const rows=result.rows;
-      if(rows.length>0){
-        A.listings=rows;
-        if(loadMsg) loadMsg.textContent='Loaded '+rows.length.toLocaleString()+' listings ✓';
-        // Write-through cache
-        try{localStorage.setItem(STORAGE,JSON.stringify(
-          rows.map(l=>({...l,
-            closeDate:l.closeDate?l.closeDate.toISOString():null,
-            listDate:l.listDate?l.listDate.toISOString():null}))
-        ));}catch(e){}
-      } else {
-        // Empty DB — show upload screen
-        if(wlLoad) wlLoad.style.display='none';
-        if(wDrop)  wDrop.style.display='';
-      }
-    }
-  }catch(e){
-    clearTimeout(skipTimer);clearTimeout(urgentTimer);
-    console.warn('Supabase load failed:',e.message);
-    // Fall back to local cache automatically
-    loadFromCache();
-    if(wlLoad) wlLoad.style.display='none';
-    if(wDrop)  wDrop.style.display='';
-    const msg=e.message==='timeout'
-      ?'Database connection timed out — using cached data. Will sync on next upload.'
-      :'Cloud unavailable — showing locally cached data';
-    setTimeout(()=>toast(msg,'warn'),300);
+  // Cache-first: if we have data, show it immediately and sync in background
+  loadFromCache();
+  if(A.listings.length>0){
+    if(wlLoad)wlLoad.style.display='none';
+    if(wDrop)wDrop.style.display='none';
+    setTimeout(function(){syncFromSupabase();},2000);
+    return;
   }
-  try{const g=localStorage.getItem(GEO_K);if(g)A.geoCache=JSON.parse(g);}catch(e){}
+
+  // No cache - wait for Supabase
+  if(wlLoad)wlLoad.style.display='flex';
+  if(wDrop)wDrop.style.display='none';
+
+  var skipTimer=setTimeout(function(){
+    if(_cancelLoad)return;
+    if(skipBtn)skipBtn.style.display='block';
+    if(loadSub)loadSub.textContent='Taking longer than usual. Is your Supabase project active?';
+  },5000);
+  var warnTimer=setTimeout(function(){
+    if(_cancelLoad)return;
+    if(loadMsg)loadMsg.textContent='Still connecting...';
+    if(loadSub)loadSub.textContent='Visit supabase.com to check if your project is paused.';
+  },12000);
+  var hardTimer=setTimeout(function(){
+    if(_cancelLoad)return;
+    _cancelLoad=true;
+    clearTimeout(skipTimer);clearTimeout(warnTimer);
+    loadFromCache();
+    if(wlLoad)wlLoad.style.display='none';
+    if(wDrop&&A.listings.length===0)wDrop.style.display='';
+    setTimeout(function(){
+      toast(A.listings.length?'Using cached data (database timed out)':'Database timed out. Upload a CSV to continue.','warn');
+    },200);
+  },20000);
+
+  // Fetch with cancel check
+  try{
+    var rows=await fetchFromSupabase(15000);
+    clearTimeout(skipTimer);clearTimeout(warnTimer);clearTimeout(hardTimer);
+    if(!_cancelLoad){
+      if(rows.length>0){A.listings=rows;save();}
+      else{if(wDrop)wDrop.style.display='';}
+      if(wlLoad)wlLoad.style.display='none';
+    }
+  }catch(ex){
+    clearTimeout(skipTimer);clearTimeout(warnTimer);clearTimeout(hardTimer);
+    if(!_cancelLoad){
+      loadFromCache();
+      if(wlLoad)wlLoad.style.display='none';
+      if(wDrop&&A.listings.length===0)wDrop.style.display='';
+      var msg=ex.name==='AbortError'||ex.message.indexOf('timeout')>=0
+        ?'Database timed out - check if your project is paused at supabase.com'
+        :'Could not reach database. Upload a CSV to continue.';
+      setTimeout(function(){toast(msg,'warn');},200);
+    }
+  }
+  try{var g=localStorage.getItem(GEO_K);if(g)A.geoCache=JSON.parse(g);}catch(ex){}
 }
-function save(){try{localStorage.setItem(STORAGE,JSON.stringify(A.listings.map(l=>({...l,closeDate:l.closeDate?l.closeDate.toISOString():null,listDate:l.listDate?l.listDate.toISOString():null}))));}catch(e){}}
-function saveGeo(){try{localStorage.setItem(GEO_K,JSON.stringify(A.geoCache));}catch(e){}}
+
+async function syncFromSupabase(){
+  try{
+    var rows=await fetchFromSupabase(12000);
+    if(rows.length>0&&rows.length!==A.listings.length){
+      A.listings=rows;save();
+      updateHeader();rebuildCityTabs();populateIntelCityPills();populateOppCityDropdown();
+    }
+  }catch(ex){console.warn('Sync skipped:',ex.message);}
+}
 
 async function clearAll(){
   if(!confirm('Clear ALL data from the cloud database and local cache?\nThis affects everyone with the link. This cannot be undone.'))return;
-  toast('Deleting from cloud database…','inf');
+  toast('Deleting from cloud...','inf');
   try{
     await deleteAllFromSupabase();
     localStorage.removeItem(STORAGE);localStorage.removeItem(GEO_K);
     A.listings=[];A.geoCache={};A.comps=[];A.excluded.clear();
-    updateHeader();rebuildCityTabs();
-    toast('All data cleared from cloud and local cache','inf');
-  }catch(e){toast('Cloud delete failed: '+e.message,'err');}
+    updateHeader();rebuildCityTabs();toast('All data cleared','inf');
+  }catch(ex){toast('Cloud delete failed: '+ex.message,'err');}
 }
 
 // ═══════════════════════════════════
