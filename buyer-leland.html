@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buyer Advisory — 844 Leland Way, Livermore CA 94550</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0f2540; --gold: #c9963a; --gold-light: #f5e6c8;
+    --red: #b5302a; --red-light: #fdf0ef;
+    --amber: #b5721a; --amber-light: #fef6e4;
+    --green: #1f6b3a; --green-light: #edf7f1;
+    --slate: #f4f5f7; --text: #1a1e2e; --muted: #5c6278;
+    --border: #dde1ea; --white: #ffffff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Source Sans 3', sans-serif; color: var(--text); background: #f0f2f6; font-size: 15px; line-height: 1.7; }
+  .report-header { background: var(--navy); color: white; padding: 48px 60px 40px; position: relative; overflow: hidden; }
+  .report-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gold); }
+  .report-header::after { content: ''; position: absolute; bottom: -60px; right: -60px; width: 200px; height: 200px; border-radius: 50%; border: 40px solid rgba(201,150,58,0.12); }
+  .tag { display: inline-block; background: var(--gold); color: var(--navy); font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 4px 12px; border-radius: 2px; margin-bottom: 16px; }
+  .report-header h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; margin-bottom: 6px; line-height: 1.2; }
+  .report-header .address { font-size: 18px; color: rgba(255,255,255,0.75); margin-bottom: 24px; }
+  .header-meta { display: flex; gap: 32px; flex-wrap: wrap; }
+  .meta-item { font-size: 13px; color: rgba(255,255,255,0.6); }
+  .meta-item strong { display: block; color: rgba(255,255,255,0.9); font-weight: 600; font-size: 14px; }
+  .tab-bar { background: var(--navy); border-top: 1px solid rgba(255,255,255,0.1); display: flex; padding: 0 60px; overflow-x: auto; }
+  .tab-btn { padding: 14px 18px; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.5); cursor: pointer; border: none; background: none; border-bottom: 3px solid transparent; white-space: nowrap; transition: all 0.2s; font-family: 'Source Sans 3', sans-serif; }
+  .tab-btn:hover { color: rgba(255,255,255,0.8); }
+  .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .wrapper { max-width: 980px; margin: 0 auto; padding: 40px 20px 80px; }
+  .exec-summary { background: var(--navy); color: white; border-radius: 8px; padding: 28px 32px; margin-bottom: 36px; border-left: 4px solid var(--gold); }
+  .exec-summary h2 { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--gold); margin-bottom: 12px; }
+  .exec-summary p { font-size: 14px; line-height: 1.75; color: rgba(255,255,255,0.85); }
+  .exec-summary p + p { margin-top: 10px; }
+  .scorecard { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 36px; }
+  .score-card { background: white; border-radius: 8px; padding: 20px 18px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border-top: 3px solid transparent; }
+  .score-card.red { border-top-color: var(--red); }
+  .score-card.amber { border-top-color: var(--amber); }
+  .score-card.green { border-top-color: var(--green); }
+  .score-card .count { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; line-height: 1; margin-bottom: 6px; }
+  .score-card.red .count { color: var(--red); }
+  .score-card.amber .count { color: var(--amber); }
+  .score-card.green .count { color: var(--green); }
+  .score-card .label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+  .section { margin-bottom: 40px; }
+  .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--border); }
+  .section-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .icon-red { background: var(--red-light); }
+  .icon-amber { background: var(--amber-light); }
+  .icon-green { background: var(--green-light); }
+  .icon-navy { background: rgba(15,37,64,0.08); }
+  .section-header h2 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 600; color: var(--navy); }
+  .section-header .subtitle { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .finding-card { background: white; border-radius: 8px; margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); overflow: hidden; border-left: 4px solid var(--border); }
+  .finding-card.critical { border-left-color: var(--red); }
+  .finding-card.caution { border-left-color: var(--amber); }
+  .finding-card.ok { border-left-color: var(--green); }
+  .finding-header { padding: 14px 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; user-select: none; }
+  .finding-header:hover { background: #fafbfd; }
+  .badge { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; white-space: nowrap; }
+  .badge-red { background: var(--red-light); color: var(--red); }
+  .badge-amber { background: var(--amber-light); color: var(--amber); }
+  .badge-green { background: var(--green-light); color: var(--green); }
+  .badge-navy { background: rgba(15,37,64,0.08); color: var(--navy); }
+  .finding-title { font-weight: 600; font-size: 14px; flex: 1; }
+  .finding-body { padding: 0 20px 16px 44px; font-size: 14px; color: var(--muted); line-height: 1.75; display: none; }
+  .finding-body.open { display: block; }
+  .finding-body ul { padding-left: 20px; margin-top: 8px; }
+  .finding-body li { margin-bottom: 4px; }
+  .chevron { font-size: 12px; color: var(--muted); transition: transform 0.2s; }
+  .chevron.open { transform: rotate(90deg); }
+  .action-note { background: var(--gold-light); border-left: 3px solid var(--gold); padding: 10px 14px; border-radius: 4px; margin-top: 12px; font-size: 13px; color: #6b4c14; font-weight: 600; }
+  .buyer-note { background: var(--green-light); border-left: 3px solid var(--green); padding: 10px 14px; border-radius: 4px; margin-top: 12px; font-size: 13px; color: #1f5230; font-weight: 600; }
+  .specs-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 28px; }
+  .spec-item { background: white; border-radius: 6px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+  .spec-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 4px; }
+  .spec-value { font-size: 14px; font-weight: 600; color: var(--text); }
+  .doc-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.05); font-size: 13.5px; }
+  .doc-table th { background: var(--navy); color: white; padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+  .doc-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .doc-table tr:last-child td { border-bottom: none; }
+  .doc-table tr:nth-child(even) td { background: #fafbfd; }
+  .priority-high { color: var(--red); font-weight: 600; }
+  .priority-med { color: var(--amber); font-weight: 600; }
+  .priority-ok { color: var(--green); font-weight: 600; }
+  .age-banner { background: #fff8ed; border: 1px solid #f5d9a0; border-left: 4px solid var(--amber); border-radius: 6px; padding: 16px 20px; margin-bottom: 28px; font-size: 14px; color: #6b4c14; line-height: 1.65; }
+  .info-banner { background: #f0f4fa; border: 1px solid #c5d3e8; border-left: 4px solid var(--navy); border-radius: 6px; padding: 16px 20px; margin-bottom: 28px; font-size: 14px; color: #2a3a52; line-height: 1.65; }
+  .pest-cost-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.05); font-size: 14px; margin-bottom: 24px; }
+  .pest-cost-table th { background: var(--navy); color: white; padding: 10px 16px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .pest-cost-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .pest-cost-table tr:last-child td { border-bottom: none; }
+  .pest-cost-table .cost { font-weight: 700; color: var(--red); white-space: nowrap; }
+  .pest-cost-table .section1 { background: #fdf0ef; }
+  .pest-cost-table .section2 { background: #fef6e4; }
+  .pest-cost-table .fi { background: #f4f5f7; }
+  .total-row td { font-weight: 700; background: var(--slate); }
+  /* COMP */
+  .comp-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; margin-bottom: 32px; }
+  .comp-card { background: white; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
+  .comp-card-header { padding: 14px 18px 10px; border-bottom: 1px solid var(--border); }
+  .comp-address { font-weight: 700; font-size: 15px; color: var(--navy); }
+  .comp-sold-date { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .comp-price { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: var(--navy); margin-top: 6px; }
+  .comp-card-body { padding: 12px 18px 16px; }
+  .comp-stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 10px; }
+  .comp-stat .cs-label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .comp-stat .cs-val { font-weight: 600; font-size: 13px; }
+  .comp-psf { color: var(--amber); }
+  .comp-tag { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; margin-top: 6px; }
+  .comp-tag-green { background: var(--green-light); color: var(--green); }
+  .comp-tag-amber { background: var(--amber-light); color: var(--amber); }
+  .comp-tag-red { background: var(--red-light); color: var(--red); }
+  .comp-tag-navy { background: rgba(15,37,64,0.08); color: var(--navy); }
+  .comp-adjust { font-size: 12.5px; color: var(--muted); margin-top: 10px; line-height: 1.6; }
+  .comp-bar-row { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+  .comp-bar-label { font-size: 12px; color: var(--muted); width: 75px; flex-shrink: 0; }
+  .comp-bar-track { flex: 1; background: #e8ecf3; border-radius: 4px; height: 6px; }
+  .comp-bar-fill { height: 6px; border-radius: 4px; background: var(--gold); }
+  .subject-card { background: var(--navy); color: white; border-radius: 8px; padding: 24px 28px; margin-bottom: 28px; border-left: 4px solid var(--gold); }
+  .subject-card h3 { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 16px; margin-bottom: 12px; }
+  .val-range { display: flex; gap: 16px; margin-top: 14px; flex-wrap: wrap; }
+  .val-box { background: rgba(255,255,255,0.07); border-radius: 6px; padding: 12px 16px; flex: 1; min-width: 140px; }
+  .val-box .vb-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.5); margin-bottom: 4px; }
+  .val-box .vb-val { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: white; }
+  .val-box .vb-sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 3px; }
+  /* TIER BOXES */
+  .tier-box { background: white; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); overflow: hidden; }
+  .tier-header { padding: 14px 20px; font-weight: 700; font-size: 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .tier-header.t-seller { background: #fdf3f3; color: var(--red); border-left: 4px solid var(--red); }
+  .tier-header.t-negotiate { background: #fef9f0; color: var(--amber); border-left: 4px solid var(--amber); }
+  .tier-header.t-buyer { background: #f0f8f4; color: var(--green); border-left: 4px solid var(--green); }
+  .tier-row { display: grid; grid-template-columns: 1fr 130px 160px; gap: 12px; padding: 10px 20px; border-bottom: 1px solid #f3f5f8; font-size: 13.5px; align-items: start; }
+  .tier-row:last-child { border-bottom: none; }
+  .tr-cost { font-weight: 700; color: var(--muted); text-align: right; }
+  .tr-source { font-size: 12px; color: var(--muted); font-style: italic; }
+  .tier-total { display: grid; grid-template-columns: 1fr 130px 160px; gap: 12px; padding: 12px 20px; background: var(--slate); font-weight: 700; font-size: 14px; }
+  .report-footer { background: var(--navy); color: rgba(255,255,255,0.55); text-align: center; padding: 24px 40px; font-size: 12px; line-height: 1.7; }
+  @media (max-width: 700px) {
+    .report-header { padding: 32px 24px 28px; }
+    .tab-bar { padding: 0 12px; }
+    .scorecard { grid-template-columns: repeat(2,1fr); }
+    .specs-grid { grid-template-columns: repeat(2,1fr); }
+    .comp-grid { grid-template-columns: 1fr; }
+    .tier-row, .tier-total { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="report-header">
+  <div style="margin-bottom:20px;">
+    <span style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--gold);letter-spacing:1px;">TEAM PARIKH &nbsp;<span style="color:rgba(255,255,255,0.4);font-weight:300;">|</span>&nbsp; <span style="color:rgba(255,255,255,0.7);font-size:13px;font-weight:400;font-family:'Source Sans 3',sans-serif;">Keller Williams</span></span>
+  </div>
+  <div class="tag">Buyer Advisory Report</div>
+  <h1>Disclosure, Inspection &amp; Market Analysis</h1>
+  <div class="address">844 Leland Way, Livermore, CA 94550 &nbsp;·&nbsp; Sunset West Neighborhood</div>
+  <div class="header-meta">
+    <div class="meta-item"><strong>Prepared</strong>May 20, 2026</div>
+    <div class="meta-item"><strong>Home Inspection</strong>May 8, 2026 — HomeGuard (Perjanik)</div>
+    <div class="meta-item"><strong>Pest Report</strong>May 8, 2026 — HomeGuard (Mejia)</div>
+    <div class="meta-item"><strong>Roof Report</strong>May 9, 2026 — HomeGuard (Robinson)</div>
+    <div class="meta-item"><strong>AVID</strong>April 27, 2026 — Caviness/Compass</div>
+    <div class="meta-item"><strong>Seller</strong>Virginia Kleiner Trust (Non-Occupant)</div>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="showTab('overview')">📋 Overview</button>
+  <button class="tab-btn" onclick="showTab('inspection')">🔍 Home Inspection</button>
+  <button class="tab-btn" onclick="showTab('pest')">🪲 Pest &amp; Roof</button>
+  <button class="tab-btn" onclick="showTab('disclosures')">📄 Disclosures</button>
+  <button class="tab-btn" onclick="showTab('repair')">🛠️ Repair Strategy</button>
+  <button class="tab-btn" onclick="showTab('comps')">📊 Comp Analysis</button>
+  <button class="tab-btn" onclick="showTab('checklist')">✅ Checklist</button>
+</div>
+
+<!-- TAB 1: OVERVIEW -->
+<div id="tab-overview" class="tab-content active">
+<div class="wrapper">
+  <div class="exec-summary">
+    <h2>Executive Summary</h2>
+    <p>This is a <strong>1965-built, 3-bed/2-bath single-story home</strong> in Livermore's established Sunset West neighborhood, offered by the executor of the Virginia Kleiner Trust — a non-occupant who has acknowledged limited personal knowledge of the property's history. Three independent professional reports conducted in May 2026 document a meaningful list of conditions worth understanding as you shape your position in this transaction.</p>
+    <p>The property has genuine appeal: well-located in a walkable neighborhood close to downtown and the ACE train, cosmetically refreshed before listing, no HOA, no solar encumbrance, and clean title. Alongside those positives, the inspections surface several real items — a crawl space that couldn't be accessed due to moisture, an AC system that underperformed at inspection, garage-area water damage classified as Section 1 by the pest inspector, multiple electrical items needing attention, and a 16–20-year-old roof with 10 documented repair needs. This advisory helps you separate what's worth raising with the seller from what comes with the territory of a 61-year-old home and should factor into your offer price instead.</p>
+  </div>
+
+  <div class="scorecard">
+    <div class="score-card red"><div class="count">8</div><div class="label">🔴 Raise with Seller</div></div>
+    <div class="score-card amber"><div class="count">10</div><div class="label">🟡 Buyer Budgets For</div></div>
+    <div class="score-card green"><div class="count">6</div><div class="label">🟢 Clean / No Action</div></div>
+    <div class="score-card red"><div class="count" style="font-size:22px;">$708+</div><div class="label">🔴 Pest Sec. 1 (Conv.)</div></div>
+  </div>
+
+  <div class="age-banner">⚠️ <strong>Calibrate Expectations for a 1965 Home:</strong> Properties of this era commonly contain asbestos-containing materials, aluminum branch wiring, undersized electrical service, and mechanical systems nearing end of life. These are characteristics of this vintage, not defects unique to this address — they belong in your offer price, not entirely in a repair request. The goal of this advisory is to identify where the seller's participation is genuinely warranted, and where you're better served pricing the deferred maintenance into your number.</div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">🏠</div><div><h2>Property Snapshot</h2><div class="subtitle">As documented by HomeGuard and TDS/SPQ disclosures</div></div></div>
+    <div class="specs-grid">
+      <div class="spec-item"><div class="spec-label">Built</div><div class="spec-value">1965 (~61 years old)</div></div>
+      <div class="spec-item"><div class="spec-label">Type</div><div class="spec-value">1-Story SFD / ~1,660 SF</div></div>
+      <div class="spec-item"><div class="spec-label">Foundation</div><div class="spec-value">Poured Concrete + Crawl Space</div></div>
+      <div class="spec-item"><div class="spec-label">Exterior</div><div class="spec-value">Brick Veneer + Stucco</div></div>
+      <div class="spec-item"><div class="spec-label">Roof</div><div class="spec-value">Comp. Shingle — 16–20 yrs, Fair</div></div>
+      <div class="spec-item"><div class="spec-label">Furnace</div><div class="spec-value">Goodman Forced Air Gas — Older</div></div>
+      <div class="spec-item"><div class="spec-label">AC</div><div class="spec-value">Trane Central — Underperforming</div></div>
+      <div class="spec-item"><div class="spec-label">Water Heater</div><div class="spec-value">Gas (Garage) — Age Unknown</div></div>
+      <div class="spec-item"><div class="spec-label">Electrical</div><div class="spec-value">100A Main + 125A Branch (Garage)</div></div>
+      <div class="spec-item"><div class="spec-label">HOA</div><div class="spec-value">None — Fee-Simple</div></div>
+      <div class="spec-item"><div class="spec-label">Solar / PACE</div><div class="spec-value">None — Clean Title</div></div>
+      <div class="spec-item"><div class="spec-label">APN</div><div class="spec-value">099-0304-081 / Alameda County</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-green">🟢</div><div><h2>Positives Worth Noting</h2></div></div>
+    <div class="finding-card ok">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-green">Clean</span><span class="finding-title">No HOA — fee-simple ownership, no dues, no CC&amp;Rs</span></div>
+      <div class="finding-body">No monthly dues, no HOA rules constraining future improvements, no reserve fund shortfalls, and no HOA litigation or special assessments to contend with.</div>
+    </div>
+    <div class="finding-card ok">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-green">Clean</span><span class="finding-title">No active termite infestation — prior treatment documented on property</span></div>
+      <div class="finding-body">The pest inspector found evidence of past subterranean termite activity with a chemical treatment tag in place, but <strong>no present activity</strong>. No current recommendation for active infestation is made. This is a positive indicator of prior professional remediation.</div>
+    </div>
+    <div class="finding-card ok">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-green">Clean</span><span class="finding-title">Clean title — no solar PPA, no PACE lien, no pending lawsuits</span></div>
+      <div class="finding-body">No solar lease or PPA encumbrance, no PACE lien, no transfer fees, no lawsuits, no abatement orders, no zoning violations disclosed. The only shared-responsibility disclosure is a neighboring fence — entirely standard.</div>
+    </div>
+    <div class="finding-card ok">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-green">Clean</span><span class="finding-title">Cosmetic refresh reduces move-in burden</span></div>
+      <div class="finding-body">Interior paint, refinished wood floors, new bathroom vanities, and some light fixtures updated in preparation for listing. This reduces move-in cosmetic work, though the functional items documented by inspectors still need attention.</div>
+    </div>
+    <div class="finding-card ok">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-green">Clean</span><span class="finding-title">Established Sunset West location — walkable, ACE train access, no nuisances disclosed</span></div>
+      <div class="finding-body">Sunset West is a well-established, in-demand south Livermore neighborhood with good school access, walkability to downtown Livermore, and ACE commuter rail access. No neighborhood noise, traffic nuisance, or zoning issues disclosed in either the TDS or SPQ.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- TAB 2: HOME INSPECTION -->
+<div id="tab-inspection" class="tab-content">
+<div class="wrapper">
+  <div class="exec-summary">
+    <h2>Home Inspection — HomeGuard Inc., May 8, 2026</h2>
+    <p>Inspector Anthony Perjanik documented 15 immediate action items and a range of additional maintenance observations. The most significant limitation: the crawl space could not be inspected due to excessive moisture — sub-area structural components, plumbing, and pest conditions beneath the home remain unknown. Findings are organized below by significance and negotiation relevance. The Repair Strategy tab shows how these are split between seller-discussion items and buyer-accepts items.</p>
+  </div>
+
+  <div class="info-banner">ℹ️ <strong>Context:</strong> Many inspection flags are characteristic of a 1965 home and are already reflected in how this property is priced relative to updated neighborhood comps. Items highlighted below as most significant are those involving functional failures, safety concerns, or conditions atypical even for an older home — not routine age-related observations.</div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-red">⚑</div><div><h2>Priority Findings</h2><div class="subtitle">Functional failures, safety items, or conditions meriting discussion with the seller</div></div></div>
+
+    <div class="finding-card critical">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-red">Unknown</span><span class="finding-title">Crawl space inaccessible — excessive moisture, muddy soil</span></div>
+      <div class="finding-body">The crawl space could not be inspected — structural components, plumbing, and any pest conditions beneath the home are entirely unknown. HomeGuard will return at no charge once the area dries. This is the largest unquantified risk in this transaction. It is entirely reasonable to make contingency removal conditional on a completed crawl space inspection, with any resulting Section 1 findings included in the repair discussion.
+        <div class="action-note">It is reasonable to request that contingency removal be conditioned on HomeGuard completing the crawl space further inspection, with any new Section 1 findings addressed as part of the repair agreement.</div>
+      </div>
+    </div>
+
+    <div class="finding-card critical">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-red">Safety</span><span class="finding-title">Uncapped gas line in garage</span></div>
+      <div class="finding-body">An open, uncapped gas line was found in the garage. This is a simple, low-cost safety correction — a licensed plumber can cap the line for roughly $200–$400. It is a clear item to include in a repair request as a pre-close correction.
+        <div class="action-note">A straightforward item to ask the seller to resolve before close.</div>
+      </div>
+    </div>
+
+    <div class="finding-card critical">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-red">Code / Fire</span><span class="finding-title">Garage man door — auto-closer non-functional, pet door breach in fire separation</span></div>
+      <div class="finding-body">The passage door between the garage and living area is required to be self-closing for fire protection and CO prevention. The mechanism does not function, and a pet door cut into the door creates an additional breach in the fire separation. Door replacement is likely the most practical solution — it addresses both issues in one step.
+        <div class="action-note">Including door replacement or repair-to-code in the repair request is well-supported. This is a code-compliance item, not a cosmetic one.</div>
+      </div>
+    </div>
+
+    <div class="finding-card critical">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-red">HVAC</span><span class="finding-title">AC unit producing minimal temperature differential — performance impaired</span></div>
+      <div class="finding-body">The Trane central AC showed only a minimal temperature drop between supply output and ambient air — a standard indicator of a system that needs service or has a more significant failure. The AVID also notes the condenser unit appears worn. An independent HVAC contractor diagnostic is needed to quantify the actual condition and determine whether this is a service call or a replacement situation.
+        <div class="action-note">A reasonable approach is to request the seller share an HVAC contractor's diagnostic on the AC unit. Based on findings, a repair credit or service credit is appropriate — full replacement planning is a buyer capital item.</div>
+      </div>
+    </div>
+
+    <div class="finding-card critical">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-red">HVAC / CO Risk</span><span class="finding-title">Furnace exhaust flue — moisture and corrosion observed</span></div>
+      <div class="finding-body">Moisture and corrosion at the exhaust flue is a legitimate safety concern — a compromised flue can route combustion gases into the living space rather than outside. A licensed HVAC technician needs to evaluate the flue and furnace. The furnace itself (Goodman forced air gas) is operational but older.
+        <div class="action-note">Requesting the seller provide an HVAC contractor's written inspection of the furnace and flue — with results shared — is a proportional and reasonable ask.</div>
+      </div>
+    </div>
+
+    <div class="finding-card critical">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-red">Plumbing</span><span class="finding-title">Master bathroom shower completely inoperable — no water output</span></div>
+      <div class="finding-body">The master bathroom shower has zero water output and cannot be operated. The pest report separately flagged the shower handle as inoperable. A licensed plumber needs to diagnose whether this is a failed valve cartridge or something more involved. A non-functional primary bath shower is a functional deficiency, not routine wear and tear.
+        <div class="action-note">A plumbing repair or equivalent credit is a reasonable, well-supported ask. Obtaining a plumber's estimate during your contingency period will anchor the conversation.</div>
+      </div>
+    </div>
+
+    <div class="finding-card critical">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-red">Plumbing / Safety</span><span class="finding-title">Hall bathroom tub — hot and cold supply reversed</span></div>
+      <div class="finding-body">Hot and cold lines are plumbed backwards at the hall bathroom tub. Beyond inconvenience, this creates a scalding risk when someone reaches instinctively for the cold tap. This is a simple plumber correction at modest cost.
+        <div class="action-note">A reasonable item to ask the seller to correct prior to close.</div>
+      </div>
+    </div>
+
+    <div class="finding-card critical">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-red">Electrical</span><span class="finding-title">Exposed wiring (garage + kitchen sink), non-functional garage GFCI</span></div>
+      <div class="finding-body">Three specific electrical corrections fall outside what can fairly be attributed to home age alone: (1) exposed wiring on garage walls below 7 feet needs conduit enclosure, (2) exposed wiring under the kitchen sink needs conduit enclosure, and (3) the GFCI outlet in the garage failed to trip — requiring circuit investigation and repair. The broader ungrounded-outlet issue throughout the home is a 1965 characteristic that belongs in the offer price, not this list.
+        <div class="action-note">The specific exposed wiring and failed GFCI are well-supported items to include in a repair request. The broader grounding upgrade is appropriately a long-term buyer project.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-amber">🟡</div><div><h2>Buyer Planning Items</h2><div class="subtitle">Real conditions, but appropriately reflected in offer price rather than repair request</div></div></div>
+
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Capital Item</span><span class="finding-title">100A electrical panel — undersized; unlabeled circuits; crowded wiring</span></div>
+      <div class="finding-body">The 100A main service is standard for 1965 but below the 200A modern baseline. Panels are crowded and unlabeled. Several breakers were off for unknown reasons. Panel upgrade to 200A service ($5,000–$10,000) is a capital improvement — plan for it within the first few years, especially if EV charging is on your horizon. Commission an electrician to label circuits and evaluate the scope as an early priority.
+        <div class="buyer-note">Budget: Electrician evaluation $200–$400. Panel upgrade (future): $5,000–$10,000.</div>
+      </div>
+    </div>
+
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Due Diligence</span><span class="finding-title">Asbestos-containing materials — testing required before any renovation</span></div>
+      <div class="finding-body">The inspector flags that 1965 construction likely contains asbestos in ceiling texture, pipe insulation, floor tile, and other materials. This is common to all homes of this era — it is not a defect unique to this property. Testing before any renovation is standard practice.
+        <div class="buyer-note">Budget: CIH testing $400–$800 before first renovation project. Abatement scope varies by material type and extent.</div>
+      </div>
+    </div>
+
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Capital Item</span><span class="finding-title">Aging HVAC — budget for eventual replacement</span></div>
+      <div class="finding-body">Both the Goodman furnace and Trane AC are older units without documented service dates. Even after near-term servicing, full HVAC system replacement should be budgeted within this ownership cycle. Combined replacement cost: $8,000–$15,000.
+        <div class="buyer-note">Budget as a medium-term capital item. Annual maintenance contracts from day one extend service life meaningfully.</div>
+      </div>
+    </div>
+
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Maintenance</span><span class="finding-title">Water heater age unknown; no drip pan or seismic shutoff</span></div>
+      <div class="finding-body">The water heater data plate was inaccessible. Request documentation from the seller. A drip pan and seismic shutoff valve are both absent and should be added early in ownership.
+        <div class="buyer-note">Budget: Drip pan $100–$250, seismic shutoff $300–$600, water heater replacement $800–$1,800 if age confirms &gt;10 years.</div>
+      </div>
+    </div>
+
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Maintenance</span><span class="finding-title">Non-functional disposer; water hammer; loose outlets; attic insulation gaps</span></div>
+      <div class="finding-body">A collection of smaller items: waste disposer non-functional ($100–$400 to replace), water hammer at hall tub supply ($150–$400 for shock absorbers), several loose outlets throughout (general tune-up), and uneven/missing attic insulation. These are buyer-accepts items — not worth including in a repair request.
+        <div class="buyer-note">Address within the first 30–60 days. Combined: ~$600–$1,200.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- TAB 3: PEST & ROOF -->
+<div id="tab-pest" class="tab-content">
+<div class="wrapper">
+  <div class="exec-summary">
+    <h2>Pest (WDO) &amp; Roof Reports — HomeGuard, May 8–9, 2026</h2>
+    <p>The pest report by Eric Mejia (License #FR68502) documents two Section 1 fungus-damage items totaling <strong>$708</strong> — the conventional seller obligation in California. The crawl space remains an open Further Inspection item at no charge. The roof report by Matthew Robinson documents <strong>10 repair items at a combined estimate of $1,135</strong>, including confirmed direct water entry at the chimney shoulder flashing. Both reports are internally consistent with the home inspection findings.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-red">🪲</div><div><h2>Pest Report — Cost Summary</h2></div></div>
+    <table class="pest-cost-table">
+      <tr><th>Item</th><th>Classification</th><th>Description</th><th>HomeGuard Bid</th></tr>
+      <tr class="section1"><td><strong>1A</strong></td><td><strong style="color:var(--red);">SECTION 1</strong></td><td>Garage overhead door jambs — fungus damaged from weather exposure. Cut off bottom of jamb(s) and fill void.</td><td class="cost">$156</td></tr>
+      <tr class="section1"><td><strong>1B</strong></td><td><strong style="color:var(--red);">SECTION 1</strong></td><td>Garage man door right jamb — fungus damaged. Remove and replace jamb.</td><td class="cost">$552</td></tr>
+      <tr class="total-row"><td colspan="3"><strong>Section 1 Total — California Convention: Seller's Responsibility</strong></td><td class="cost">$708</td></tr>
+      <tr class="section2"><td><strong>2A</strong></td><td><span style="color:var(--amber);font-weight:600;">SECTION 2</span></td><td>Kitchen tile countertop — loose/missing grout, cracked tiles. Reseal and maintain.</td><td class="cost">$345</td></tr>
+      <tr class="section2"><td><strong>2B</strong></td><td><span style="color:var(--amber);font-weight:600;">SECTION 2</span></td><td>Under-sink cabinet shelf — deteriorated/delaminated. Remove and replace.</td><td class="cost">$974</td></tr>
+      <tr class="section2"><td><strong>2C</strong></td><td><span style="color:var(--amber);font-weight:600;">SECTION 2</span></td><td>Bath windows lower than shower head — moisture intrusion risk. Keep well sealed; consider waterproof curtain.</td><td class="cost">Owner/Maintain</td></tr>
+      <tr class="section2"><td><strong>2D</strong></td><td><span style="color:var(--amber);font-weight:600;">SECTION 2</span></td><td>Master bath shower handle inoperable. Have appropriate tradesperson repair.</td><td class="cost">Other Trades</td></tr>
+      <tr class="section2"><td><strong>2E</strong></td><td><span style="color:var(--amber);font-weight:600;">SECTION 2</span></td><td>Hall bath — gap between tub spout and wall covering. Secure and seal.</td><td class="cost">$52</td></tr>
+      <tr class="section2"><td><strong>2F</strong></td><td><span style="color:var(--amber);font-weight:600;">SECTION 2</span></td><td>Water stains at roof — potential roof leakage. Roof inspection needed. (See Roof section below.)</td><td class="cost">Other Trades</td></tr>
+      <tr class="fi"><td><strong>3A</strong></td><td><span style="color:var(--muted);font-weight:600;">FURTHER INSP.</span></td><td>Crawl space — excessive moisture/muddy soil. HomeGuard will return at no charge once dry.</td><td class="cost">Will Bid</td></tr>
+    </table>
+    <div class="info-banner" style="margin-top:16px;">ℹ️ Section 2 items are not a conventional seller obligation, but a combined credit covering 2A + 2B ($1,319) can reasonably be folded into the overall repair discussion without overloading the request. Don't list all Section 2 items individually — that reads as nickel-and-diming. Pick the material ones.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-amber">🏚️</div><div><h2>Roof Report — 10 Deficiencies / $1,135 Repair Bid</h2></div></div>
+    <table class="doc-table">
+      <tr><th>#</th><th>Finding</th><th>Priority</th></tr>
+      <tr><td><strong>1</strong></td><td>Exposed fasteners in field — seal with caulking/mastic</td><td class="priority-med">Moderate</td></tr>
+      <tr><td><strong>2</strong></td><td>Fasteners working through shingles — secure and seal</td><td class="priority-med">Moderate</td></tr>
+      <tr><td><strong>3</strong></td><td>Lifted sheathing boards over garage — remove, secure, reinstall shingles</td><td class="priority-high">High — structural</td></tr>
+      <tr><td><strong>4</strong></td><td>Pipe and attic vent flashings not properly integrated — re-flash</td><td class="priority-high">High — water pathway</td></tr>
+      <tr><td><strong>5</strong></td><td>Prior ridge intersection repairs deteriorated — redo</td><td class="priority-high">High — prior repair failure</td></tr>
+      <tr><td><strong>6</strong></td><td>Chimney counter flashing — needs sealing</td><td class="priority-high">High — water entry</td></tr>
+      <tr><td><strong>7</strong></td><td>Chimney shoulder flashing — <em>cracked solder joints allowing direct water entry</em></td><td class="priority-high">High — confirmed entry</td></tr>
+      <tr><td><strong>8</strong></td><td>Vent flashing pulling up from roof surface — re-secure</td><td class="priority-high">High</td></tr>
+      <tr><td><strong>9</strong></td><td>Damaged ridge caps — replace/repair</td><td class="priority-med">Moderate</td></tr>
+      <tr><td><strong>10</strong></td><td>Damaged field shingles — replace/repair</td><td class="priority-med">Moderate</td></tr>
+    </table>
+    <div class="age-banner" style="margin-top:16px;">⚠️ <strong>Roof Life Planning:</strong> Items 6 and 7 — chimney flashing failures — correlate directly with water stains observed in the attic/garage during the home inspection and water stains flagged by the pest report (2F). These are the same moisture pathway documented by three independent sources. Once the 10 repair items are completed, the system may have 10–15 more years of useful life, but <strong>significant granule loss</strong> (item 11, not bid) indicates the clock is running. Budget a full roof replacement ($12,000–$20,000) within a 5–10 year horizon.</div>
+  </div>
+</div>
+</div>
+
+<!-- TAB 4: DISCLOSURES -->
+<div id="tab-disclosures" class="tab-content">
+<div class="wrapper">
+  <div class="exec-summary">
+    <h2>Disclosure Review — TDS, SPQ &amp; AVID</h2>
+    <p>The seller completed the TDS and SPQ on March 17, 2026. The AVID was completed by listing agent Brett Caviness on April 27, 2026. The central disclosure theme: the seller is the executor of the Virginia Kleiner Trust and explicitly states the home was not personally occupied — nearly all "No" answers in the SPQ reflect absence of knowledge, not confirmed absence of conditions. Treat the professional inspections as your primary evidence of property condition.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-amber">📋</div><div><h2>Key Observations from Disclosure Documents</h2></div></div>
+
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Knowledge Gap</span><span class="finding-title">Non-occupant executor — "No" answers reflect limited awareness, not confirmed absence</span></div>
+      <div class="finding-body">The SPQ answers "No" to water intrusion, mold/fungus, and system defects — yet the inspections documented all three. This doesn't necessarily indicate misrepresentation; it most likely reflects genuine lack of awareness by a non-occupant trustee. The practical implication: you cannot rely on the SPQ for comfort on condition. Let the inspection reports and your own investigation be the guide.</div>
+    </div>
+
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">TDS</span><span class="finding-title">Water repair/replacement disclosed — inspected by city, but scope not detailed</span></div>
+      <div class="finding-body">The SPQ discloses: <em>"Water repair/replacement. Inspected by the city."</em> No further detail on what system, when, or what prompted it. Request all available documentation, permits, and city inspection records.
+        <div class="action-note">Request the permit number and scope description for the water repair before contingency removal. Pull Alameda County building permits for APN 099-0304-081.</div>
+      </div>
+    </div>
+
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">TDS</span><span class="finding-title">Sprinkler system — installed but operational status uncertain</span></div>
+      <div class="finding-body">The TDS checks sprinklers present but notes: "Installed but not sure about workability." The SPQ confirms the backyard has no sprinkler coverage. Test the system during your contingency period — a non-functional irrigation system affects both landscaping and the expansive soil management that's particularly relevant in Livermore's climate.</div>
+    </div>
+
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">AVID</span><span class="finding-title">Pre-listing refresh — cosmetic work may mask underlying surface conditions</span></div>
+      <div class="finding-body">The AVID addendum discloses: <em>"May be some holes in walls when accessories are removed, some scratches on floors and may be discoloration or additional/new wear under rugs and furnishings once removed."</em> This is candid and worth taking at face value — price for what's underneath the staging, not just what's visible during showing.</div>
+    </div>
+
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">AVID</span><span class="finding-title">Agent advises independent verification of permits, heritage trees, and parking</span></div>
+      <div class="finding-body">The listing agent's own addendum advises buyers to verify: city/county codes, heritage tree ordinance status, historic district designation, and overnight parking restrictions on Leland Way. The AVID notes "some areas of plantings and trees look to be leaning" — check with City of Livermore Planning whether any trees are protected.
+        <div class="action-note">Contact City of Livermore Planning &amp; Community Development: (925) 960-4400. Confirm heritage tree and parking status for Leland Way.</div>
+      </div>
+    </div>
+
+    <div class="finding-card ok">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-green">Positive</span><span class="finding-title">No liens, lawsuits, abatement orders, or governmental actions disclosed</span></div>
+      <div class="finding-body">Both TDS and SPQ confirm: no pending lawsuits, no PACE lien, no solar PPA, no HOA authority, no shared common interest development, no encroachments, no fill soil issues, no flood/drainage/settling problems disclosed, no zoning violations, no historic district designation. The only TDS C.2 item is a shared fence — standard.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- TAB 5: REPAIR STRATEGY -->
+<div id="tab-repair" class="tab-content">
+<div class="wrapper">
+  <div class="exec-summary">
+    <h2>Repair Request Framework</h2>
+    <p>A well-calibrated repair request focuses on <strong>material, functional, or safety items</strong> where seller participation is both reasonable and realistic — not a wholesale transfer of every inspection finding. The framework below separates what's worth raising with the seller from what belongs in the buyer's court. A focused, proportional request is far more effective than a comprehensive list that reads as an attempt to re-price the deal through the back door. The listing agent on the other side needs to be able to present this to their client as reasonable — that's how repairs actually get done.</p>
+  </div>
+
+  <div class="tier-box">
+    <div class="tier-header t-seller">🔴 Tier 1 — Reasonable to Ask Seller to Address Before Close</div>
+    <div class="tier-body">
+      <div class="tier-row"><div>Pest Section 1 — fungus-damaged garage door jambs (1A + 1B)</div><div class="tr-cost">~$708</div><div class="tr-source">California convention — seller's obligation</div></div>
+      <div class="tier-row"><div>All 10 Roof repair items — including active chimney flashing water entry</div><div class="tr-cost">~$1,135</div><div class="tr-source">Active water entry into structure; well-documented</div></div>
+      <div class="tier-row"><div>Cap uncapped gas line in garage (licensed plumber)</div><div class="tr-cost">~$200–$400</div><div class="tr-source">Simple safety correction; not age-related</div></div>
+      <div class="tier-row"><div>Restore garage man door fire separation — replace door or repair auto-closer and remove pet door breach</div><div class="tr-cost">~$400–$800</div><div class="tr-source">Code-compliance item; functional, not cosmetic</div></div>
+      <div class="tier-row"><div>Correct reversed hot/cold supply at hall bathroom tub</div><div class="tr-cost">~$200–$400</div><div class="tr-source">Safety item — scalding risk, simple plumber fix</div></div>
+      <div class="tier-row"><div>Encase exposed wiring in garage and under kitchen sink in conduit</div><div class="tr-cost">~$300–$600</div><div class="tr-source">Code item independent of home age</div></div>
+      <div class="tier-row"><div>Repair non-functional GFCI outlet in garage</div><div class="tr-cost">~$100–$200</div><div class="tr-source">Required GFCI protection location — clear deficiency</div></div>
+    </div>
+    <div class="tier-total"><div>Estimated Tier 1 Total</div><div style="color:var(--red);">~$3,000–$4,200</div><div class="tr-source" style="font-style:normal;">Or equivalent credit at closing</div></div>
+  </div>
+
+  <div class="tier-box">
+    <div class="tier-header t-negotiate">🟡 Tier 2 — Support a Credit or Price Discussion (Not Line-Item Repair Requests)</div>
+    <div class="tier-body">
+      <div class="tier-row"><div>Master bathroom shower — plumber diagnosis and repair (functional failure)</div><div class="tr-cost">~$500–$1,500</div><div class="tr-source">Non-functional primary bath shower; not cosmetic</div></div>
+      <div class="tier-row"><div>AC system — request seller share HVAC diagnostic report; negotiate from findings</div><div class="tr-cost">Credit TBD</div><div class="tr-source">Minimal temp differential at inspection; need diagnosis</div></div>
+      <div class="tier-row"><div>Furnace flue — request HVAC inspection results or small service credit</div><div class="tr-cost">~$150–$300</div><div class="tr-source">Corrosion/moisture at exhaust flue</div></div>
+      <div class="tier-row"><div>Pest Section 2 — partial credit for items 2A ($345) and 2B ($974)</div><div class="tr-cost">~$1,319</div><div class="tr-source">Not strictly seller obligation but reasonable to include</div></div>
+      <div class="tier-row"><div>Crawl space — contingency removal conditioned on completed further inspection; any new Section 1 findings addressed</div><div class="tr-cost">Unknown</div><div class="tr-source">Largest unknown; non-negotiable as a contingency condition</div></div>
+    </div>
+    <div class="tier-total"><div>Tier 2 Combined Range</div><div style="color:var(--amber);">~$2,000–$3,500+</div><div class="tr-source" style="font-style:normal;">Best addressed as combined closing credit</div></div>
+  </div>
+
+  <div class="tier-box">
+    <div class="tier-header t-buyer">🟢 Tier 3 — Buyer Accepts / Prices Into Offer — Not Part of Repair Discussion</div>
+    <div class="tier-body">
+      <div class="tier-row"><div>General cosmetic wear — scuffs, marks, floors, baseboards</div><div class="tr-cost">—</div><div class="tr-source">Normal wear; already reflected in pricing vs. updated comps</div></div>
+      <div class="tier-row"><div>Ungrounded 3-prong outlets throughout — grounding/rewiring upgrade</div><div class="tr-cost">$3,000–$8,000</div><div class="tr-source">1965 construction characteristic — buyer capital project</div></div>
+      <div class="tier-row"><div>100A panel upgrade to 200A service</div><div class="tr-cost">$5,000–$10,000</div><div class="tr-source">Capital improvement; plan for it, don't request it</div></div>
+      <div class="tier-row"><div>Waste disposer replacement, water hammer shock absorbers, loose outlet tightening</div><div class="tr-cost">~$500–$1,000</div><div class="tr-source">Minor items; not worth including in seller discussion</div></div>
+      <div class="tier-row"><div>Attic insulation, crawl space screens, chimney cleaning, downspout extensions</div><div class="tr-cost">~$800–$2,200</div><div class="tr-source">Routine deferred maintenance; buyer's first-year tasks</div></div>
+      <div class="tier-row"><div>Asbestos testing, seismic gas shutoff, drip pan</div><div class="tr-cost">~$700–$1,400</div><div class="tr-source">Standard buyer move-in tasks for a 1965 home</div></div>
+      <div class="tier-row"><div>HVAC replacement, water heater, eventual roof replacement</div><div class="tr-cost">$15,000–$35,000</div><div class="tr-source">Long-term capital items — fold into offer price, not repair list</div></div>
+    </div>
+  </div>
+
+  <div class="exec-summary" style="background:#1a2f4a;border-left-color:#e0a840;margin-top:28px;">
+    <h2 style="color:#f5c842;">The Right Posture</h2>
+    <p>A focused Tier 1 request — the Section 1 pest items, all 10 roof repairs, the gas cap, the garage door, the reversed plumbing, the exposed wiring, and the GFCI — is clean, well-documented, and defensible. These have clear professional findings behind them and finite, reasonable costs. A listing agent can present this package to their seller without difficulty. Tier 2 items are best addressed through a combined closing credit that acknowledges the HVAC uncertainty and the crawl space unknown — asking the seller to manage contractors for complex diagnostic work is rarely practical in escrow and creates friction without resolution. Tier 3 items belong in the offer price relative to updated neighborhood comps. The long-term capital exposure — electrical upgrade, HVAC replacement, eventual roof — is precisely why this home should clear well below the modernized 469 Ontario Dr benchmark ($1,465,000 / $873/SF) and instead anchor closer to the primary 3/2 comp at 555 Ontario Dr ($1,350,000 / $811/SF), <em>less</em> a deferred-maintenance discount of $95,000–$200,000. That math defines the as-is offer band of <strong>~$1,150,000–$1,250,000</strong>.</p>
+  </div>
+</div>
+</div>
+
+<!-- TAB 6: COMP ANALYSIS -->
+<div id="tab-comps" class="tab-content">
+<div class="wrapper">
+  <div class="exec-summary">
+    <h2>Comparable Sales Analysis — Sunset West / 94550</h2>
+    <p>The subject property is at 844 Leland Way in Livermore's Sunset West neighborhood — a mid-century single-family enclave on the south side of Livermore. No closed sale on Leland Way itself surfaces in the Jan 2024–May 2026 MLS window. The analysis below draws from the closest available sales by configuration (3-bed/2-bath), square footage (within ±70 SF of the subject's 1,660 SF), lot size (within ±1,000 SF of the ~6,000 SF subject lot), and vintage (1960–1972). All comps are pulled from BridgeMLS / Bay East AOR records and reflect closed transactions within the last 4 months unless otherwise noted.</p>
+    <p style="margin-top:10px;"><strong>Material market shift since prior cycle:</strong> The Jan–April 2026 sales pattern shows a meaningfully stronger market than the Aug 2025 / Nov 2024 reference points used in earlier drafts of this analysis. Closed 3/2 sales of similar size are now clearing in the $740–$815/SF band, vs. $700–$715/SF in late 2024 / mid-2025. This appreciation has been incorporated into the value ranges shown above.</p>
+  </div>
+
+  <div class="subject-card">
+    <h3>Subject — 844 Leland Way</h3>
+    <div style="font-size:14px;color:rgba(255,255,255,0.82);line-height:1.85;">
+      <strong>3 bed / 2 bath / 1,660 SF &nbsp;·&nbsp; Built 1965 &nbsp;·&nbsp; Single-Story, Brick + Stucco</strong><br>
+      Condition: <strong>Fair-Average</strong> — Cosmetically refreshed (paint, floors, vanities). Deferred maintenance: aging/underperforming HVAC, 10-item roof repair list, Section 1 pest damage, inaccessible crawl space, multiple electrical items, inoperable master shower<br>
+      No HOA · No Solar/PACE · APN 099-0304-081
+    </div>
+    <div class="val-range">
+      <div class="val-box">
+        <div class="vb-label">As-Is Value Range</div>
+        <div class="vb-val">$1.15M–$1.25M</div>
+        <div class="vb-sub">~$693–$753/SF · Pre-repair, adjusted for deferred maintenance</div>
+      </div>
+      <div class="val-box">
+        <div class="vb-label">Post-Repair Range</div>
+        <div class="vb-val">$1.23M–$1.30M</div>
+        <div class="vb-sub">~$741–$783/SF · After Tier 1 + 2 items resolved</div>
+      </div>
+      <div class="val-box">
+        <div class="vb-label">Updated Ceiling</div>
+        <div class="vb-val">$1.35M–$1.45M</div>
+        <div class="vb-sub">~$813–$873/SF · Fully modernized benchmark (see 469 Ontario)</div>
+      </div>
+    </div>
+    <p style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.4);">Opinion-of-value estimates based on closed MLS comparable sales (Jan–May 2026) and condition adjustments. Not a formal appraisal — supplements offer-strategy analysis.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">📌</div><div><h2>Recent Comparable Sales</h2><div class="subtitle">Jan–May 2026 closings · Sunset West &amp; immediate-vicinity 94550 · Source: BridgeMLS / Bay East AOR</div></div></div>
+  </div>
+
+  <div class="comp-grid">
+
+    <div class="comp-card">
+      <div class="comp-card-header">
+        <div class="comp-address">555 Ontario Dr, Livermore</div>
+        <div class="comp-sold-date">Sold: April 9, 2026 &nbsp;·&nbsp; Sunset / Sunset West border</div>
+        <div class="comp-price">$1,350,000</div>
+      </div>
+      <div class="comp-card-body">
+        <div class="comp-stats">
+          <div class="comp-stat"><div class="cs-label">Beds/Baths</div><div class="cs-val">3 / 2</div></div>
+          <div class="comp-stat"><div class="cs-label">Size</div><div class="cs-val">1,665 SF</div></div>
+          <div class="comp-stat"><div class="cs-label">Lot</div><div class="cs-val">6,786 SF</div></div>
+          <div class="comp-stat"><div class="cs-label">$/SF</div><div class="cs-val comp-psf">$811/SF</div></div>
+          <div class="comp-stat"><div class="cs-label">Built</div><div class="cs-val">1966</div></div>
+        </div>
+        <div class="comp-bar-row"><div class="comp-bar-label">Size vs. Subj.</div><div class="comp-bar-track"><div class="comp-bar-fill" style="width:100%"></div></div><span style="font-size:12px;color:var(--muted);">+5 SF</span></div>
+        <span class="comp-tag comp-tag-green">Primary Anchor — Closest Match</span>
+        <p class="comp-adjust"><strong>Strongest direct comp in the dataset.</strong> Same configuration (3/2), near-identical square footage (+5 SF), same era (1966 vs. 1965), similar lot (+786 SF), same broad neighborhood, closed within the last 6 weeks. Applied directly to subject 1,660 SF, the $811/SF rate implies <strong>~$1,346,000 at comparable condition</strong>. Subject deferred maintenance (HVAC, roof, electrical service capacity, crawl space risk, Section 1 pest, plumbing items) warrants a downward condition adjustment of <strong>$95,000–$200,000</strong>, implying a subject as-is value of <strong>~$1,150,000–$1,250,000</strong>. This is the primary value anchor.</p>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-header">
+        <div class="comp-address">343 Anna Maria St, Livermore</div>
+        <div class="comp-sold-date">Sold: January 23, 2026 &nbsp;·&nbsp; Livermore (non-Sunset West)</div>
+        <div class="comp-price">$1,200,000</div>
+      </div>
+      <div class="comp-card-body">
+        <div class="comp-stats">
+          <div class="comp-stat"><div class="cs-label">Beds/Baths</div><div class="cs-val">3 / 2</div></div>
+          <div class="comp-stat"><div class="cs-label">Size</div><div class="cs-val">1,683 SF</div></div>
+          <div class="comp-stat"><div class="cs-label">Lot</div><div class="cs-val">6,500 SF</div></div>
+          <div class="comp-stat"><div class="cs-label">$/SF</div><div class="cs-val comp-psf">$713/SF</div></div>
+          <div class="comp-stat"><div class="cs-label">Built</div><div class="cs-val">1966</div></div>
+        </div>
+        <div class="comp-bar-row"><div class="comp-bar-label">Size vs. Subj.</div><div class="comp-bar-track"><div class="comp-bar-fill" style="width:101%"></div></div><span style="font-size:12px;color:var(--muted);">+23 SF</span></div>
+        <span class="comp-tag comp-tag-amber">Secondary — Average-Condition Indicator</span>
+        <p class="comp-adjust"><strong>Same configuration, near-identical size, same vintage</strong> — but in a less-premium pocket of north Livermore (not Sunset West). The $713/SF likely reflects an average-condition home outside the Sunset West premium zone. Applying a +$50,000–$100,000 neighborhood adjustment for Sunset West desirability (south-side proximity to downtown / ACE / better-rated micro-area) implies an <strong>average-condition value for subject of ~$1,235,000–$1,285,000</strong>. After downward condition adjustment for deferred maintenance: <strong>~$1,085,000–$1,185,000</strong>. Brackets the lower end of the primary anchor.</p>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-header">
+        <div class="comp-address">1307 Belfast Ct, Livermore</div>
+        <div class="comp-sold-date">Sold: January 13, 2026 &nbsp;·&nbsp; Sunset East</div>
+        <div class="comp-price">$1,280,000</div>
+      </div>
+      <div class="comp-card-body">
+        <div class="comp-stats">
+          <div class="comp-stat"><div class="cs-label">Beds/Baths</div><div class="cs-val">3 / 2</div></div>
+          <div class="comp-stat"><div class="cs-label">Size</div><div class="cs-val">1,728 SF</div></div>
+          <div class="comp-stat"><div class="cs-label">Lot</div><div class="cs-val">7,414 SF</div></div>
+          <div class="comp-stat"><div class="cs-label">$/SF</div><div class="cs-val comp-psf">$741/SF</div></div>
+          <div class="comp-stat"><div class="cs-label">Built</div><div class="cs-val">1970</div></div>
+        </div>
+        <div class="comp-bar-row"><div class="comp-bar-label">Size vs. Subj.</div><div class="comp-bar-track"><div class="comp-bar-fill" style="width:104%"></div></div><span style="font-size:12px;color:var(--muted);">+68 SF</span></div>
+        <span class="comp-tag comp-tag-amber">Secondary — Adjacent Neighborhood</span>
+        <p class="comp-adjust"><strong>Same configuration, slightly larger</strong> — Sunset East is the neighborhood immediately east of subject, with comparable demographics and demand. 5 years newer construction (1970 vs. 1965). At $741/SF applied to subject 1,660 SF: $1,230,060 — reduced minimally for size scaling and 5-year age difference: <strong>~$1,200,000–$1,235,000 at comparable condition</strong>. Subtract deferred-maintenance discount: <strong>~$1,050,000–$1,135,000 as-is</strong>. Reinforces the lower bracket established by Anna Maria.</p>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-header">
+        <div class="comp-address">1030 Via Madrid, Livermore</div>
+        <div class="comp-sold-date">Sold: March 3, 2026 &nbsp;·&nbsp; Sunset West</div>
+        <div class="comp-price">$1,225,000</div>
+      </div>
+      <div class="comp-card-body">
+        <div class="comp-stats">
+          <div class="comp-stat"><div class="cs-label">Beds/Baths</div><div class="cs-val">4 / 2.5</div></div>
+          <div class="comp-stat"><div class="cs-label">Size</div><div class="cs-val">1,643 SF</div></div>
+          <div class="comp-stat"><div class="cs-label">Lot</div><div class="cs-val">6,200 SF</div></div>
+          <div class="comp-stat"><div class="cs-label">$/SF</div><div class="cs-val comp-psf">$746/SF</div></div>
+          <div class="comp-stat"><div class="cs-label">Built</div><div class="cs-val">1960</div></div>
+        </div>
+        <div class="comp-bar-row"><div class="comp-bar-label">Size vs. Subj.</div><div class="comp-bar-track"><div class="comp-bar-fill" style="width:99%"></div></div><span style="font-size:12px;color:var(--muted);">−17 SF</span></div>
+        <span class="comp-tag comp-tag-navy">Same Neighborhood — Different Config</span>
+        <p class="comp-adjust"><strong>Same neighborhood (Sunset West), near-identical SF and lot</strong>, but 4-bed / 2.5-bath vs. subject 3/2. Extra bedroom and half-bath typically add $20,000–$35,000 in this market. Adjusting downward for config: <strong>net-equivalent 3/2 value at Via Madrid's condition ~$1,190,000–$1,205,000</strong> — applied to subject SF: <strong>~$1,200,000–$1,220,000 at comparable condition</strong>. Subtract deferred-maintenance discount: <strong>~$1,050,000–$1,120,000 as-is</strong>. Lower-mid bracket; useful as a Sunset West condition reference for a property roughly five years older than subject.</p>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-header">
+        <div class="comp-address">637 Caliente Ave, Livermore</div>
+        <div class="comp-sold-date">Sold: April 22, 2026 &nbsp;·&nbsp; Sunset West</div>
+        <div class="comp-price">$1,350,000</div>
+      </div>
+      <div class="comp-card-body">
+        <div class="comp-stats">
+          <div class="comp-stat"><div class="cs-label">Beds/Baths</div><div class="cs-val">4 / 2</div></div>
+          <div class="comp-stat"><div class="cs-label">Size</div><div class="cs-val">1,696 SF</div></div>
+          <div class="comp-stat"><div class="cs-label">Lot</div><div class="cs-val">6,098 SF</div></div>
+          <div class="comp-stat"><div class="cs-label">$/SF</div><div class="cs-val comp-psf">$796/SF</div></div>
+          <div class="comp-stat"><div class="cs-label">Built</div><div class="cs-val">1964</div></div>
+        </div>
+        <div class="comp-bar-row"><div class="comp-bar-label">Size vs. Subj.</div><div class="comp-bar-track"><div class="comp-bar-fill" style="width:102%"></div></div><span style="font-size:12px;color:var(--muted);">+36 SF</span></div>
+        <span class="comp-tag comp-tag-green">Same Neighborhood — Strong Confirmation</span>
+        <p class="comp-adjust"><strong>Same neighborhood (Sunset West), very close on SF / lot / vintage</strong> — closed within the last 4 weeks. 4-bed instead of 3-bed (adjust down $15,000–$25,000 for extra bedroom value). Net-equivalent 3-bed value: <strong>~$1,325,000–$1,335,000</strong> applied to subject SF: <strong>~$1,295,000–$1,305,000 at comparable condition</strong>. Subtract deferred-maintenance discount: <strong>~$1,135,000–$1,210,000 as-is</strong>. Strongly corroborates the primary anchor at 555 Ontario.</p>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-header">
+        <div class="comp-address">469 Ontario Dr, Livermore</div>
+        <div class="comp-sold-date">Sold: April 6, 2026 &nbsp;·&nbsp; Sunset West</div>
+        <div class="comp-price">$1,465,000</div>
+      </div>
+      <div class="comp-card-body">
+        <div class="comp-stats">
+          <div class="comp-stat"><div class="cs-label">Beds/Baths</div><div class="cs-val">4 / 2</div></div>
+          <div class="comp-stat"><div class="cs-label">Size</div><div class="cs-val">1,679 SF</div></div>
+          <div class="comp-stat"><div class="cs-label">Lot</div><div class="cs-val">6,000 SF</div></div>
+          <div class="comp-stat"><div class="cs-label">$/SF</div><div class="cs-val comp-psf">$873/SF</div></div>
+          <div class="comp-stat"><div class="cs-label">Built</div><div class="cs-val">1966</div></div>
+        </div>
+        <div class="comp-bar-row"><div class="comp-bar-label">Size vs. Subj.</div><div class="comp-bar-track"><div class="comp-bar-fill" style="width:101%"></div></div><span style="font-size:12px;color:var(--muted);">+19 SF</span></div>
+        <span class="comp-tag comp-tag-red">Updated Ceiling Indicator</span>
+        <p class="comp-adjust"><strong>Same neighborhood (Sunset West), identical lot size, very close SF</strong>, sold for $115,000 more than 637 Caliente two weeks earlier despite near-identical size — the $873/SF rate is the highest in the dataset and indicates this home was substantially modernized (likely full kitchen / bath / HVAC / electrical updates). Applied to subject SF: $873 × 1,660 = <strong>$1,449,000 as the fully-modernized ceiling for a 4-bed Leland Way equivalent</strong>. For 3-bed subject post-major-renovation: <strong>~$1,350,000–$1,425,000</strong>. Defines the upper bound — useful for understanding what's possible if subject is eventually renovated, but not directly applicable to current as-is value.</p>
+      </div>
+    </div>
+
+    <div class="comp-card">
+      <div class="comp-card-header">
+        <div class="comp-address">1133 Coronado Way, Livermore</div>
+        <div class="comp-sold-date">Sold: February 18, 2026 &nbsp;·&nbsp; Sunset West</div>
+        <div class="comp-price">$1,080,000</div>
+      </div>
+      <div class="comp-card-body">
+        <div class="comp-stats">
+          <div class="comp-stat"><div class="cs-label">Beds/Baths</div><div class="cs-val">4 / 2</div></div>
+          <div class="comp-stat"><div class="cs-label">Size</div><div class="cs-val">1,516 SF</div></div>
+          <div class="comp-stat"><div class="cs-label">Lot</div><div class="cs-val">6,914 SF</div></div>
+          <div class="comp-stat"><div class="cs-label">$/SF</div><div class="cs-val comp-psf">$712/SF</div></div>
+          <div class="comp-stat"><div class="cs-label">Built</div><div class="cs-val">1960</div></div>
+        </div>
+        <div class="comp-bar-row"><div class="comp-bar-label">Size vs. Subj.</div><div class="comp-bar-track"><div class="comp-bar-fill" style="width:91%"></div></div><span style="font-size:12px;color:var(--muted);">−144 SF</span></div>
+        <span class="comp-tag comp-tag-navy">Same Neighborhood — Lower-Condition Floor</span>
+        <p class="comp-adjust"><strong>Same neighborhood (Sunset West), smaller (-144 SF), oldest in dataset (1960)</strong>. The $712/SF — the lowest $/SF among Sunset West sales — likely indicates an under-updated condition similar to subject. Applied to subject 1,660 SF: $712 × 1,660 = <strong>~$1,182,000</strong>. Smaller homes typically command higher $/SF, so size-normalizing downward: subject as-is at similar condition likely <strong>$1,130,000–$1,180,000</strong>. Establishes a defensible floor for an offer if additional issues emerge from crawl space further inspection.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">📈</div><div><h2>Market Summary</h2></div></div>
+    <table class="doc-table">
+      <tr><th>Metric</th><th>Value</th><th>Source</th></tr>
+      <tr><td>Primary anchor — 555 Ontario Dr (Apr 9, 2026)</td><td>$811/SF / $1,350,000</td><td>3/2 / 1,665 SF / 6,786 lot / 1966 — closest direct match</td></tr>
+      <tr><td>Confirming comp — 637 Caliente Ave (Apr 22, 2026)</td><td>$796/SF / $1,350,000</td><td>4/2 / 1,696 SF / 6,098 lot / 1964 — Sunset West</td></tr>
+      <tr><td>Updated ceiling — 469 Ontario Dr (Apr 6, 2026)</td><td>$873/SF / $1,465,000</td><td>4/2 / 1,679 SF / 6,000 lot / 1966 — heavily modernized</td></tr>
+      <tr><td>Lower-condition floor — 1133 Coronado Way (Feb 2026)</td><td>$712/SF / $1,080,000</td><td>4/2 / 1,516 SF / 6,914 lot / 1960 — Sunset West, dated</td></tr>
+      <tr><td>Median $/SF — close-match dataset (n=7, Jan–May 2026)</td><td>$746/SF</td><td>Median of seven SF/lot/era-matched closings within 4 months</td></tr>
+      <tr><td><strong>Subject — As-Is Indicated Value</strong></td><td><strong>~$1,150,000–$1,250,000</strong></td><td>Adj. for deferred maintenance, HVAC risk, crawl space unknown</td></tr>
+      <tr><td><strong>Subject — Post-Repair Indicated Value</strong></td><td><strong>~$1,225,000–$1,300,000</strong></td><td>After Tier 1 + Tier 2 items resolved</td></tr>
+      <tr><td><strong>Subject — Fully-Modernized Ceiling</strong></td><td><strong>~$1,350,000–$1,425,000</strong></td><td>If renovated to comp 469 Ontario standard</td></tr>
+      <tr><td>Average days on market — 94550 (subset of close-match comps)</td><td>Most cleared within 30 days; several with no DOM recorded</td><td>BridgeMLS / Bay East AOR closings, Jan–May 2026</td></tr>
+    </table>
+    <div class="age-banner" style="margin-top:20px;">📌 <strong>Data Transparency:</strong> No closed sale on Leland Way itself surfaces in BridgeMLS / Bay East records for the Jan 2024–May 2026 window. The estimates above are built from seven 94550 closings filtered for proximity on configuration (3/2 priority), square footage (within ±70 SF of 1,660), lot size (within ±1,000 SF of ~6,000), and vintage (1960–1972), all closed between Jan 13 and Apr 22, 2026. The dataset is tight by design — eliminating Tempo, South Livermore, and outsized properties whose $/SF ratios would distort the rate set. Any closed Leland Way sale within the same window, if surfaced through private MLS access, should be incorporated as a same-street anchor and would refine these ranges.</div>
+  </div>
+</div>
+</div>
+
+<!-- TAB 7: CHECKLIST -->
+<div id="tab-checklist" class="tab-content">
+<div class="wrapper">
+  <div class="exec-summary">
+    <h2>Action Checklist</h2>
+    <p>Everything organized by timing. Framed around what you control — not what the seller must do. The repair request is one item on this list. The rest are your own due diligence steps and early ownership priorities.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-red">🔴</div><div><h2>During Contingency Period</h2></div></div>
+    <table class="doc-table">
+      <tr><th>Action</th><th>Why It Matters</th><th>Priority</th><th>Est. Cost</th></tr>
+      <tr><td>Commission licensed electrician — evaluate full panel, test all outlets, scope any upgrades</td><td>Understand grounding, panel capacity, and full electrical scope before finalizing position</td><td class="priority-high">High</td><td>$200–$400</td></tr>
+      <tr><td>Commission independent HVAC contractor — AC performance diagnostic + furnace/flue inspection</td><td>Quantify AC issue and furnace flue concern; use findings in Tier 2 credit discussion</td><td class="priority-high">High</td><td>$150–$300</td></tr>
+      <tr><td>Coordinate with seller/HomeGuard on crawl space further inspection before removing contingency</td><td>Eliminate largest unknown in transaction before committing</td><td class="priority-high">Critical</td><td>No charge (HomeGuard)</td></tr>
+      <tr><td>Submit Tier 1 repair request (see Repair Strategy tab)</td><td>Focused, well-documented items with clear professional support</td><td class="priority-high">High</td><td>—</td></tr>
+      <tr><td>Pull Alameda County building permits — APN 099-0304-081</td><td>Verify water repair/replacement scope, confirm permit status of pre-listing work</td><td class="priority-high">High</td><td>Free</td></tr>
+      <tr><td>Request water repair/replacement documentation from seller</td><td>SPQ discloses this work — understand what was done, when, and by whom</td><td class="priority-high">High</td><td>—</td></tr>
+      <tr><td>Test all sprinkler zones — hire irrigation contractor if seller can't confirm</td><td>Operational status uncertain; critical for expansive soil management</td><td class="priority-med">Medium</td><td>$100–$200</td></tr>
+      <tr><td>Contact City of Livermore Planning re: heritage trees, parking restrictions</td><td>Listing agent advises independent verification of these items</td><td class="priority-med">Medium</td><td>Free — (925) 960-4400</td></tr>
+      <tr><td>Obtain homeowner's insurance quote — flag roof age and 100A panel</td><td>Some insurers require roof documentation or updated panels; know this before contingency removal</td><td class="priority-med">Medium</td><td>—</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-amber">🟡</div><div><h2>First 30–60 Days After Possession</h2></div></div>
+    <table class="doc-table">
+      <tr><th>Action</th><th>Why</th><th>Est. Cost</th></tr>
+      <tr><td>Change all exterior locks; resolve no-key entry handle</td><td>Security — standard move-in step</td><td>$150–$400</td></tr>
+      <tr><td>Verify smoke detectors and CO detectors installed and tested on all levels</td><td>California legal requirement; CO detectors required</td><td>$50–$150</td></tr>
+      <tr><td>Install seismic gas shutoff valve</td><td>Not currently present; important in earthquake country</td><td>$300–$600</td></tr>
+      <tr><td>Install drip pan under water heater</td><td>Protect garage structure from potential leak</td><td>$100–$250</td></tr>
+      <tr><td>Replace waste disposer + properly connect power cord</td><td>Non-functional; straightforward appliance swap</td><td>$200–$450</td></tr>
+      <tr><td>Repair torn crawl space vent screens</td><td>Prevent rodent entry while crawl space is drying</td><td>$50–$200</td></tr>
+      <tr><td>Extend downspouts at least 5 feet from foundation</td><td>Redirect water away from crawl space; critical for expansive soil</td><td>$200–$800</td></tr>
+      <tr><td>Electrician visit — label all circuits, tighten loose outlets, apply anti-oxidant in panel</td><td>Electrical tune-up; understand what you have before planning upgrades</td><td>$300–$600</td></tr>
+      <tr><td>Chimney cleaning and inspection before using fireplace</td><td>Safe operation; confirm damper and firebox condition</td><td>$150–$300</td></tr>
+      <tr><td>Schedule annual HVAC maintenance contract</td><td>Extend service life of older units; establish service history</td><td>$150–$300/yr</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-green">🟢</div><div><h2>Year 1–5 Capital Planning</h2></div></div>
+    <table class="doc-table">
+      <tr><th>Item</th><th>Timing</th><th>Est. Cost</th><th>Notes</th></tr>
+      <tr><td>Asbestos testing before any renovation work</td><td>Before first renovation project</td><td>$400–$800</td><td>CIH testing; standard for 1965 construction</td></tr>
+      <tr><td>Attic insulation top-up</td><td>Year 1</td><td>$800–$2,000</td><td>Blown-in over existing; energy efficiency improvement</td></tr>
+      <tr><td>Crawl space moisture barrier after further inspection clears</td><td>After crawl space inspection</td><td>$1,500–$4,000</td><td>Reduces fungus risk in sub-area</td></tr>
+      <tr><td>Outlet grounding upgrade — kitchen, baths, garage priority circuits</td><td>Year 1–2</td><td>$2,000–$5,000</td><td>Highest-use locations first; full home rewire is longer-term</td></tr>
+      <tr><td>200A electrical service upgrade</td><td>Year 2–3</td><td>$5,000–$10,000</td><td>Required for EV charging, renovation permits, or major appliance additions</td></tr>
+      <tr><td>Full HVAC replacement (furnace + AC)</td><td>Year 3–7, condition-dependent</td><td>$8,000–$15,000</td><td>Based on HVAC contractor diagnostic findings</td></tr>
+      <tr><td>Full roof replacement</td><td>Year 5–10</td><td>$12,000–$20,000</td><td>Granule loss and age — monitor annually</td></tr>
+      <tr><td>Water heater replacement if age confirmed &gt;10 years</td><td>Year 1–3</td><td>$800–$1,800</td><td>Obtain age documentation from seller; plan accordingly</td></tr>
+    </table>
+  </div>
+</div>
+</div>
+
+<div class="report-footer">
+  <strong>844 Leland Way, Livermore, CA 94550 &nbsp;·&nbsp; Virginia Kleiner Trust</strong><br>
+  Prepared May 20, 2026 &nbsp;·&nbsp; Sources: HomeGuard Home Inspection (05/08/2026), HomeGuard WDO Pest Report (05/08/2026), HomeGuard Roof Inspection (05/09/2026), TDS (03/17/2026), SPQ (03/17/2026), AVID (04/27/2026) &nbsp;·&nbsp; Comp data: Public MLS records (BridgeMLS / Bay East)<br>
+  This advisory is for informational purposes only and does not constitute a formal appraisal, legal advice, or structural engineering opinion. Buyer should engage qualified independent professionals — licensed electrician, HVAC contractor, structural engineer where warranted — to verify findings before contingency removal.
+</div>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+function toggle(header) {
+  const body = header.nextElementSibling;
+  const chevron = header.querySelector('.chevron');
+  body.classList.toggle('open');
+  chevron.classList.toggle('open');
+}
+</script>
+</body>
+</html>
