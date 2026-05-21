@@ -401,6 +401,42 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
 .cq-d{background:rgba(238,94,94,.12);color:var(--red);border-color:rgba(238,94,94,.3)}
 .ta-badge{font-size:9px;padding:1px 5px;border-radius:6px;background:rgba(43,192,203,.1);color:var(--teal);border:1px solid rgba(43,192,203,.25);margin-left:4px}
 
+
+/* ── METRIC TOOLTIP ── */
+.mi-tip{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:rgba(160,175,204,.15);color:var(--txt2);font-size:9px;cursor:help;border:1px solid var(--bdr);margin-left:5px;flex-shrink:0;position:relative;vertical-align:middle}
+.mi-tip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#1C2235;border:1px solid var(--bdr);border-radius:6px;padding:8px 11px;font-size:11px;color:var(--txt);line-height:1.65;white-space:normal;width:240px;z-index:999;pointer-events:none;opacity:0;transition:opacity .2s;font-family:var(--ff);font-weight:400;box-shadow:0 8px 24px rgba(0,0,0,.6);text-transform:none;letter-spacing:0}
+.mi-tip:hover::after{opacity:1}
+/* ── MI SECTION HEADERS ── */
+.mi-section-hdr{display:flex;align-items:center;gap:12px;padding:6px 0 4px;margin:6px 0}
+.mi-section-hdr-line{flex:1;height:1px;background:var(--bdr)}
+.mi-section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;padding:3px 12px;border-radius:10px;white-space:nowrap;border:1px solid}
+.mi-section-seller{color:var(--gold);border-color:rgba(201,168,76,.4);background:rgba(201,168,76,.06)}
+.mi-section-buyer{color:var(--blue);border-color:rgba(62,142,247,.3);background:rgba(62,142,247,.06)}
+/* ── LEVERAGE SCORE ── */
+.lev-score{display:flex;align-items:center;gap:14px;padding:14px;background:var(--sur);border-radius:6px;margin-bottom:8px}
+.lev-badge{font-family:var(--fd);font-size:32px;font-weight:600;min-width:44px;text-align:center}
+.lev-low{color:var(--red)}.lev-mod{color:var(--org)}.lev-hi{color:var(--grn)}
+.lev-detail{font-size:11px;color:var(--txt2);line-height:1.7}
+/* ── AFFORDABILITY ── */
+.afford-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(40,51,79,.4);font-size:12px}
+.afford-row:last-child{border-bottom:none}
+.afford-lbl{flex:1;color:var(--txt2)}.afford-val{font-family:var(--fm);color:var(--txt);font-weight:500}
+.rate-input{width:60px;background:var(--sur);border:1px solid var(--bdr);border-radius:4px;color:var(--gold);font-family:var(--fm);font-size:12px;padding:3px 6px;outline:none;text-align:center}
+.rate-input:focus{border-color:var(--gold)}
+/* ── HEATMAP ── */
+.hm-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-top:4px}
+.hm-cell{border-radius:4px;padding:6px 3px;text-align:center;font-size:10px;line-height:1.4;cursor:default}
+.hm-mo{color:rgba(255,255,255,.6);font-size:9px;font-weight:700;letter-spacing:.3px}
+.hm-val{font-family:var(--fm);font-size:10.5px;font-weight:500;color:#fff}
+/* ── DOWNLOAD BUTTON ── */
+.mi-dl-btn{display:inline-flex;align-items:center;gap:5px;font-size:10px;padding:3px 9px;border:1px solid var(--bdr);border-radius:4px;background:transparent;color:var(--txt3);cursor:pointer;font-family:var(--ff);transition:all .15s}
+.mi-dl-btn:hover{border-color:var(--gold);color:var(--gold)}
+/* ── TREND MINI CHART ── */
+.mi-chart-wrap{height:180px;position:relative;margin-top:4px}
+/* ── RATIO BAR ── */
+.ratio-bar-wrap{display:flex;height:18px;border-radius:4px;overflow:hidden;margin:6px 0}
+.ratio-seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;transition:width .4s}
+
 @media print{.cma-sidebar,.tab-nav,.hdr-btns,.date-bar{display:none!important}.cma-main{padding:0}.card{break-inside:avoid}}
 </style>
 </head>
@@ -529,7 +565,7 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
                 <button class="pill" onclick="setRadius(0.75,this)">0.75 mi</button>
                 <button class="pill" onclick="setRadius(1.0,this)">1.0 mi</button>
               </div>
-              <div style="font-size:10px;color:var(--txt3);margin-top:5px;line-height:1.6">Geocodes subject via OpenStreetMap. First run ~30s per address then cached permanently.</div>
+              <div style="font-size:10px;color:var(--txt3);margin-top:5px;line-height:1.6">Requires internet + HTTPS. Works on your live site URL. May not work when opening the file directly from your computer.<br><strong style="color:var(--org)">Note: CMA valuation never depends on this — it is map-only.</strong></div>
             </div>
           </div>
         </div>
@@ -1593,8 +1629,8 @@ async function applyProximityFilter(candidates){
       const url=`https://nominatim.openstreetmap.org/search?`+new URLSearchParams({q:`${subj.addr}, ${subj.city}, California, USA`,format:'json',limit:'1',countrycodes:'us'});
       const r=await fetch(url);const d=await r.json();
       if(d.length){subj.lat=parseFloat(d[0].lat);subj.lng=parseFloat(d[0].lon);}
-      else{toast('Could not geocode subject — proximity filter skipped','err');return;}
-    }catch(e){toast('Geocoding failed — check internet connection','err');return;}
+      else{toast('Could not geocode address — proximity filter skipped. CMA results above are accurate.','warn');return;}
+    }catch(e){toast('Proximity geocoding unavailable — CMA valuation is unaffected. Turn off Proximity Filter to dismiss.','warn');el('prox-track').classList.remove('on');A.proximityEnabled=false;el('prox-lbl').textContent='Off — city scope only';el('prox-extra').style.display='none';return;}
   }
   // Geocode candidates that aren't cached
   const radius=A.proximityRadius;
@@ -2637,9 +2673,12 @@ function populateIntelCityPills(){
   const wrap = el('mi-city-pills');
   if(!wrap) return;
   const cities = [...new Set(A.listings.map(l=>l.city))].filter(Boolean).sort();
-  wrap.innerHTML = cities.map(c=>`<button class="mi-scope-pill" onclick="setIntelScope('${c}',this)">${toTitle(c)}</button>`).join('');
-  // Default to "All"
-  el('mi-scope-all').classList.add('active');
+  wrap.innerHTML = cities.map(c=>
+    `<button class="mi-scope-pill${A.intelScope===c?' active':''}" onclick="setIntelScope('${c}',this)">${toTitle(c)}</button>`
+  ).join('');
+  // Restore All Cities highlight correctly based on current scope
+  const allBtn = el('mi-scope-all');
+  if(allBtn) allBtn.classList.toggle('active', A.intelScope==='all');
 }
 
 // Quick valuation helper: estimate value of one listing using local sold comps
@@ -2700,9 +2739,8 @@ function renderMarketIntel(){
     return;
   }
   populateIntelCityPills();
-  // Filter listings by intel scope
+
   const inScope = A.intelScope==='all' ? A.listings : A.listings.filter(l=>l.city===A.intelScope);
-  // Apply global date range (sold listings only)
   const gdr = A.globalDateRange;
   const filtered = inScope.filter(l=>{
     if(gdr.start && l.status==='SLD' && l.closeDate && l.closeDate < gdr.start) return false;
@@ -2714,25 +2752,111 @@ function renderMarketIntel(){
   const actv = filtered.filter(l=>l.status==='ACTV');
   const pend = filtered.filter(l=>l.status==='PEND');
 
-  // ── Module 5: Trends — counts, DOM, SP/LP, $/SqFt, time series
+  // FIX 1: recency windows use RAW in-scope sold data (NOT filtered by date range bar)
+  // so "Sold · 30 Days" always reflects actual recent activity regardless of the date filter
+  const soldInScope = inScope.filter(l=>l.status==='SLD');
+  const byWindow = (days) => {
+    const cutoff = new Date(TODAY.getTime() - days*864e5);
+    return soldInScope.filter(l=>l.closeDate && l.closeDate >= cutoff);
+  };
+  const w30 = byWindow(30), w60 = byWindow(60), w90 = byWindow(90);
+
   const medDOM   = S.median(sold.map(l=>l.dom).filter(x=>x>=0));
   const medCDOM  = S.median(sold.map(l=>l.cdom||l.dom).filter(x=>x>=0));
   const splp     = sold.filter(l=>l.sp&&l.lp).map(l=>l.sp/l.lp);
   const medSPLP  = S.median(splp);
   const medPPSF  = S.median(sold.filter(l=>l.ppsf).map(l=>l.ppsf));
-  const medActPPSF = S.median(actv.filter(l=>l.listPPSF || (l.lp&&l.sqft)).map(l=>l.listPPSF || l.lp/l.sqft));
-
-  // 30/60/90-day windows on close date
-  const byWindow = (days) => {
-    const cutoff = new Date(TODAY.getTime() - days*864e5);
-    return sold.filter(l=>l.closeDate && l.closeDate >= cutoff);
-  };
-  const w30 = byWindow(30), w60 = byWindow(60), w90 = byWindow(90);
-
-  // Absorption (sold/actv ratio) — proxy for market velocity
+  const medActPPSF = S.median(actv.filter(l=>l.listPPSF||(l.lp&&l.sqft)).map(l=>l.listPPSF||l.lp/l.sqft));
   const absorption = actv.length ? (sold.length/actv.length) : null;
+  const medSP = S.median(sold.filter(l=>l.sp).map(l=>l.sp));
 
-  // ── Module 6: Pricing Accuracy — classify each active listing
+  // ── SELLER METRICS ──────────────────────────────────────────
+  // Over-ask sale rate
+  const soldWithRatio = sold.filter(l=>l.sp&&l.lp);
+  const overAsk = soldWithRatio.filter(l=>l.sp>l.lp).length;
+  const overAskRate = soldWithRatio.length ? (overAsk/soldWithRatio.length*100) : null;
+
+  // List-to-close timeline: DOM (list→contract) + escrow (contract→close)
+  const ltcSold = sold.filter(l=>l.closeDate&&l.listDate&&l.dom>=0);
+  const escrowDays = ltcSold.map(l=>{
+    const totalDays = Math.round((l.closeDate-l.listDate)/(864e5));
+    return Math.max(0, totalDays - l.dom);
+  }).filter(x=>x>0&&x<120);
+  const medEscrow = S.median(escrowDays);
+  const medLTC    = medDOM!=null&&medEscrow!=null ? Math.round(medDOM)+Math.round(medEscrow) : null;
+
+  // PPSF trend by month (last 12 months)
+  const ppsfByMonth = {};
+  sold.filter(l=>l.closeDate&&l.ppsf>0).forEach(l=>{
+    const key = `${l.closeDate.getFullYear()}-${String(l.closeDate.getMonth()+1).padStart(2,'0')}`;
+    if(!ppsfByMonth[key]) ppsfByMonth[key]={sum:0,cnt:0,vals:[]};
+    ppsfByMonth[key].vals.push(l.ppsf);
+    ppsfByMonth[key].cnt++;
+  });
+  const trendMonths = Object.keys(ppsfByMonth).sort().slice(-12);
+  const trendPPSF   = trendMonths.map(k=>Math.round(S.median(ppsfByMonth[k].vals)));
+  const trendLabels = trendMonths.map(k=>{const[y,m]=k.split('-');return MONTHS[parseInt(m)-1]+" '"+y.slice(2);});
+
+  // Inventory velocity: new listings (actv+pend) vs sold in period
+  const invVel = sold.length ? ((actv.length+pend.length)/Math.max(1,sold.length)) : null;
+  const invVelLbl = invVel==null?'—':invVel<0.5?'Absorbing Fast':invVel<1?'Balanced':invVel<1.5?'Slight Buildup':'Building Up';
+  const invVelCls = invVel==null?'':invVel<0.5?'up':invVel<1?'':invVel<1.5?'':'down';
+
+  // ── BUYER METRICS ──────────────────────────────────────────
+  // Competitive Offer Index (estimated based on DOM + over-ask rate)
+  const compIdx = (()=>{
+    if(!medDOM||overAskRate==null) return null;
+    const domFactor = Math.max(0,1-(medDOM/30)*0.3);
+    const askFactor = overAskRate/100;
+    const raw = 1 + Math.round((domFactor*0.4 + askFactor*0.6)*6);
+    return Math.max(1,Math.min(12,raw));
+  })();
+
+  // Best Time to Buy — monthly median SP grouped by calendar month (all years)
+  const byCalMonth = Array(12).fill(null).map(()=>[]);
+  soldInScope.filter(l=>l.closeDate&&l.sp>0).forEach(l=>{
+    byCalMonth[l.closeDate.getMonth()].push(l.sp);
+  });
+  const calMonthMedians = byCalMonth.map(arr=>arr.length>=3?S.median(arr):null);
+  const validMedians = calMonthMedians.filter(x=>x!=null);
+  const hmMin = validMedians.length?Math.min(...validMedians):0;
+  const hmMax = validMedians.length?Math.max(...validMedians):1;
+
+  // Negotiation Leverage Score — composite (0–100, higher = more buyer power)
+  const leverageScore = (()=>{
+    let score=50;
+    if(absorption!=null){
+      if(absorption>3) score-=20;
+      else if(absorption>1.5) score-=8;
+      else if(absorption<0.5) score+=20;
+      else score+=8;
+    }
+    if(medDOM!=null){
+      if(medDOM<10) score-=15;
+      else if(medDOM<20) score-=6;
+      else if(medDOM>45) score+=15;
+      else if(medDOM>30) score+=6;
+    }
+    if(overAskRate!=null){
+      if(overAskRate>70) score-=15;
+      else if(overAskRate>50) score-=6;
+      else if(overAskRate<30) score+=12;
+      else if(overAskRate<20) score+=18;
+    }
+    return Math.max(5,Math.min(95,score));
+  })();
+  const levCls  = leverageScore>=60?'lev-hi':leverageScore>=35?'lev-mod':'lev-low';
+  const levLabel = leverageScore>=60?'HIGH':leverageScore>=35?'MODERATE':'LOW';
+  const levNote  = leverageScore>=60
+    ? `Buyers hold meaningful negotiating power. Absorption is low, homes sit longer, and fewer are selling over ask. Use this data to anchor offers strategically below list.`
+    : leverageScore>=35
+    ? `Balanced conditions — neither side has dominant leverage. Come in with a clean, competitive offer near list price and negotiate from there.`
+    : `Sellers hold the cards — low inventory, fast sales, and high over-ask rates. Strong offers with minimal contingencies are recommended.`;
+
+  // New Listings vs Pending ratio
+  const nlPendRatio = (actv.length+pend.length)>0 ? pend.length/(actv.length+pend.length)*100 : null;
+
+  // ── PRICING ACCURACY (existing module 6) ──────────────────
   let acc = {sigOver:0, modOver:0, fair:0, under:0, sigUnder:0, valued:0, unvaluable:0};
   let varianceList = [];
   actv.forEach(a=>{
@@ -2745,156 +2869,474 @@ function renderMarketIntel(){
     if(cls.cls==='over' && pct>10) acc.sigOver++;
     else if(cls.cls==='over')      acc.modOver++;
     else if(cls.cls==='fair')      acc.fair++;
-    else if(pct >= -10)             acc.under++;
-    else                            acc.sigUnder++;
+    else if(pct >= -10)            acc.under++;
+    else                           acc.sigUnder++;
     varianceList.push({mlsNo:a.mlsNo, addr:a.address, lp:a.lp, est:v.est, pct, dom:a.dom, cdom:a.cdom||a.dom});
   });
 
-  // ── Module 7: Liquidity — DOM/CDOM vs variance correlation
-  // Bucket: overpriced (>5%) vs fair (-5..5) vs underpriced (<-5)
   const byBucket = {over:[], fair:[], under:[]};
   varianceList.forEach(v=>{
     if(v.pct > 5) byBucket.over.push(v);
     else if(v.pct >= -5) byBucket.fair.push(v);
     else byBucket.under.push(v);
   });
-  const avgDOM = b => S.mean(b.map(v=>v.cdom||v.dom).filter(x=>x>=0)) || 0;
-  const overDOM = avgDOM(byBucket.over), fairDOM = avgDOM(byBucket.fair), underDOM = avgDOM(byBucket.under);
+  const avgDOMbucket = b => S.mean(b.map(v=>v.cdom||v.dom).filter(x=>x>=0)) || 0;
+  const overDOM = avgDOMbucket(byBucket.over), fairDOM = avgDOMbucket(byBucket.fair), underDOM = avgDOMbucket(byBucket.under);
 
-  // Build insights (PRD Module 7 AC1: minimum 3 insights, with cause→effect)
   const insights = [];
   if(byBucket.over.length>=3 && byBucket.fair.length>=3){
     const ratio = fairDOM ? (overDOM/fairDOM) : 1;
-    if(ratio > 1.2){
-      insights.push(`Listings priced <strong>more than 5% above model value</strong> are sitting on the market about <strong>${ratio.toFixed(1)}× longer</strong> than fairly-priced ones (${Math.round(overDOM)} vs ${Math.round(fairDOM)} CDOM). Pricing discipline matters more than market lift in this scope.`);
-    } else if(ratio < 0.95){
-      insights.push(`Overpriced listings are clearing about as fast as fairly-priced ones in this scope — buyers are reaching for inventory regardless of price. Consistent with a hot market or low absorption (currently ${absorption?absorption.toFixed(1)+'×':'n/a'}).`);
-    }
+    if(ratio > 1.2) insights.push(`Listings priced <strong>more than 5% above model value</strong> are sitting on the market about <strong>${ratio.toFixed(1)}× longer</strong> than fairly-priced ones (${Math.round(overDOM)} vs ${Math.round(fairDOM)} CDOM).`);
+    else if(ratio < 0.95) insights.push(`Overpriced listings are clearing about as fast as fairly-priced ones — buyers are reaching for inventory. Consistent with a hot market (Absorption: ${absorption?absorption.toFixed(1)+'×':'n/a'}).`);
   }
   if(medSPLP){
-    const pct = (medSPLP*100);
-    if(pct >= 102) insights.push(`Median sale closes at <strong>${pct.toFixed(1)}% of list</strong> — buyers paying over ask. Conditions favor sellers; underwrite list prices accordingly.`);
-    else if(pct < 98) insights.push(`Median sale closes at <strong>${pct.toFixed(1)}% of list</strong> — buyers negotiating concessions. List 2–3% above target to absorb the typical haircut.`);
-    else insights.push(`Median sale closes at <strong>${pct.toFixed(1)}% of list</strong> — balanced pricing pressure in both directions.`);
+    const pct=(medSPLP*100);
+    if(pct>=102) insights.push(`Median sale closes at <strong>${pct.toFixed(1)}% of list</strong> — buyers paying over ask. Conditions favor sellers; underwrite list prices accordingly.`);
+    else if(pct<98) insights.push(`Median sale closes at <strong>${pct.toFixed(1)}% of list</strong> — buyers negotiating concessions. List 2–3% above target to absorb the typical haircut.`);
+    else insights.push(`Median sale closes at <strong>${pct.toFixed(1)}% of list</strong> — balanced pricing pressure.`);
   }
   if(w30.length>=3 && w90.length>=10){
-    const p30 = S.median(w30.filter(l=>l.ppsf).map(l=>l.ppsf));
-    const p90 = S.median(w90.filter(l=>l.ppsf).map(l=>l.ppsf));
-    if(p30 && p90){
-      const pct = ((p30-p90)/p90*100);
-      if(Math.abs(pct) > 1.5){
-        insights.push(`Median <strong>$/sqft moved ${pct>0?'up':'down'} ${Math.abs(pct).toFixed(1)}%</strong> in the last 30 days vs the trailing 90-day window. ${pct>0?'Pricing momentum is building.':'Pricing momentum is softening — anchor list prices conservatively.'}`);
-      }
-    }
+    const p30=S.median(w30.filter(l=>l.ppsf).map(l=>l.ppsf));
+    const p90=S.median(w90.filter(l=>l.ppsf).map(l=>l.ppsf));
+    if(p30&&p90){const pct=((p30-p90)/p90*100);if(Math.abs(pct)>1.5) insights.push(`Median <strong>$/sqft moved ${pct>0?'up':'down'} ${Math.abs(pct).toFixed(1)}%</strong> in the last 30 days vs the trailing 90-day window. ${pct>0?'Pricing momentum is building.':'Pricing is softening — anchor list prices conservatively.'}`);}
   }
-  if(acc.valued >= 5){
-    const overShare = ((acc.sigOver+acc.modOver)/acc.valued*100);
-    if(overShare > 35) insights.push(`Of <strong>${acc.valued} active listings</strong> we could value, <strong>${overShare.toFixed(0)}% are overpriced</strong> vs comps. Below-list offers and slow contract velocity are likely.`);
-    else if(overShare < 15) insights.push(`Only <strong>${overShare.toFixed(0)}% of ${acc.valued} active listings</strong> show overpricing — sellers are reading the market well. Expect tighter negotiation room for buyers.`);
+  if(acc.valued>=5){
+    const overShare=((acc.sigOver+acc.modOver)/acc.valued*100);
+    if(overShare>35) insights.push(`Of <strong>${acc.valued} active listings</strong> we could value, <strong>${overShare.toFixed(0)}% are overpriced</strong> vs comps.`);
+    else if(overShare<15) insights.push(`Only <strong>${overShare.toFixed(0)}% of ${acc.valued} active listings</strong> are overpriced — sellers are reading the market well.`);
   }
-  if(absorption !== null){
-    if(absorption > 3) insights.push(`Absorption of <strong>${absorption.toFixed(1)}× sold per active</strong> indicates strong demand. Months of supply runs about ${(actv.length / Math.max(1,sold.length/(sold.length?12:1))).toFixed(1)}.`);
-    else if(absorption < 1) insights.push(`Absorption of <strong>${absorption.toFixed(1)}× sold per active</strong> means inventory is accumulating relative to clearance. Buyer leverage is increasing.`);
+  if(absorption!==null){
+    if(absorption>3) insights.push(`Absorption of <strong>${absorption.toFixed(1)}× sold per active</strong> indicates strong demand.`);
+    else if(absorption<1) insights.push(`Absorption of <strong>${absorption.toFixed(1)}× sold per active</strong> means inventory is accumulating. Buyer leverage is increasing.`);
   }
-  if(insights.length < 3){
-    insights.push(`Add more sold and active listings to this scope to surface stronger statistical patterns. Currently working with ${sold.length} sold and ${actv.length} active.`);
-  }
+  if(insights.length<3) insights.push(`Add more sold and active listings to surface stronger statistical patterns. Currently working with ${sold.length} sold and ${actv.length} active.`);
 
-  // Histogram of $/sqft for sold listings
+  // $/sqft histogram
   const ppsfs = sold.map(l=>l.ppsf).filter(x=>x>0).sort((a,b)=>a-b);
-  let histRows = '';
-  if(ppsfs.length >= 5){
-    const lo = ppsfs[Math.floor(ppsfs.length*0.05)], hi = ppsfs[Math.floor(ppsfs.length*0.95)];
-    const buckets = 10;
-    const step = Math.max(1,(hi-lo)/buckets);
-    const counts = Array(buckets).fill(0);
-    ppsfs.forEach(p=>{const i=Math.min(buckets-1, Math.max(0, Math.floor((p-lo)/step))); counts[i]++;});
-    const max = Math.max(...counts);
-    histRows = counts.map((c,i)=>{
-      const lab = `$${Math.round(lo+i*step)}–${Math.round(lo+(i+1)*step)}`;
-      const w = max ? (c/max*100) : 0;
+  let histRows='';
+  if(ppsfs.length>=5){
+    const lo=ppsfs[Math.floor(ppsfs.length*0.05)],hi=ppsfs[Math.floor(ppsfs.length*0.95)];
+    const step=Math.max(1,(hi-lo)/10);
+    const counts=Array(10).fill(0);
+    ppsfs.forEach(p=>{const i=Math.min(9,Math.max(0,Math.floor((p-lo)/step)));counts[i]++;});
+    const max=Math.max(...counts);
+    histRows=counts.map((c,i)=>{
+      const lab=`$${Math.round(lo+i*step)}–${Math.round(lo+(i+1)*step)}`;
+      const w=max?(c/max*100):0;
       return `<div class="mi-bar-row"><div class="mi-bar-lbl">${lab}</div><div class="mi-bar-track"><div class="mi-bar-fill fair" style="width:${w}%"></div></div><div class="mi-bar-num">${c}</div></div>`;
     }).join('');
   }
 
-  // Render
+  // Tooltip helper
+  const tip = (text) => `<span class="mi-tip" data-tip="${text}">ⓘ</span>`;
+
+  // Heatmap cells
+  const hmCells = calMonthMedians.map((med,i)=>{
+    if(med==null) return `<div class="hm-cell" style="background:rgba(40,51,79,.4)"><div class="hm-mo">${MONTHS[i]}</div><div class="hm-val" style="color:var(--txt3)">—</div></div>`;
+    const t = hmMax>hmMin ? (med-hmMin)/(hmMax-hmMin) : 0.5;
+    // Cool (blue) = cheaper months, warm (gold) = pricier months
+    const r = Math.round(62 + t*(201-62));
+    const g = Math.round(142 + t*(168-142));
+    const b2= Math.round(247 + t*(76-247));
+    const bg=`rgba(${r},${g},${b2},${0.25+t*0.55})`;
+    const isBest = med===hmMin && validMedians.length>1;
+    return `<div class="hm-cell" style="background:${bg};border:1px solid rgba(${r},${g},${b2},.4)" title="${MONTHS[i]}: ${fmt(med)}">
+      <div class="hm-mo">${MONTHS[i]}${isBest?' 🎯':''}</div>
+      <div class="hm-val">${fmtK(med)}</div>
+    </div>`;
+  }).join('');
+
+  // ──────────────────────────────────────────
+  // RENDER
+  // ──────────────────────────────────────────
   el('mi-content').innerHTML = `
-    <!-- Trends row -->
+
+    <!-- KEY METRICS ROW -->
     <div class="mi-row mi-row-4">
       <div class="mi-card">
-        <div class="mi-title">Active Inventory <span class="ct-chip">Module 5</span></div>
-        <div class="mi-stat-grid">
-          <div class="mi-stat"><div class="mi-stat-lbl">Active</div><div class="mi-stat-val">${actv.length}</div><div class="mi-stat-sub">${actv.length?fmt(S.median(actv.filter(l=>l.lp).map(l=>l.lp)))+' median list':'—'}</div></div>
-          <div class="mi-stat"><div class="mi-stat-lbl">Pending</div><div class="mi-stat-val">${pend.length}</div><div class="mi-stat-sub">in escrow</div></div>
-          <div class="mi-stat"><div class="mi-stat-lbl">Sold (in scope)</div><div class="mi-stat-val">${sold.length}</div><div class="mi-stat-sub">${sold.length?fmt(S.median(sold.filter(l=>l.sp).map(l=>l.sp)))+' median sale':'—'}</div></div>
-          <div class="mi-stat"><div class="mi-stat-lbl">Absorption</div><div class="mi-stat-val ${absorption&&absorption>2?'up':absorption&&absorption<1?'down':''}">${absorption?absorption.toFixed(1)+'×':'—'}</div><div class="mi-stat-sub">sold per active</div></div>
+        <div class="mi-title">Active Inventory <button class="mi-dl-btn" onclick="downloadMICard('mi-inv','Active Inventory')">⬇ PNG</button></div>
+        <div id="mi-inv" class="mi-stat-grid">
+          <div class="mi-stat">
+            <div class="mi-stat-lbl">Active ${tip('Homes currently listed for sale that have not yet received an accepted offer.')}</div>
+            <div class="mi-stat-val">${actv.length}</div>
+            <div class="mi-stat-sub">${actv.length?fmt(S.median(actv.filter(l=>l.lp).map(l=>l.lp)))+' median list':'—'}</div>
+          </div>
+          <div class="mi-stat">
+            <div class="mi-stat-lbl">Pending ${tip('Homes under contract (accepted offer) but not yet closed. A high pending count signals strong near-term demand.')}</div>
+            <div class="mi-stat-val">${pend.length}</div>
+            <div class="mi-stat-sub">in escrow</div>
+          </div>
+          <div class="mi-stat">
+            <div class="mi-stat-lbl">Sold (in scope) ${tip('Total homes that closed escrow in the selected date range. More closed sales = stronger comp pool for valuations.')}</div>
+            <div class="mi-stat-val">${sold.length}</div>
+            <div class="mi-stat-sub">${sold.length?fmt(S.median(sold.filter(l=>l.sp).map(l=>l.sp)))+' median sale':'—'}</div>
+          </div>
+          <div class="mi-stat">
+            <div class="mi-stat-lbl">Absorption ${tip('How many homes sold for every one currently active. Above 1× means the market is absorbing listings faster than they accumulate — a seller\'s market signal.')}</div>
+            <div class="mi-stat-val ${absorption&&absorption>2?'up':absorption&&absorption<1?'down':''}">${absorption?absorption.toFixed(1)+'×':'—'}</div>
+            <div class="mi-stat-sub">sold per active</div>
+          </div>
         </div>
       </div>
+
       <div class="mi-card">
-        <div class="mi-title">Pricing Discipline</div>
-        <div class="mi-stat-grid">
-          <div class="mi-stat"><div class="mi-stat-lbl">Median SP/LP</div><div class="mi-stat-val ${medSPLP&&medSPLP>1.01?'up':medSPLP&&medSPLP<0.98?'down':''}">${medSPLP?(medSPLP*100).toFixed(1)+'%':'—'}</div><div class="mi-stat-sub">${medSPLP&&medSPLP>=1.02?"Hot Seller's":medSPLP&&medSPLP>=0.99?'Balanced':medSPLP&&medSPLP>=0.96?'Soft':"Buyer's"}</div></div>
-          <div class="mi-stat"><div class="mi-stat-lbl">Median DOM</div><div class="mi-stat-val">${medDOM?Math.round(medDOM):'—'}</div><div class="mi-stat-sub">days on market</div></div>
-          <div class="mi-stat"><div class="mi-stat-lbl">Median CDOM</div><div class="mi-stat-val">${medCDOM?Math.round(medCDOM):'—'}</div><div class="mi-stat-sub">cumulative DOM</div></div>
-          <div class="mi-stat"><div class="mi-stat-lbl">Median Sold $/SqFt</div><div class="mi-stat-val">${medPPSF?'$'+Math.round(medPPSF):'—'}</div><div class="mi-stat-sub">${medActPPSF?'list: $'+Math.round(medActPPSF):''}</div></div>
+        <div class="mi-title">Pricing Discipline <button class="mi-dl-btn" onclick="downloadMICard('mi-pricing','Pricing Discipline')">⬇ PNG</button></div>
+        <div id="mi-pricing" class="mi-stat-grid">
+          <div class="mi-stat">
+            <div class="mi-stat-lbl">Median SP/LP ${tip('Sale price ÷ list price as a percentage. Above 100% means buyers are paying more than the asking price — a sign of a competitive market. Below 100% means sellers are accepting less.')}</div>
+            <div class="mi-stat-val ${medSPLP&&medSPLP>1.01?'up':medSPLP&&medSPLP<0.98?'down':''}">${medSPLP?(medSPLP*100).toFixed(1)+'%':'—'}</div>
+            <div class="mi-stat-sub">${medSPLP&&medSPLP>=1.02?"Hot Seller's":medSPLP&&medSPLP>=0.99?'Balanced':medSPLP&&medSPLP>=0.96?'Soft':"Buyer's"}</div>
+          </div>
+          <div class="mi-stat">
+            <div class="mi-stat-lbl">Median DOM ${tip('Days on Market — how long, on average, a home is listed before going under contract. Lower numbers mean homes are selling faster.')}</div>
+            <div class="mi-stat-val">${medDOM?Math.round(medDOM):'—'}</div>
+            <div class="mi-stat-sub">days on market</div>
+          </div>
+          <div class="mi-stat">
+            <div class="mi-stat-lbl">Median CDOM ${tip('Cumulative Days on Market — includes time from any prior listing attempts. Higher than DOM suggests homes are being relisted after failing to sell.')}</div>
+            <div class="mi-stat-val">${medCDOM?Math.round(medCDOM):'—'}</div>
+            <div class="mi-stat-sub">cumulative DOM</div>
+          </div>
+          <div class="mi-stat">
+            <div class="mi-stat-lbl">Median Sold $/SqFt ${tip('The midpoint price per square foot across all sold homes. Used to quickly compare value across different sized properties.')}</div>
+            <div class="mi-stat-val">${medPPSF?'$'+Math.round(medPPSF):'—'}</div>
+            <div class="mi-stat-sub">${medActPPSF?'list: $'+Math.round(medActPPSF):''}</div>
+          </div>
         </div>
       </div>
+
       <div class="mi-card">
-        <div class="mi-title">Recency Windows</div>
-        <div class="mi-stat-grid">
-          <div class="mi-stat"><div class="mi-stat-lbl">Sold · 30 days</div><div class="mi-stat-val">${w30.length}</div><div class="mi-stat-sub">${w30.length?'med $'+Math.round(S.median(w30.filter(l=>l.ppsf).map(l=>l.ppsf))||0)+'/sqft':'—'}</div></div>
-          <div class="mi-stat"><div class="mi-stat-lbl">Sold · 60 days</div><div class="mi-stat-val">${w60.length}</div><div class="mi-stat-sub">${w60.length?'med $'+Math.round(S.median(w60.filter(l=>l.ppsf).map(l=>l.ppsf))||0)+'/sqft':'—'}</div></div>
-          <div class="mi-stat"><div class="mi-stat-lbl">Sold · 90 days</div><div class="mi-stat-val">${w90.length}</div><div class="mi-stat-sub">${w90.length?'med $'+Math.round(S.median(w90.filter(l=>l.ppsf).map(l=>l.ppsf))||0)+'/sqft':'—'}</div></div>
-          <div class="mi-stat"><div class="mi-stat-lbl">SP/LP · 90d</div><div class="mi-stat-val">${(()=>{const a=w90.filter(l=>l.sp&&l.lp).map(l=>l.sp/l.lp);return a.length?(S.median(a)*100).toFixed(1)+'%':'—';})()}</div><div class="mi-stat-sub">recent ratio</div></div>
+        <div class="mi-title">Recency Windows <button class="mi-dl-btn" onclick="downloadMICard('mi-recency','Recency Windows')">⬇ PNG</button></div>
+        <div id="mi-recency" class="mi-stat-grid">
+          <div class="mi-stat">
+            <div class="mi-stat-lbl">Sold · 30 Days ${tip('Homes that closed escrow in the last 30 days. Always relative to today — unaffected by the date range filter above.')}</div>
+            <div class="mi-stat-val ${w30.length>0?'up':''}">${w30.length}</div>
+            <div class="mi-stat-sub">${w30.length?'med $'+Math.round(S.median(w30.filter(l=>l.ppsf).map(l=>l.ppsf))||0)+'/sqft':'no recent closings'}</div>
+          </div>
+          <div class="mi-stat">
+            <div class="mi-stat-lbl">Sold · 60 Days ${tip('Homes closed in the last 60 days. A growing number here vs. 30 days shows increasing market activity.')}</div>
+            <div class="mi-stat-val">${w60.length}</div>
+            <div class="mi-stat-sub">${w60.length?'med $'+Math.round(S.median(w60.filter(l=>l.ppsf).map(l=>l.ppsf))||0)+'/sqft':'—'}</div>
+          </div>
+          <div class="mi-stat">
+            <div class="mi-stat-lbl">Sold · 90 Days ${tip('Homes closed in the last 90 days. This is the primary window appraisers and lenders use for comparable sales.')}</div>
+            <div class="mi-stat-val">${w90.length}</div>
+            <div class="mi-stat-sub">${w90.length?'med $'+Math.round(S.median(w90.filter(l=>l.ppsf).map(l=>l.ppsf))||0)+'/sqft':'—'}</div>
+          </div>
+          <div class="mi-stat">
+            <div class="mi-stat-lbl">SP/LP · 90d ${tip('Sale-to-list ratio for the last 90 days only. More current than the full-period ratio — useful for detecting recent market shifts.')}</div>
+            <div class="mi-stat-val">${(()=>{const a=w90.filter(l=>l.sp&&l.lp).map(l=>l.sp/l.lp);return a.length?(S.median(a)*100).toFixed(1)+'%':'—';})()}</div>
+            <div class="mi-stat-sub">recent ratio</div>
+          </div>
         </div>
       </div>
+
       <div class="mi-card">
         <div class="mi-title">Geography</div>
         <div class="mi-stat-grid">
           <div class="mi-stat"><div class="mi-stat-lbl">Scope</div><div class="mi-stat-val" style="font-size:14px;font-family:var(--ff)">${A.intelScope==='all'?'All Cities':toTitle(A.intelScope)}</div><div class="mi-stat-sub">${[...new Set(filtered.map(l=>l.city))].length} cities in scope</div></div>
-          <div class="mi-stat"><div class="mi-stat-lbl">Counties</div><div class="mi-stat-val" style="font-size:14px;font-family:var(--ff)">${[...new Set(filtered.map(l=>l.county).filter(Boolean))].length}</div><div class="mi-stat-sub">${[...new Set(filtered.map(l=>l.county).filter(Boolean))].slice(0,2).join(', ')||'—'}</div></div>
-          <div class="mi-stat"><div class="mi-stat-lbl">SFR / Condo / TH</div><div class="mi-stat-val" style="font-size:14px;font-family:var(--fm)">${filtered.filter(l=>l.bt==='DE').length} / ${filtered.filter(l=>l.bt==='CO').length} / ${filtered.filter(l=>l.bt==='TH').length}</div><div class="mi-stat-sub">by property type</div></div>
+          <div class="mi-stat"><div class="mi-stat-lbl">Counties</div><div class="mi-stat-val" style="font-size:14px">${[...new Set(filtered.map(l=>l.county).filter(Boolean))].length}</div><div class="mi-stat-sub">${[...new Set(filtered.map(l=>l.county).filter(Boolean))].slice(0,2).join(', ')||'—'}</div></div>
+          <div class="mi-stat"><div class="mi-stat-lbl">SFR / Condo / TH</div><div class="mi-stat-val" style="font-size:13px;font-family:var(--fm)">${filtered.filter(l=>l.bt==='DE').length} / ${filtered.filter(l=>l.bt==='CO').length} / ${filtered.filter(l=>l.bt==='TH').length}</div><div class="mi-stat-sub">by property type</div></div>
           <div class="mi-stat"><div class="mi-stat-lbl">Total Records</div><div class="mi-stat-val">${filtered.length}</div><div class="mi-stat-sub">in current filter</div></div>
         </div>
       </div>
     </div>
 
-    <!-- Pricing Accuracy + Histogram row -->
+    <!-- SELLER INTELLIGENCE -->
+    <div class="mi-section-hdr">
+      <div class="mi-section-line" style="flex:1;height:1px;background:var(--bdr)"></div>
+      <div class="mi-section-label mi-section-seller">🏡 Seller Intelligence</div>
+      <div class="mi-section-line" style="flex:1;height:1px;background:var(--bdr)"></div>
+    </div>
+
+    <div class="mi-row mi-row-3">
+      <div class="mi-card">
+        <div class="mi-title">
+          $/SqFt Trend — Last 12 Months ${tip('Shows whether the price-per-square-foot is rising or falling month over month. A rising line means sellers can command more per square foot than they could a year ago.')}
+          <button class="mi-dl-btn" onclick="downloadMICard('mi-trend-wrap','$/SqFt Trend')">⬇ PNG</button>
+        </div>
+        <div id="mi-trend-wrap" class="mi-chart-wrap">
+          <canvas id="mi-trend-chart"></canvas>
+        </div>
+        ${trendMonths.length<3?`<div class="mi-empty" style="padding:20px;font-size:11px">Not enough dated sold records for trend line.</div>`:''}
+      </div>
+
+      <div class="mi-card">
+        <div class="mi-title">List-to-Close Timeline ${tip('The full journey from first day on market to closing. DOM = days until offer accepted. Escrow = time from accepted offer to close. Together they tell sellers how long the full process typically takes.')}
+          <button class="mi-dl-btn" onclick="downloadMICard('mi-ltc','List-to-Close')">⬇ PNG</button>
+        </div>
+        <div id="mi-ltc">
+          ${medLTC ? `
+            <div style="display:flex;align-items:center;gap:0;margin:10px 0 6px;height:36px">
+              <div style="background:rgba(201,168,76,.3);border-radius:4px 0 0 4px;height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--gold);font-weight:700;padding:0 10px;flex:${Math.round(medDOM)}" title="Median DOM: ${Math.round(medDOM)} days">${Math.round(medDOM)}d DOM</div>
+              <div style="background:rgba(62,142,247,.3);border-radius:0 4px 4px 0;height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--blue);font-weight:700;padding:0 10px;flex:${Math.round(medEscrow)}" title="Median Escrow: ${Math.round(medEscrow)} days">${Math.round(medEscrow)}d Escrow</div>
+            </div>
+            <div style="font-family:var(--fm);font-size:28px;font-weight:500;color:var(--txt);margin:8px 0 4px">${medLTC} days total</div>
+            <div style="font-size:11px;color:var(--txt2)">Median list-to-close · ${ltcSold.length} records with full data</div>
+            <div class="expl-card" style="margin-top:10px"><strong>What this means for sellers</strong>Plan for roughly ${Math.round(medDOM)} days on market before an accepted offer, then ${Math.round(medEscrow)} more days in escrow before collecting proceeds.</div>
+          ` : `<div class="mi-empty" style="padding:24px 12px;font-size:11px">Insufficient list date + close date data to compute timeline.<br>Ensure your MLS export includes both LD and Close Date fields.</div>`}
+        </div>
+      </div>
+
+      <div class="mi-card">
+        <div class="mi-title">Over-Ask Sale Rate ${tip('The percentage of homes that sold above their asking price. Above 50% is a strong seller\'s market. Below 30% gives buyers more negotiating room.')}
+          &nbsp; Inventory Velocity ${tip('Compares how many active listings exist vs. how quickly homes are selling. "Absorbing Fast" means the market is eating up supply — good for sellers.')}
+        </div>
+        <div style="margin:8px 0">
+          <div style="font-size:11px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Over-Ask Sale Rate</div>
+          ${overAskRate!=null ? `
+            <div style="display:flex;align-items:baseline;gap:10px">
+              <div style="font-family:var(--fm);font-size:32px;font-weight:500;color:${overAskRate>60?'var(--grn)':overAskRate>40?'var(--org)':'var(--red)'}">${overAskRate.toFixed(0)}%</div>
+              <div style="font-size:11px;color:var(--txt2)">${overAsk} of ${soldWithRatio.length} homes</div>
+            </div>
+            <div class="mi-bar-row" style="margin-top:6px">
+              <div class="mi-bar-track" style="flex:1;height:10px">
+                <div class="mi-bar-fill ${overAskRate>60?'fair':overAskRate>40?'warn':'over'}" style="width:${overAskRate}%"></div>
+              </div>
+            </div>
+          ` : '<div style="color:var(--txt3);font-size:12px;padding:8px 0">Insufficient SP/LP data</div>'}
+        </div>
+        <div style="margin-top:14px">
+          <div style="font-size:11px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Inventory Velocity</div>
+          <div style="font-family:var(--fm);font-size:22px;font-weight:500" class="${invVelCls}">${invVelLbl}</div>
+          <div style="font-size:11px;color:var(--txt2);margin-top:3px">${invVel!=null?`${(actv.length+pend.length)} supply · ${sold.length} sold in period`:'—'}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BUYER INTELLIGENCE -->
+    <div class="mi-section-hdr">
+      <div class="mi-section-line" style="flex:1;height:1px;background:var(--bdr)"></div>
+      <div class="mi-section-label mi-section-buyer">🔑 Buyer Intelligence</div>
+      <div class="mi-section-line" style="flex:1;height:1px;background:var(--bdr)"></div>
+    </div>
+
+    <div class="mi-row mi-row-3">
+      <div class="mi-card">
+        <div class="mi-title">Negotiation Leverage Score ${tip('A composite score estimating how much negotiating power buyers currently have, based on absorption rate, days on market, and over-ask rate. Higher = more buyer power.')}</div>
+        <div class="lev-score">
+          <div class="lev-badge ${levCls}">${levLabel}</div>
+          <div>
+            <div style="font-family:var(--fm);font-size:13px;color:var(--txt2);margin-bottom:4px">Score: ${leverageScore}/100</div>
+            <div style="width:100%;background:var(--bdr);height:5px;border-radius:3px;overflow:hidden;width:140px">
+              <div style="height:100%;border-radius:3px;width:${leverageScore}%;background:${leverageScore>=60?'var(--grn)':leverageScore>=35?'var(--org)':'var(--red)'}"></div>
+            </div>
+          </div>
+        </div>
+        <div class="lev-detail">${levNote}</div>
+        <div class="expl-card" style="margin-top:8px"><strong>Components</strong>
+          Absorption (${absorption?absorption.toFixed(1)+'×':'n/a'}) · Median DOM (${medDOM?Math.round(medDOM)+' days':'n/a'}) · Over-ask rate (${overAskRate!=null?overAskRate.toFixed(0)+'%':'n/a'})
+        </div>
+      </div>
+
+      <div class="mi-card">
+        <div class="mi-title">Affordability Snapshot ${tip('Estimates the monthly mortgage payment for the median sold price in this market. Adjust the interest rate to match current rates.')}</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:8px 10px;background:var(--sur);border-radius:5px">
+          <span style="font-size:11px;color:var(--txt2)">Interest Rate:</span>
+          <input class="rate-input" id="mi-rate" type="number" value="6.75" step="0.25" min="1" max="15" oninput="updateAffordability()">
+          <span style="font-size:11px;color:var(--txt2)">%</span>
+          <span style="font-size:10px;color:var(--txt3);margin-left:4px">30-yr fixed</span>
+        </div>
+        <div id="mi-afford-rows">
+          ${renderAffordability(medSP, 6.75)}
+        </div>
+      </div>
+
+      <div class="mi-card">
+        <div class="mi-title">Competitive Offer Index ${tip('Estimates the number of competing offers a typical listing receives, based on how quickly homes are selling and the rate of over-ask sales. Higher = more competition for each home.')}
+          &nbsp; New vs. Pending ${tip('Shows what percentage of the current inventory is already under contract. A high pending ratio means much of what\'s listed is already spoken for — a sign of strong demand.')}
+        </div>
+        <div style="margin:8px 0 14px">
+          <div style="font-size:11px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Est. Offers Per Listing</div>
+          ${compIdx!=null ? `
+            <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px">
+              <div style="font-family:var(--fm);font-size:36px;font-weight:500;color:${compIdx>=6?'var(--red)':compIdx>=3?'var(--org)':'var(--grn)'}">${compIdx}</div>
+              <div style="font-size:12px;color:var(--txt2)">${compIdx>=6?'Highly competitive':compIdx>=3?'Moderate competition':'Low competition'}</div>
+            </div>
+            <div style="font-size:10px;color:var(--txt3)">Estimated — based on DOM (${medDOM?Math.round(medDOM):'?'} days) and over-ask rate (${overAskRate!=null?overAskRate.toFixed(0)+'%':'?'})</div>
+          ` : '<div style="color:var(--txt3);font-size:12px">Insufficient data</div>'}
+        </div>
+        <div style="font-size:11px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">New Listings vs. Pending</div>
+        ${nlPendRatio!=null ? `
+          <div class="ratio-bar-wrap">
+            <div class="ratio-seg" style="width:${100-nlPendRatio}%;background:rgba(62,142,247,.5)">${Math.round(100-nlPendRatio)}% Active</div>
+            <div class="ratio-seg" style="width:${nlPendRatio}%;background:rgba(245,162,58,.6)">${Math.round(nlPendRatio)}% Pending</div>
+          </div>
+          <div style="font-size:10px;color:var(--txt2)">${actv.length} active · ${pend.length} pending · ${nlPendRatio>=40?'High absorption — demand is strong':'Normal absorption rate'}</div>
+        ` : '<div style="color:var(--txt3);font-size:12px">—</div>'}
+      </div>
+    </div>
+
+    <!-- BEST TIME TO BUY HEATMAP -->
+    <div class="mi-row" style="grid-template-columns:1fr">
+      <div class="mi-card">
+        <div class="mi-title">
+          Best Time to Buy — Monthly Price Heatmap ${tip('Shows the historical median sale price for each calendar month across all years in your database. Cooler colors (blue) = lower prices. The 🎯 marks the historically cheapest month to buy in this market.')}
+          <button class="mi-dl-btn" onclick="downloadMICard('mi-heatmap','Best Time to Buy Heatmap')">⬇ PNG</button>
+        </div>
+        <div id="mi-heatmap">
+          ${validMedians.length>=4 ? `
+            <div class="hm-grid">${hmCells}</div>
+            <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:10px;color:var(--txt3)">
+              <span>🔵 Historically lower prices</span>
+              <span>${soldInScope.filter(l=>l.closeDate).length} sales across ${[...new Set(soldInScope.filter(l=>l.closeDate).map(l=>l.closeDate.getFullYear()))].length} years</span>
+              <span>🟡 Historically higher prices</span>
+            </div>
+          ` : `<div class="mi-empty" style="padding:24px 12px;font-size:11px">Need at least 4 months of sales data across multiple years to generate a meaningful heatmap.</div>`}
+        </div>
+      </div>
+    </div>
+
+    <!-- EXISTING MODULES: Pricing Accuracy + Distribution + Liquidity + Insights -->
     <div class="mi-row mi-row-2">
       <div class="mi-card">
-        <div class="mi-title">Pricing Accuracy of Active Listings <span class="ct-chip">Module 6</span></div>
+        <div class="mi-title">Pricing Accuracy of Active Listings ${tip('Each active listing is valued against recent sold comps. This shows what percentage are overpriced, fairly priced, or underpriced relative to market data — useful for advising buyers on offer strategy.')}
+          <button class="mi-dl-btn" onclick="downloadMICard('mi-accuracy','Pricing Accuracy')">⬇ PNG</button>
+        </div>
+        <div id="mi-accuracy">
         ${acc.valued ? `
           <div class="mi-bar-row"><div class="mi-bar-lbl">Sig. Overpriced (>10%)</div><div class="mi-bar-track"><div class="mi-bar-fill over" style="width:${acc.sigOver/acc.valued*100}%"></div></div><div class="mi-bar-num">${acc.sigOver}</div></div>
           <div class="mi-bar-row"><div class="mi-bar-lbl">Mod. Overpriced (5–10%)</div><div class="mi-bar-track"><div class="mi-bar-fill warn" style="width:${acc.modOver/acc.valued*100}%"></div></div><div class="mi-bar-num">${acc.modOver}</div></div>
           <div class="mi-bar-row"><div class="mi-bar-lbl">Fairly Priced (±5%)</div><div class="mi-bar-track"><div class="mi-bar-fill fair" style="width:${acc.fair/acc.valued*100}%"></div></div><div class="mi-bar-num">${acc.fair}</div></div>
           <div class="mi-bar-row"><div class="mi-bar-lbl">Underpriced (5–10%)</div><div class="mi-bar-track"><div class="mi-bar-fill under" style="width:${acc.under/acc.valued*100}%"></div></div><div class="mi-bar-num">${acc.under}</div></div>
           <div class="mi-bar-row"><div class="mi-bar-lbl">Sig. Underpriced (>10%)</div><div class="mi-bar-track"><div class="mi-bar-fill under" style="width:${acc.sigUnder/acc.valued*100}%"></div></div><div class="mi-bar-num">${acc.sigUnder}</div></div>
-          <div class="expl-card"><strong>Methodology</strong>Each active is valued against same-city sold comps within ±25% sqft, ±1 BR, ±30yr age, sold within 18 months. Variance % = (List − Model) / Model. ${acc.unvaluable} listing(s) lacked enough comps to value.</div>
-        ` : `<div class="mi-empty" style="padding:30px 12px">Not enough active listings or sold comps to compute pricing accuracy in this scope.</div>`}
+          <div class="expl-card"><strong>Methodology</strong>Each active valued against same-city sold comps within ±25% sqft, ±1 BR, sold within 18 months. ${acc.unvaluable} listing(s) lacked comps.</div>
+        ` : `<div class="mi-empty" style="padding:30px 12px">Not enough active listings or sold comps in this scope.</div>`}
+        </div>
       </div>
       <div class="mi-card">
-        <div class="mi-title">$/SqFt Distribution — Sold</div>
+        <div class="mi-title">$/SqFt Distribution — Sold ${tip('Shows how many sold homes fall into each $/sqft price bucket. A tight bell curve means the market prices consistently. Wide spread means mixed product types or condition vary greatly.')}
+          <button class="mi-dl-btn" onclick="downloadMICard('mi-dist','$/SqFt Distribution')">⬇ PNG</button>
+        </div>
+        <div id="mi-dist">
         ${histRows ? histRows : `<div class="mi-empty" style="padding:30px 12px">Not enough sold listings.</div>`}
-        ${histRows ? `<div class="expl-card" style="margin-top:8px"><strong>How to read</strong>Each bar is one $/sqft bucket. Fat tails indicate heterogeneity (mixed product types or condition). Tight bell shape means the market is pricing consistently — adjustments will be modest.</div>` : ''}
+        ${histRows ? `<div class="expl-card" style="margin-top:8px"><strong>How to read</strong>Each bar is one $/sqft bucket. A tight bell shape means the market prices consistently — adjustments between comps will be modest. Fat tails indicate heterogeneity.</div>` : ''}
+        </div>
       </div>
     </div>
 
-    <!-- Liquidity / Discipline row -->
     <div class="mi-row mi-row-2">
       <div class="mi-card">
-        <div class="mi-title">Liquidity vs Pricing Discipline <span class="ct-chip">Module 7</span></div>
-        ${byBucket.over.length+byBucket.fair.length+byBucket.under.length >= 5 ? `
-          <div class="mi-bar-row"><div class="mi-bar-lbl">Overpriced (>5%)</div><div class="mi-bar-track"><div class="mi-bar-fill over" style="width:${Math.min(100, overDOM/Math.max(overDOM,fairDOM,underDOM,1)*100)}%"></div></div><div class="mi-bar-num">${Math.round(overDOM)} d</div></div>
-          <div class="mi-bar-row"><div class="mi-bar-lbl">Fair (±5%)</div><div class="mi-bar-track"><div class="mi-bar-fill fair" style="width:${Math.min(100, fairDOM/Math.max(overDOM,fairDOM,underDOM,1)*100)}%"></div></div><div class="mi-bar-num">${Math.round(fairDOM)} d</div></div>
-          <div class="mi-bar-row"><div class="mi-bar-lbl">Underpriced (<−5%)</div><div class="mi-bar-track"><div class="mi-bar-fill under" style="width:${Math.min(100, underDOM/Math.max(overDOM,fairDOM,underDOM,1)*100)}%"></div></div><div class="mi-bar-num">${Math.round(underDOM)} d</div></div>
-          <div class="expl-card" style="margin-top:8px"><strong>How to read</strong>Average CDOM (cumulative days on market) by pricing band. Long bars on overpriced rows mean discipline matters; flat bars across all rows mean a hot market hides pricing mistakes (risky comp interpretation).</div>
+        <div class="mi-title">Liquidity vs Pricing Discipline ${tip('Shows how long overpriced, fairly-priced, and underpriced listings sit on the market. If overpriced homes take dramatically longer, pricing discipline is rewarded. If all bars are equal, buyers are absorbing everything.')}</div>
+        ${byBucket.over.length+byBucket.fair.length+byBucket.under.length>=5 ? `
+          <div class="mi-bar-row"><div class="mi-bar-lbl">Overpriced (>5%)</div><div class="mi-bar-track"><div class="mi-bar-fill over" style="width:${Math.min(100,overDOM/Math.max(overDOM,fairDOM,underDOM,1)*100)}%"></div></div><div class="mi-bar-num">${Math.round(overDOM)} d</div></div>
+          <div class="mi-bar-row"><div class="mi-bar-lbl">Fair (±5%)</div><div class="mi-bar-track"><div class="mi-bar-fill fair" style="width:${Math.min(100,fairDOM/Math.max(overDOM,fairDOM,underDOM,1)*100)}%"></div></div><div class="mi-bar-num">${Math.round(fairDOM)} d</div></div>
+          <div class="mi-bar-row"><div class="mi-bar-lbl">Underpriced (<−5%)</div><div class="mi-bar-track"><div class="mi-bar-fill under" style="width:${Math.min(100,underDOM/Math.max(overDOM,fairDOM,underDOM,1)*100)}%"></div></div><div class="mi-bar-num">${Math.round(underDOM)} d</div></div>
+          <div class="expl-card" style="margin-top:8px"><strong>How to read</strong>Average CDOM by pricing band. Long bars on overpriced rows mean discipline matters; flat bars across all rows mean a hot market hides pricing mistakes.</div>
         ` : `<div class="mi-empty" style="padding:30px 12px">Not enough valued active listings to compare DOM by pricing band.</div>`}
       </div>
       <div class="mi-card">
-        <div class="mi-title">Insights</div>
+        <div class="mi-title">Market Insights</div>
         ${insights.map(t=>`<div class="mi-insight">${t}</div>`).join('')}
       </div>
     </div>`;
+
+  // Initialize Chart.js PPSF trend
+  if(trendMonths.length>=3){
+    setTimeout(()=>{
+      const canvas=el('mi-trend-chart');
+      if(!canvas)return;
+      if(canvas._chart) canvas._chart.destroy();
+      const ctx=canvas.getContext('2d');
+      canvas._chart=new Chart(ctx,{
+        type:'line',
+        data:{
+          labels:trendLabels,
+          datasets:[{
+            label:'Median $/SqFt',
+            data:trendPPSF,
+            borderColor:'#C9A84C',
+            backgroundColor:'rgba(201,168,76,.12)',
+            borderWidth:2,
+            pointBackgroundColor:'#C9A84C',
+            pointRadius:3,
+            fill:true,
+            tension:0.35
+          }]
+        },
+        options:{
+          responsive:true,maintainAspectRatio:false,
+          plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'$'+ctx.parsed.y+'/sqft'}}},
+          scales:{
+            x:{grid:{color:'rgba(40,51,79,.5)'},ticks:{color:'#A0AFCC',font:{size:9}}},
+            y:{grid:{color:'rgba(40,51,79,.5)'},ticks:{color:'#A0AFCC',font:{size:9},callback:v=>'$'+v}}
+          }
+        }
+      });
+    },100);
+  }
+
+  // Initialize affordability
+  setTimeout(updateAffordability, 150);
+}
+
+// Affordability calculator helper
+function renderAffordability(medSP, rate){
+  if(!medSP||medSP<=0) return '<div style="color:var(--txt3);font-size:12px;padding:8px 0">No sold price data available</div>';
+  const downPct=0.20, down=medSP*downPct, loan=medSP-down;
+  const mo=rate/100/12;
+  const n=360;
+  const pmt=mo?Math.round(loan*mo*Math.pow(1+mo,n)/(Math.pow(1+mo,n)-1)):Math.round(loan/n);
+  const propTax=Math.round(medSP*0.012/12);
+  const ins=Math.round(medSP*0.004/12);
+  const total=pmt+propTax+ins;
+  return `
+    <div class="afford-row"><div class="afford-lbl">Median Sale Price</div><div class="afford-val">${fmt(Math.round(medSP))}</div></div>
+    <div class="afford-row"><div class="afford-lbl">Down Payment (20%)</div><div class="afford-val">${fmt(Math.round(down))}</div></div>
+    <div class="afford-row"><div class="afford-lbl">Loan Amount</div><div class="afford-val">${fmt(Math.round(loan))}</div></div>
+    <div class="afford-row"><div class="afford-lbl">P&I Payment</div><div class="afford-val">${fmt(pmt)}/mo</div></div>
+    <div class="afford-row"><div class="afford-lbl">Est. Property Tax</div><div class="afford-val">${fmt(propTax)}/mo</div></div>
+    <div class="afford-row"><div class="afford-lbl">Est. Insurance</div><div class="afford-val">${fmt(ins)}/mo</div></div>
+    <div class="afford-row" style="border-top:2px solid var(--bdr);margin-top:4px;padding-top:8px">
+      <div class="afford-lbl" style="font-weight:700;color:var(--txt)">Total Est. Monthly</div>
+      <div class="afford-val" style="color:var(--gold);font-size:16px">${fmt(total)}/mo</div>
+    </div>
+    <div style="font-size:10px;color:var(--txt3);margin-top:6px">Assumes 20% down, 30-yr fixed, 1.2% prop tax, 0.4% insurance. HOA not included.</div>`;
+}
+
+function updateAffordability(){
+  const inp=el('mi-rate');
+  const rows=el('mi-afford-rows');
+  if(!inp||!rows)return;
+  const rate=parseFloat(inp.value)||6.75;
+  const inScope2=A.intelScope==='all'?A.listings:A.listings.filter(l=>l.city===A.intelScope);
+  const medSP=S.median(inScope2.filter(l=>l.status==='SLD'&&l.sp>0).map(l=>l.sp));
+  rows.innerHTML=renderAffordability(medSP,rate);
+}
+
+// PNG download for any MI card
+function downloadMICard(cardId, title){
+  const card=el(cardId);
+  if(!card){toast('Element not found','err');return;}
+  const scope=A.intelScope==='all'?'All Cities':toTitle(A.intelScope);
+  const dateStr=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  // Use html2canvas if available, otherwise show instruction
+  if(typeof html2canvas==='function'){
+    html2canvas(card,{backgroundColor:'#141927',scale:2,logging:false,useCORS:true}).then(canvas=>{
+      const pad=40, footer=30;
+      const out=document.createElement('canvas');
+      out.width=Math.max(1200,canvas.width);out.height=canvas.height+pad+footer;
+      const ctx=out.getContext('2d');
+      ctx.fillStyle='#0C0F1A';ctx.fillRect(0,0,out.width,out.height);
+      // Header
+      ctx.fillStyle='#C9A84C';ctx.font='bold 16px sans-serif';
+      ctx.fillText(`Team Parikh · ${title} · ${scope}`,20,28);
+      // Chart
+      ctx.drawImage(canvas,0,pad);
+      // Footer
+      const fy=out.height-10;
+      ctx.fillStyle='#5C6E94';ctx.font='11px sans-serif';
+      ctx.fillText(`Powered by Team Parikh Valuation Model  |  Data as of ${dateStr}`,20,fy);
+      const a=document.createElement('a');a.download=`TeamParikh_${title.replace(/\s+/g,'_')}.png`;
+      a.href=out.toDataURL('image/png');a.click();
+    });
+  } else {
+    toast('PNG export requires html2canvas — loading…','inf');
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    s.onload=()=>downloadMICard(cardId,title);
+    document.head.appendChild(s);
+  }
 }
 
 // ───────────────────────────────────────────────────────────
@@ -3091,6 +3533,14 @@ function exportOpportunities(){
 // INIT
 // ═══════════════════════════════════
 async function init(){
+  // Disable proximity filter automatically when not on HTTPS
+  // (geocoding requires HTTPS — file:// and blob: origins won't work)
+  if(location.protocol!=='https:'){
+    A.proximityEnabled=false;
+    const pt=el('prox-track');if(pt)pt.classList.remove('on');
+    const pl=el('prox-lbl');if(pl)pl.textContent='Off — requires HTTPS (works on your live site)';
+    const pe=el('prox-extra');if(pe)pe.style.display='none';
+  }
   await load();
   updateHeader();
 
