@@ -446,9 +446,13 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
 <div id="welcome">
   <div class="wl-logo">Team Parikh <em>Valuation Model</em></div>
   <p class="wl-sub">Appraiser-grade valuations with time-adjusted comps, dynamic method weighting, reconciliation narratives, market diagnostics, and mispricing detection — powered by your MLS export. All analysis runs locally. Data auto-maintains a rolling 3-year window.</p>
-  <div id="wl-loading" style="display:flex;flex-direction:column;align-items:center;gap:18px;padding:40px 0">
+  <div id="wl-loading" style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:40px 0">
     <div style="width:44px;height:44px;border:2px solid rgba(201,168,76,.2);border-top-color:#C9A84C;border-radius:50%;animation:spin .9s linear infinite"></div>
-    <div style="font-size:14px;color:rgba(221,229,240,.6);letter-spacing:.5px">Connecting to database…</div>
+    <div id="wl-load-msg" style="font-size:14px;color:rgba(221,229,240,.6);letter-spacing:.5px">Connecting to database…</div>
+    <div id="wl-load-sub" style="font-size:11px;color:rgba(160,175,204,.45)">Loading your MLS data</div>
+    <button id="wl-skip-btn" onclick="skipToCache()" style="display:none;margin-top:4px;padding:7px 20px;background:transparent;border:1px solid rgba(201,168,76,.35);border-radius:6px;color:rgba(201,168,76,.7);font-family:var(--ff);font-size:12px;cursor:pointer">
+      Use cached data instead →
+    </button>
   </div>
   <div class="drop-hero" id="wdrop" style="display:none" onclick="document.getElementById('wfile').click()">
     <div class="dh-icon">📂</div>
@@ -867,14 +871,21 @@ function fromRow(r){
 }
 
 // Fetch ALL listings from Supabase (paginates 1 000 rows at a time)
-async function fetchFromSupabase(){
+// 12-second timeout per page — if Supabase is unreachable, fails fast to cache
+async function fetchFromSupabase(timeoutMs=12000){
   let all=[], from=0;
   const PAGE=1000;
   while(true){
-    const resp=await fetch(
-      `${SB_URL}/rest/v1/listings?select=*&order=mls_no`,
-      {headers:{...SB_HDR,'Range-Unit':'items','Range':`${from}-${from+PAGE-1}`}}
-    );
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),timeoutMs);
+    let resp;
+    try{
+      resp=await fetch(
+        `${SB_URL}/rest/v1/listings?select=*&order=mls_no`,
+        {headers:{...SB_HDR,'Range-Unit':'items','Range':`${from}-${from+PAGE-1}`},
+         signal:controller.signal}
+      );
+    }finally{clearTimeout(timer);}
     if(!resp.ok) throw new Error(`DB fetch failed (${resp.status})`);
     const rows=await resp.json();
     all=all.concat(rows);
@@ -1061,47 +1072,101 @@ function haversine(la1,lo1,la2,lo2){const R=3958.8,r=Math.PI/180,dl=(la2-la1)*r,
 // ═══════════════════════════════════
 // STORAGE
 // ═══════════════════════════════════
+// Loads the local cache into A.listings without hitting Supabase
+function loadFromCache(){
+  try{
+    const r=localStorage.getItem(STORAGE);
+    if(r){
+      A.listings=JSON.parse(r);
+      A.listings.forEach(l=>{
+        if(l.closeDate&&typeof l.closeDate==='string')l.closeDate=new Date(l.closeDate);
+        if(l.listDate&&typeof l.listDate==='string')l.listDate=new Date(l.listDate);
+      });
+    }
+  }catch(e){console.warn('Cache load error:',e);}
+  try{const g=localStorage.getItem(GEO_K);if(g)A.geoCache=JSON.parse(g);}catch(e){}
+}
+
+// Called when user clicks "Use cached data instead →"
+function skipToCache(){
+  _skipLoad=true; // signal load() to abort its wait
+}
+let _skipLoad=false;
+
 async function load(){
-  // Show loading spinner, hide drop zone while fetching
+  _skipLoad=false;
   const wlLoad=el('wl-loading'),wDrop=el('wdrop');
+  const loadMsg=el('wl-load-msg'),loadSub=el('wl-load-sub'),skipBtn=el('wl-skip-btn');
   if(wlLoad) wlLoad.style.display='flex';
   if(wDrop)  wDrop.style.display='none';
 
+  // Check if local cache exists — if so show skip button after 3 seconds
+  const hasCache=!!localStorage.getItem(STORAGE);
+  const skipTimer=hasCache?setTimeout(()=>{
+    if(skipBtn) skipBtn.style.display='block';
+    if(loadSub) loadSub.textContent='Taking longer than usual — or use your cached data below';
+  },3000):null;
+
+  // Show "skip" option more prominently after 8 seconds
+  const urgentTimer=hasCache?setTimeout(()=>{
+    if(loadMsg) loadMsg.textContent='Still connecting…';
+    if(loadSub) loadSub.textContent='Supabase may be slow. Your cached data is available now.';
+    if(skipBtn){skipBtn.style.borderColor='rgba(201,168,76,.7)';skipBtn.style.color='#C9A84C';}
+  },8000):null;
+
+  // Race: Supabase fetch vs user clicking Skip vs 15s hard timeout
   try{
-    // Primary: fetch from Supabase (shared across all users)
-    const rows=await fetchFromSupabase();
-    if(rows.length>0){
-      A.listings=rows;
-      // Write-through to localStorage as a fast local cache
-      try{localStorage.setItem(STORAGE,JSON.stringify(
-        rows.map(l=>({...l,
-          closeDate:l.closeDate?l.closeDate.toISOString():null,
-          listDate:l.listDate?l.listDate.toISOString():null}))
-      ));}catch(e){}
-    } else {
-      // Database is empty — show drop zone so user can upload
+    const supabasePromise=fetchFromSupabase(12000);
+    // Poll _skipLoad flag every 200ms so skip button works
+    const skipPromise=new Promise(resolve=>{
+      const poll=setInterval(()=>{if(_skipLoad){clearInterval(poll);resolve('skip');}},200);
+    });
+    const hardTimeout=new Promise((_,reject)=>setTimeout(()=>reject(new Error('timeout')),15000));
+
+    const result=await Promise.race([
+      supabasePromise.then(r=>({rows:r})),
+      skipPromise.then(()=>({skip:true})),
+      hardTimeout,
+    ]);
+
+    clearTimeout(skipTimer);clearTimeout(urgentTimer);
+
+    if(result.skip){
+      // User clicked skip — use cache
+      loadFromCache();
       if(wlLoad) wlLoad.style.display='none';
       if(wDrop)  wDrop.style.display='';
-    }
-  } catch(e){
-    // Supabase unavailable — fall back to local cache with warning
-    console.warn('Supabase load failed, using local cache:',e);
-    try{
-      const r=localStorage.getItem(STORAGE);
-      if(r){
-        A.listings=JSON.parse(r);
-        A.listings.forEach(l=>{
-          if(l.closeDate&&typeof l.closeDate==='string')l.closeDate=new Date(l.closeDate);
-          if(l.listDate&&typeof l.listDate==='string')l.listDate=new Date(l.listDate);
-        });
+      setTimeout(()=>toast('Using cached data — cloud sync will resume on next upload','warn'),300);
+    } else if(result.rows){
+      const rows=result.rows;
+      if(rows.length>0){
+        A.listings=rows;
+        if(loadMsg) loadMsg.textContent='Loaded '+rows.length.toLocaleString()+' listings ✓';
+        // Write-through cache
+        try{localStorage.setItem(STORAGE,JSON.stringify(
+          rows.map(l=>({...l,
+            closeDate:l.closeDate?l.closeDate.toISOString():null,
+            listDate:l.listDate?l.listDate.toISOString():null}))
+        ));}catch(e){}
+      } else {
+        // Empty DB — show upload screen
+        if(wlLoad) wlLoad.style.display='none';
+        if(wDrop)  wDrop.style.display='';
       }
-    }catch(e2){}
+    }
+  }catch(e){
+    clearTimeout(skipTimer);clearTimeout(urgentTimer);
+    console.warn('Supabase load failed:',e.message);
+    // Fall back to local cache automatically
+    loadFromCache();
     if(wlLoad) wlLoad.style.display='none';
     if(wDrop)  wDrop.style.display='';
-    setTimeout(()=>toast('Cloud unavailable — showing locally cached data','warn'),500);
+    const msg=e.message==='timeout'
+      ?'Database connection timed out — using cached data. Will sync on next upload.'
+      :'Cloud unavailable — showing locally cached data';
+    setTimeout(()=>toast(msg,'warn'),300);
   }
-  const g=localStorage.getItem(GEO_K);
-  try{if(g) A.geoCache=JSON.parse(g);}catch(e){}
+  try{const g=localStorage.getItem(GEO_K);if(g)A.geoCache=JSON.parse(g);}catch(e){}
 }
 function save(){try{localStorage.setItem(STORAGE,JSON.stringify(A.listings.map(l=>({...l,closeDate:l.closeDate?l.closeDate.toISOString():null,listDate:l.listDate?l.listDate.toISOString():null}))));}catch(e){}}
 function saveGeo(){try{localStorage.setItem(GEO_K,JSON.stringify(A.geoCache));}catch(e){}}
