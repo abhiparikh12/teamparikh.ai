@@ -210,6 +210,7 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
 
 /* ── AUTOFIX HIGHLIGHT ── */
 .autofill-glow{animation:glow .8s ease-out}
+@keyframes spin{to{transform:rotate(360deg)}}
 @keyframes glow{0%,100%{box-shadow:none}50%{box-shadow:0 0 12px rgba(201,168,76,.5)}}
 .leaflet-popup-content-wrapper{background:var(--sur)!important;color:var(--txt)!important;border:1px solid var(--bdr)!important;border-radius:var(--r)!important;box-shadow:0 8px 32px rgba(0,0,0,.6)!important}
 .leaflet-popup-tip{background:var(--sur)!important}
@@ -398,7 +399,11 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
 <div id="welcome">
   <div class="wl-logo">Team Parikh <em>Valuation Model</em></div>
   <p class="wl-sub">Appraiser-grade valuations with time-adjusted comps, dynamic method weighting, reconciliation narratives, market diagnostics, and mispricing detection — powered by your MLS export. All analysis runs locally. Data auto-maintains a rolling 3-year window.</p>
-  <div class="drop-hero" id="wdrop" onclick="document.getElementById('wfile').click()">
+  <div id="wl-loading" style="display:flex;flex-direction:column;align-items:center;gap:18px;padding:40px 0">
+    <div style="width:44px;height:44px;border:2px solid rgba(201,168,76,.2);border-top-color:#C9A84C;border-radius:50%;animation:spin .9s linear infinite"></div>
+    <div style="font-size:14px;color:rgba(221,229,240,.6);letter-spacing:.5px">Connecting to database…</div>
+  </div>
+  <div class="drop-hero" id="wdrop" style="display:none" onclick="document.getElementById('wfile').click()">
     <div class="dh-icon">📂</div>
     <div class="dh-t">Drop your MLS Export CSV here</div>
     <div class="dh-s">Supports Sold · Active · Pending listings<br>Data stays in your browser — never uploaded anywhere</div>
@@ -709,7 +714,7 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
     <div class="m-drop" id="mdrop" onclick="document.getElementById('mfile').click()">
       <div style="font-size:28px;margin-bottom:10px">📂</div>
       <div style="font-size:15px;font-weight:600;color:var(--txt);margin-bottom:5px">Drop MLS Export CSV or click to browse</div>
-      <div style="font-size:12px;color:var(--txt2)">New records merge cumulatively · duplicates skipped by MLS# · sold data older than 3 years auto-pruned</div>
+      <div style="font-size:12px;color:var(--txt2)">Uploads sync to cloud instantly · all users see updated data immediately · 3-year rolling window auto-maintained</div>
     </div>
     <input type="file" id="mfile" accept=".csv" style="display:none">
     <div class="m-sum" id="m-sum">
@@ -765,6 +770,95 @@ const A = {
 
 const STORAGE = 'piq_v5';
 const GEO_K   = 'piq_geo_v3';
+// ═══════════════════════════════════
+// SUPABASE — Cloud Database
+// Data is shared across all users/browsers in real time.
+// Upload once → everyone sees it instantly at the URL.
+// ═══════════════════════════════════
+const SB_URL = 'https://ersnftpesyouedgmdhwy.supabase.co';
+const SB_KEY = 'sb_publishable_81vm0A8u5wxlG6QvLbOEaQ_CFNZ43pJ';
+const SB_HDR = {
+  'Content-Type':'application/json',
+  'apikey': SB_KEY,
+  'Authorization': `Bearer ${SB_KEY}`,
+};
+
+// JS listing → Supabase row (snake_case columns, Date→string)
+function toRow(l){
+  return{
+    mls_no:l.mlsNo, status:l.status, dom:l.dom||0, cdom:l.cdom||0,
+    address:l.address, unit:l.unit||'', city:l.city, county:l.county||'',
+    lp:l.lp||null, sp:l.sp||null, bt:l.bt||'', sqft:l.sqft||0,
+    br:l.br||0, bth:l.bth||0, gar:l.gar||false, gar_sp:l.garSp||0,
+    yr_blt:l.yrBlt||0, lot_sq_ft:l.lotSqFt||0, hoa_fee:l.hoaFee||0,
+    stories:l.stories||'', list_ppsf:l.listPPSF||null,
+    sale_ppsf:l.salePPSF||null, ppsf:l.ppsf||null,
+    close_date:l.closeDate?l.closeDate.toISOString().split('T')[0]:null,
+    list_date:l.listDate?l.listDate.toISOString().split('T')[0]:null,
+    lat:l.lat||null, lng:l.lng||null,
+    updated_at:new Date().toISOString(),
+  };
+}
+
+// Supabase row → JS listing (camelCase, string→Date)
+function fromRow(r){
+  return{
+    mlsNo:r.mls_no, status:r.status, dom:r.dom||0, cdom:r.cdom||0,
+    address:r.address, unit:r.unit||'', city:r.city, county:r.county||'',
+    lp:r.lp, sp:r.sp, bt:r.bt, sqft:r.sqft||0,
+    br:r.br||0, bth:r.bth||0, gar:r.gar||false, garSp:r.gar_sp||0,
+    yrBlt:r.yr_blt||0, lotSqFt:r.lot_sq_ft||0, hoaFee:r.hoa_fee||0,
+    stories:r.stories||'', listPPSF:r.list_ppsf, salePPSF:r.sale_ppsf,
+    ppsf:r.ppsf,
+    // Add T12:00:00 so date parsing is timezone-safe
+    closeDate:r.close_date?new Date(r.close_date+'T12:00:00'):null,
+    listDate:r.list_date?new Date(r.list_date+'T12:00:00'):null,
+    lat:r.lat, lng:r.lng,
+  };
+}
+
+// Fetch ALL listings from Supabase (paginates 1 000 rows at a time)
+async function fetchFromSupabase(){
+  let all=[], from=0;
+  const PAGE=1000;
+  while(true){
+    const resp=await fetch(
+      `${SB_URL}/rest/v1/listings?select=*&order=mls_no`,
+      {headers:{...SB_HDR,'Range-Unit':'items','Range':`${from}-${from+PAGE-1}`}}
+    );
+    if(!resp.ok) throw new Error(`DB fetch failed (${resp.status})`);
+    const rows=await resp.json();
+    all=all.concat(rows);
+    if(rows.length<PAGE) break;
+    from+=PAGE;
+  }
+  return all.map(fromRow);
+}
+
+// Upsert to Supabase in batches of 500 (merge on mls_no)
+async function upsertToSupabase(listings){
+  const BATCH=500;
+  for(let i=0;i<listings.length;i+=BATCH){
+    const batch=listings.slice(i,i+BATCH).map(toRow);
+    const resp=await fetch(
+      `${SB_URL}/rest/v1/listings?on_conflict=mls_no`,
+      {method:'POST',
+       headers:{...SB_HDR,'Prefer':'resolution=merge-duplicates,return=minimal'},
+       body:JSON.stringify(batch)}
+    );
+    if(!resp.ok){const t=await resp.text();throw new Error(t);}
+  }
+}
+
+// Delete all listings from Supabase
+async function deleteAllFromSupabase(){
+  const resp=await fetch(
+    `${SB_URL}/rest/v1/listings?mls_no=not.is.null`,
+    {method:'DELETE', headers:SB_HDR}
+  );
+  if(!resp.ok) throw new Error(`DB delete failed (${resp.status})`);
+}
+
 
 // ═══════════════════════════════════
 // CITY ADJACENCY — Dynamic, coordinate-based
@@ -884,43 +978,61 @@ function haversine(la1,lo1,la2,lo2){const R=3958.8,r=Math.PI/180,dl=(la2-la1)*r,
 // ═══════════════════════════════════
 // STORAGE
 // ═══════════════════════════════════
-function load(){
+async function load(){
+  // Show loading spinner, hide drop zone while fetching
+  const wlLoad=el('wl-loading'),wDrop=el('wdrop');
+  if(wlLoad) wlLoad.style.display='flex';
+  if(wDrop)  wDrop.style.display='none';
+
   try{
-    const r=localStorage.getItem(STORAGE);
-    if(r) A.listings=JSON.parse(r);
-    else {
-      // Migration: try loading from previous storage key
-      const prev=localStorage.getItem('piq_v4');
-      if(prev){
-        A.listings=JSON.parse(prev);
-        // Apply 3-year prune on migration
-        const cutoff=new Date(TODAY);cutoff.setFullYear(cutoff.getFullYear()-3);
-        A.listings=A.listings.filter(l=>{
-          if(!l.closeDate)return true; // no date = keep
-          const d=typeof l.closeDate==='string'?new Date(l.closeDate):l.closeDate;
-          return !(l.status==='SLD'&&d<cutoff);
-        });
-        // Fix dates (stored as strings)
-        A.listings.forEach(l=>{if(l.closeDate&&typeof l.closeDate==='string')l.closeDate=new Date(l.closeDate);if(l.listDate&&typeof l.listDate==='string')l.listDate=new Date(l.listDate);});
-        save(); // migrate to new key
-      }
+    // Primary: fetch from Supabase (shared across all users)
+    const rows=await fetchFromSupabase();
+    if(rows.length>0){
+      A.listings=rows;
+      // Write-through to localStorage as a fast local cache
+      try{localStorage.setItem(STORAGE,JSON.stringify(
+        rows.map(l=>({...l,
+          closeDate:l.closeDate?l.closeDate.toISOString():null,
+          listDate:l.listDate?l.listDate.toISOString():null}))
+      ));}catch(e){}
+    } else {
+      // Database is empty — show drop zone so user can upload
+      if(wlLoad) wlLoad.style.display='none';
+      if(wDrop)  wDrop.style.display='';
     }
-    // Ensure dates are Date objects (they serialize to strings in JSON)
-    A.listings.forEach(l=>{
-      if(l.closeDate&&typeof l.closeDate==='string')l.closeDate=new Date(l.closeDate);
-      if(l.listDate&&typeof l.listDate==='string')l.listDate=new Date(l.listDate);
-    });
-    const g=localStorage.getItem(GEO_K);if(g)A.geoCache=JSON.parse(g);
-  }catch(e){console.warn('Load error:',e);}
+  } catch(e){
+    // Supabase unavailable — fall back to local cache with warning
+    console.warn('Supabase load failed, using local cache:',e);
+    try{
+      const r=localStorage.getItem(STORAGE);
+      if(r){
+        A.listings=JSON.parse(r);
+        A.listings.forEach(l=>{
+          if(l.closeDate&&typeof l.closeDate==='string')l.closeDate=new Date(l.closeDate);
+          if(l.listDate&&typeof l.listDate==='string')l.listDate=new Date(l.listDate);
+        });
+      }
+    }catch(e2){}
+    if(wlLoad) wlLoad.style.display='none';
+    if(wDrop)  wDrop.style.display='';
+    setTimeout(()=>toast('Cloud unavailable — showing locally cached data','warn'),500);
+  }
+  const g=localStorage.getItem(GEO_K);
+  try{if(g) A.geoCache=JSON.parse(g);}catch(e){}
 }
-function save(){try{localStorage.setItem(STORAGE,JSON.stringify(A.listings));}catch(e){toast('Storage full — try clearing old data','err');}}
+function save(){try{localStorage.setItem(STORAGE,JSON.stringify(A.listings.map(l=>({...l,closeDate:l.closeDate?l.closeDate.toISOString():null,listDate:l.listDate?l.listDate.toISOString():null}))));}catch(e){}}
 function saveGeo(){try{localStorage.setItem(GEO_K,JSON.stringify(A.geoCache));}catch(e){}}
 
-function clearAll(){
-  if(!confirm('Clear all stored MLS data? This cannot be undone.'))return;
-  localStorage.removeItem(STORAGE);localStorage.removeItem(GEO_K);
-  A.listings=[];A.geoCache={};A.comps=[];A.excluded.clear();
-  updateHeader();rebuildCityTabs();toast('All data cleared','inf');
+async function clearAll(){
+  if(!confirm('Clear ALL data from the cloud database and local cache?\nThis affects everyone with the link. This cannot be undone.'))return;
+  toast('Deleting from cloud database…','inf');
+  try{
+    await deleteAllFromSupabase();
+    localStorage.removeItem(STORAGE);localStorage.removeItem(GEO_K);
+    A.listings=[];A.geoCache={};A.comps=[];A.excluded.clear();
+    updateHeader();rebuildCityTabs();
+    toast('All data cleared from cloud and local cache','inf');
+  }catch(e){toast('Cloud delete failed: '+e.message,'err');}
 }
 
 // ═══════════════════════════════════
@@ -2106,7 +2218,7 @@ function exportComps(){
 function handleFile(file,isModal){
   if(!file)return;
   const reader=new FileReader();
-  reader.onload=e=>{
+  reader.onload=async e=>{
     try{
       const r=mergeCSV(e.target.result);
       updateHeader();rebuildCityTabs();
@@ -2138,7 +2250,14 @@ function handleFile(file,isModal){
         setTimeout(()=>initDefaultMap(),300);
       }
       const pruneMsg=r.pruned?` · ${r.pruned} old records pruned`:'';
-      toast(`Loaded ${r.added.toLocaleString()} new + ${r.updated.toLocaleString()} updated listings${pruneMsg}`,'ok');
+      // Upsert to Supabase so all users see the updated data
+      toast(`Syncing ${A.listings.length.toLocaleString()} records to cloud…`,'inf');
+      try{
+        await upsertToSupabase(A.listings);
+        toast(`✓ ${r.added.toLocaleString()} added · ${r.updated.toLocaleString()} updated${pruneMsg} · synced to cloud`,'ok');
+      }catch(e){
+        toast(`Local update done — cloud sync failed: ${e.message}`,'err');
+      }
     }catch(err){toast('CSV parse error: '+err.message,'err');console.error(err);}
   };
   reader.readAsText(file);
@@ -2843,8 +2962,8 @@ function exportOpportunities(){
 // ═══════════════════════════════════
 // INIT
 // ═══════════════════════════════════
-function init(){
-  load();
+async function init(){
+  await load();
   updateHeader();
 
   if(A.listings.length>0){
