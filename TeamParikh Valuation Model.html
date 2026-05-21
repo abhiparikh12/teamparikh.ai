@@ -3119,25 +3119,25 @@ function renderMarketIntel(){
           </div>
         </div>
         ${(()=>{
-          // Data diagnostics — always show so user knows exactly what's in the DB
-          const soldWithDate = soldInScope.filter(l=>l.closeDate);
-          const soldNoDate   = soldInScope.filter(l=>!l.closeDate);
-          const latestClose  = soldWithDate.length
-            ? new Date(Math.max(...soldWithDate.map(l=>l.closeDate.getTime())))
-            : null;
-          const daysSinceLatest = latestClose
-            ? Math.round((NOW.getTime()-latestClose.getTime())/(864e5))
-            : null;
-          const warn = !latestClose || daysSinceLatest > 90;
-          return \`<div style="margin-top:9px;padding:8px 10px;background:rgba(\${warn?'238,94,94':'56,198,139'},.06);border:1px solid rgba(\${warn?'238,94,94':'56,198,139'},.2);border-radius:5px;font-size:10.5px;line-height:1.8;color:var(--txt2)">
-            <span style="font-weight:700;color:var(--\${warn?'red':'grn'})">📅 Data diagnostic</span><br>
-            Today: <strong style="color:var(--txt)">\${NOW.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</strong> &nbsp;·&nbsp;
-            Latest closeDate in scope: <strong style="color:var(--txt)">\${latestClose?latestClose.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'None found'}</strong>
-            \${daysSinceLatest!=null?' ('+daysSinceLatest+' days ago)':''}<br>
-            Records with closeDate: <strong style="color:var(--txt)">\${soldWithDate.length}</strong> &nbsp;·&nbsp;
-            Missing closeDate: <strong style="color:\${soldNoDate.length>0?'var(--org)':'var(--txt)'}">\${soldNoDate.length}</strong>
-            \${soldNoDate.length>0?' ← <span style="color:var(--org)">Upload a fresh CSV to fix missing dates</span>':''}
-          </div>\`;
+          var soldWithDate=soldInScope.filter(function(l){return l.closeDate;});
+          var soldNoDate=soldInScope.filter(function(l){return !l.closeDate;});
+          var dts=soldWithDate.map(function(l){return l.closeDate.getTime();});
+          var latestClose=dts.length?new Date(Math.max.apply(null,dts)):null;
+          var daysSince=latestClose?Math.round((NOW.getTime()-latestClose.getTime())/(864e5)):null;
+          var warn=!latestClose||daysSince>90;
+          var color=warn?'rgba(238,94,94,.06)':'rgba(56,198,139,.06)';
+          var bcolor=warn?'rgba(238,94,94,.2)':'rgba(56,198,139,.2)';
+          var tcolor=warn?'var(--red)':'var(--grn)';
+          var latestStr=latestClose?latestClose.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'None found';
+          var daysStr=daysSince!=null?' ('+daysSince+' days ago)':'';
+          var missingStr=soldNoDate.length>0?' - <span style="color:var(--org)">Upload fresh CSV to fix</span>':'';
+          return '<div style="margin-top:9px;padding:8px 10px;background:'+color+';border:1px solid '+bcolor+';border-radius:5px;font-size:10.5px;line-height:1.8;color:var(--txt2)">'
+            +'<span style="font-weight:700;color:'+tcolor+'">Data diagnostic</span><br>'
+            +'Today: <strong style="color:var(--txt)">'+NOW.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+'</strong> &nbsp;&middot;&nbsp;'
+            +'Latest close in scope: <strong style="color:var(--txt)">'+latestStr+'</strong>'+daysStr+'<br>'
+            +'Records with close date: <strong style="color:var(--txt)">'+soldWithDate.length+'</strong> &nbsp;&middot;&nbsp;'
+            +'Missing close date: <strong style="color:var(--txt)">'+soldNoDate.length+'</strong>'+missingStr
+            +'</div>';
         })()}
       </div>
 
