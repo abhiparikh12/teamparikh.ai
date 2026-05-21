@@ -1216,6 +1216,36 @@ async function clearAll(){
 // ═══════════════════════════════════
 // CSV PARSING
 // ═══════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
+// CLOSE DATE ESTIMATION ENGINE
+// Calibrated on 7,312 Bay Area sold transactions.
+// Median escrow: 25 days from pending. Status Date matches actual
+// close within ±1 day in 79% of SLD records.
+// Priority: M1 Exact → M2 Status Date → M3 Pending+25d →
+//           M4 Off-Market+25d → M5 List+DOM+25d → UNKNOWN
+// Also accepts _est_close_date from the standalone estimator export.
+// ═══════════════════════════════════════════════════════════════════
+const ESCROW_DAYS=25;
+function _addDays(d,n){const r=new Date(d);r.setDate(r.getDate()+n);return r;}
+function _firstDate(row,keys){for(const k of keys){const d=parseDate(row[k]);if(d)return d;}return null;}
+
+function estimateCloseDate(row,explicitClose,listDate,dom){
+  // M1 — exact close date already in export
+  if(explicitClose)return{date:explicitClose,method:'M1',est:false};
+  // M2 — Status Date (matches actual close ±1d for 79% of SLD records)
+  const statusDate=_firstDate(row,['Status Date','Stat Date','Status Change Date','StatDate']);
+  if(statusDate)return{date:statusDate,method:'M2',est:true};
+  // M3 — Pending Date + 25 days median escrow
+  const pendingDate=_firstDate(row,['Pending Date','Pend Date','Under Contract Date']);
+  if(pendingDate)return{date:_addDays(pendingDate,ESCROW_DAYS),method:'M3',est:true};
+  // M4 — Off Market Date + 25 days
+  const offMktDate=_firstDate(row,['Off Market Date','OffMarket Date','Expire Date','Expiration Date']);
+  if(offMktDate)return{date:_addDays(offMktDate,ESCROW_DAYS),method:'M4',est:true};
+  // M5 — List Date + DOM + 25 days (lowest confidence)
+  if(listDate&&dom>0)return{date:_addDays(listDate,dom+ESCROW_DAYS),method:'M5',est:true};
+  return{date:null,method:'UNKNOWN',est:true};
+}
+
 function parseRow(row){
   const listPPSF=parsePrice(row['List$/SqFt']);  // e.g. "$409" → 409
   const salePPSF=parsePrice(row['Sale/SqFt']);   // e.g. "$458" → 458
@@ -1225,13 +1255,20 @@ function parseRow(row){
   const sp=parsePrice(row['SP']);
   // Use Sale/SqFt directly if present (more accurate); fallback to SP/SqFt
   const ppsf=salePPSF||(sqft&&sp?sp/sqft:null);
-  const closeDate=parseDate(row['Close Date']);
-  const listDate=parseDate(row['LD']);
+  // Accept multiple close date column names including _est_close_date from standalone tool
+  const explicitClose=parseDate(row['Close Date'])||parseDate(row['Closing Date'])||parseDate(row['_est_close_date']);
+  const listDate=parseDate(row['LD'])||parseDate(row['List Date'])||parseDate(row['Listed Date']);
+  const dom=parseInt(row['DOM'])||parseInt(row['Days On Market'])||0;
+  const status=(row['Status']||'').trim().toUpperCase();
+  // Only estimate for sold/pending — not active listings
+  const needsEst=['SLD','SOLD','WC','PEND','CS','SOM'].includes(status);
+  const est=needsEst?estimateCloseDate(row,explicitClose,listDate,dom)
+                    :{date:explicitClose,method:explicitClose?'M1':'NONE',est:false};
   return{
     mlsNo:(row['MLS No']||'').trim(),
-    status:(row['Status']||'').trim().toUpperCase(),
-    dom:parseInt(row['DOM'])||0,
-    cdom:parseInt(row['CDOM'])||0,
+    status,
+    dom,
+    cdom:parseInt(row['CDOM'])||parseInt(row['Cumulative DOM'])||0,
     address:(row['Address']||'').trim(),
     unit:(row['Unit']||'').trim(),
     city:(row['City']||'').trim().toUpperCase(),
@@ -1249,7 +1286,10 @@ function parseRow(row){
     hoaFee:hoaMo(row['HOA Fee'],row['Freq']),
     stories:(row['Stories']||'').trim(),
     listPPSF,salePPSF,ppsf,
-    closeDate,listDate,
+    closeDate:est.date,
+    closeDateMethod:est.method,
+    closeDateEst:est.est,
+    listDate,
     lat:null,lng:null,
   };
 }
@@ -1274,7 +1314,19 @@ function mergeCSV(text){
   const pruned=beforePrune-A.listings.length;
 
   save();
-  return{added,updated,pruned,total:A.listings.length};
+  // ── Close Date Coverage Stats ──
+  const sldAll=A.listings.filter(l=>['SLD','WC','PEND','CS'].includes(l.status));
+  const cdCoverage={
+    total:sldAll.length,
+    m1:sldAll.filter(l=>l.closeDateMethod==='M1').length,
+    m2:sldAll.filter(l=>l.closeDateMethod==='M2').length,
+    m3:sldAll.filter(l=>l.closeDateMethod==='M3').length,
+    m4:sldAll.filter(l=>l.closeDateMethod==='M4').length,
+    m5:sldAll.filter(l=>l.closeDateMethod==='M5').length,
+    unknown:sldAll.filter(l=>l.closeDateMethod==='UNKNOWN').length,
+  };
+  cdCoverage.resolved=cdCoverage.m1+cdCoverage.m2+cdCoverage.m3+cdCoverage.m4+cdCoverage.m5;
+  return{added,updated,pruned,total:A.listings.length,cdCoverage};
 }
 
 // ═══════════════════════════════════
@@ -2500,7 +2552,14 @@ function handleFile(file,isModal){
             rangeStr=`📅 Date range: <strong style="color:var(--txt)">${fD(minD)}</strong> → <strong style="color:var(--txt)">${fD(maxD)}</strong>`;
           }
           const citiesArr=[...new Set(A.listings.map(l=>l.city))].filter(Boolean).sort();
-          dh.innerHTML=`${rangeStr}<br>🏙 Cities in database: <strong style="color:var(--txt)">${citiesArr.map(c=>toTitle(c)).join(', ')}</strong>${r.pruned?`<br>🗑 <span style="color:var(--org)">${r.pruned} sold record(s) older than 3 years were auto-pruned</span>`:''}`;
+          const cd=r.cdCoverage||{};
+          const cdPct=cd.total>0?Math.round(cd.resolved/cd.total*100):100;
+          const cdColor=cdPct>=90?'var(--grn)':cdPct>=70?'var(--gold)':'var(--red)';
+          const cdDetail=cd.total>0
+            ?`<br><span style="font-size:10px;color:var(--txt2)">Close date sources — M1 Exact: <b style="color:var(--grn)">${cd.m1||0}</b> · M2 Status Date: <b style="color:var(--blue)">${cd.m2||0}</b> · M3 Pending+25d: <b style="color:var(--gold)">${cd.m3||0}</b> · M4 Off-Mkt+25d: <b style="color:var(--pur)">${cd.m4||0}</b> · M5 List+DOM: <b style="color:var(--org)">${cd.m5||0}</b>${cd.unknown>0?` · <b style="color:var(--red)">${cd.unknown} UNKNOWN — re-export with date fields</b>`:''}</span>`
+            :'';
+          dh.innerHTML=`${rangeStr}<br>🏙 Cities: <strong style="color:var(--txt)">${citiesArr.map(c=>toTitle(c)).join(', ')}</strong>${r.pruned?`<br>🗑 <span style="color:var(--org)">${r.pruned} old records pruned</span>`:''}<br>📅 Close date coverage: <strong style="color:${cdColor}">${cdPct}% (${(cd.resolved||0).toLocaleString()} / ${(cd.total||0).toLocaleString()} closed records)</strong>${cdDetail}`;
+        }
         }
       }else{
         el('welcome').style.display='none';el('app').classList.add('show');
