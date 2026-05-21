@@ -1,0 +1,2876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team Parikh · Valuation Model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+:root{
+  --bg:#0C0F1A;--sur:#141927;--sur2:#1C2235;--bdr:#28334F;
+  --gold:#C9A84C;--gold2:#E8C96A;--blue:#3E8EF7;--grn:#38C68B;
+  --org:#F5A23A;--red:#EE5E5E;--pur:#9F7AEA;--teal:#2BC0CB;
+  --txt:#DDE3F0;--txt2:#7A8BAE;--txt3:#3A4560;
+  --ff:'Outfit',sans-serif;--fd:'Cormorant Garamond',serif;--fm:'JetBrains Mono',monospace;
+  --r:7px;--r2:11px;
+  --hdr:52px;--nav:44px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt);font-size:13px;line-height:1.5}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:3px}
+
+/* ── WELCOME ── */
+#welcome{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:28px;padding:40px}
+.wl-logo{font-family:var(--fd);font-size:54px;font-weight:300;color:var(--gold);text-align:center;letter-spacing:1px}
+.wl-logo em{display:block;font-style:normal;font-size:13px;letter-spacing:5px;text-transform:uppercase;color:var(--txt2);margin-top:4px;font-family:var(--ff)}
+.wl-sub{color:var(--txt2);font-size:14px;text-align:center;max-width:480px;line-height:1.9}
+.drop-hero{width:100%;max-width:520px;border:2px dashed var(--bdr);border-radius:16px;padding:48px 32px;text-align:center;cursor:pointer;transition:all .2s;background:var(--sur)}
+.drop-hero:hover,.drop-hero.over{border-color:var(--gold);background:rgba(201,168,76,.05)}
+.dh-icon{font-size:40px;margin-bottom:14px}
+.dh-t{font-size:17px;font-weight:600;color:var(--txt);margin-bottom:6px}
+.dh-s{color:var(--txt2);font-size:13px;line-height:1.7}
+.wl-note{color:var(--txt3);font-size:11px}
+
+/* ── APP SHELL ── */
+#app{display:none;flex-direction:column;height:100vh;overflow:hidden}
+#app.show{display:flex}
+
+/* ── HEADER ── */
+.hdr{height:var(--hdr);background:var(--sur);border-bottom:1px solid var(--bdr);display:flex;align-items:center;padding:0 16px;gap:14px;flex-shrink:0}
+.hdr-logo{font-family:var(--fd);font-size:21px;font-weight:600;color:var(--gold);letter-spacing:.5px;white-space:nowrap}
+.hdr-logo small{font-family:var(--ff);font-size:11px;font-weight:400;color:var(--txt3);margin-left:6px;letter-spacing:2px;text-transform:uppercase}
+.hdr-status{flex:1;min-width:0;display:flex;align-items:center;gap:10px;overflow:hidden}
+.status-chip{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:2px 10px;font-size:11px;font-family:var(--fm);white-space:nowrap;border:1px solid}
+.chip-ok{background:rgba(56,198,139,.1);color:var(--grn);border-color:rgba(56,198,139,.25)}
+.chip-warn{background:rgba(245,162,58,.1);color:var(--org);border-color:rgba(245,162,58,.25)}
+.chip-off{background:rgba(120,130,160,.08);color:var(--txt2);border-color:var(--bdr)}
+.hdr-btns{display:flex;gap:7px;flex-shrink:0}
+.btn{border:none;border-radius:6px;padding:6px 14px;font-family:var(--ff);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-g{background:transparent;color:var(--txt2);border:1px solid var(--bdr)}.btn-g:hover{color:var(--txt);border-color:var(--txt2)}
+.btn-gold{background:var(--gold);color:#0C0F1A;font-weight:700}.btn-gold:hover{background:var(--gold2)}
+.btn-blue{background:var(--blue);color:#fff;font-weight:600}.btn-blue:hover{opacity:.85}
+
+/* ── TAB NAV ── */
+.tab-nav{height:var(--nav);background:var(--sur);border-bottom:1px solid var(--bdr);display:flex;align-items:flex-end;padding:0 14px;gap:2px;overflow-x:auto;flex-shrink:0}
+.tab-nav::-webkit-scrollbar{height:3px}
+.tn-btn{padding:8px 16px;font-family:var(--ff);font-size:12px;font-weight:500;color:var(--txt2);background:transparent;border:none;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:all .15s;border-radius:4px 4px 0 0}
+.tn-btn:hover{color:var(--txt);background:rgba(255,255,255,.04)}
+.tn-btn.active{color:var(--gold);border-bottom-color:var(--gold);background:rgba(201,168,76,.06)}
+.tn-city{font-size:11px}
+
+/* ── TAB CONTENT ── */
+.tab-pane{display:none;flex:1;overflow:hidden}
+.tab-pane.active{display:flex}
+
+/* ── CMA TAB ── */
+#pane-cma{flex-direction:row}
+.cma-sidebar{width:260px;min-width:260px;background:var(--sur);border-right:1px solid var(--bdr);overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:11px}
+.cma-main{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:11px}
+
+/* ── CITY TAB ── */
+.city-pane{flex-direction:column;overflow:hidden;width:100%}
+.city-stats{padding:10px 14px;background:var(--sur);border-bottom:1px solid var(--bdr);display:flex;gap:20px;flex-wrap:wrap;flex-shrink:0}
+.cs-item{display:flex;flex-direction:column;align-items:center}
+.cs-num{font-family:var(--fm);font-size:18px;font-weight:500;color:var(--txt)}
+.cs-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--txt2);margin-top:1px}
+.city-table-wrap{flex:1;overflow-y:auto;overflow-x:auto;min-height:0}
+
+/* ── CITY FILTER BAR ── */
+.city-fbar{display:flex;align-items:stretch;background:var(--sur);border-bottom:2px solid var(--bdr);overflow-x:auto;flex-shrink:0;min-height:56px}
+.city-fbar::-webkit-scrollbar{height:3px}.city-fbar::-webkit-scrollbar-thumb{background:var(--bdr)}
+.fb-grp{display:flex;flex-direction:column;justify-content:center;gap:3px;padding:5px 10px;border-right:1px solid var(--bdr);flex-shrink:0}
+.fb-grp:last-of-type{border-right:none}
+.fb-lbl{font-size:9px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+.fb-row{display:flex;align-items:center;gap:3px}
+.fbi{font-size:11px;padding:3px 6px;background:var(--sur2);border:1px solid var(--bdr);border-radius:4px;color:var(--txt);font-family:var(--fm);outline:none;min-width:0}
+.fbi:focus{border-color:var(--gold)}.fbi::placeholder{color:var(--txt3)}
+.fbi-n{width:56px}.fbi-s{width:42px}.fbi-m{width:72px}
+.fbi-sel{cursor:pointer;font-family:var(--ff);font-size:11px;background:var(--sur2);border:1px solid var(--bdr);border-radius:4px;color:var(--txt);padding:3px 5px;outline:none}
+.fbi-sel:focus{border-color:var(--gold)}
+.fbi-addr{width:120px;font-family:var(--ff)}
+.fb-dash{color:var(--txt3);font-size:10px;font-weight:700;flex-shrink:0}
+.fb-clear-btn{align-self:center;margin:0 8px;padding:5px 12px;font-size:11px;background:transparent;border:1px solid var(--bdr);border-radius:4px;color:var(--txt2);cursor:pointer;font-family:var(--ff);flex-shrink:0;white-space:nowrap}
+.fb-clear-btn:hover{border-color:var(--red);color:var(--red)}
+
+/* ── CARDS ── */
+.card{background:var(--sur2);border:1px solid var(--bdr);border-radius:var(--r);padding:13px}
+.card-title{font-family:var(--fd);font-size:15px;font-weight:600;color:var(--gold);margin-bottom:11px;letter-spacing:.3px;display:flex;align-items:center;justify-content:space-between}
+.ct-chip{font-family:var(--fm);font-size:10px;font-weight:500;background:rgba(201,168,76,.12);color:var(--gold);border:1px solid rgba(201,168,76,.25);border-radius:10px;padding:1px 8px}
+
+/* ── FORMS ── */
+.fg{margin-bottom:9px}
+.fg label{display:block;font-size:10px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px}
+.fg input,.fg select{width:100%;background:var(--sur);border:1px solid var(--bdr);border-radius:5px;color:var(--txt);font-family:var(--ff);font-size:12px;padding:6px 9px;outline:none;transition:border-color .15s}
+.fg input:focus,.fg select:focus{border-color:var(--gold)}
+.fg input::placeholder{color:var(--txt3)}
+.fg select option{background:var(--sur2)}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.rr{display:flex;align-items:center;gap:5px}
+.rr input{min-width:0}
+.rr span{color:var(--txt3);font-size:11px;flex-shrink:0}
+.btn-run{background:linear-gradient(135deg,var(--gold),#D4A030);color:#0C0F1A;font-weight:700;width:100%;padding:11px;border-radius:6px;border:none;cursor:pointer;font-family:var(--ff);font-size:14px;transition:all .15s;letter-spacing:.3px}
+.btn-run:hover{background:linear-gradient(135deg,var(--gold2),var(--gold));box-shadow:0 4px 16px rgba(201,168,76,.3)}
+
+/* ── RADIO SCOPE ── */
+.scope-row{display:flex;gap:4px}
+.scope-pill{flex:1;padding:5px 4px;border:1px solid var(--bdr);border-radius:5px;background:transparent;color:var(--txt2);font-size:11px;font-weight:500;cursor:pointer;font-family:var(--ff);text-align:center;transition:all .15s}
+.scope-pill.active{background:rgba(56,198,139,.1);color:var(--grn);border-color:rgba(56,198,139,.3)}
+
+/* ── PILL SELECT ── */
+.pill-row{display:flex;gap:4px;flex-wrap:wrap}
+.pill{border:1px solid var(--bdr);background:transparent;color:var(--txt2);border-radius:20px;padding:3px 11px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--ff);transition:all .15s}
+.pill.active{background:var(--gold);color:#0C0F1A;border-color:var(--gold)}
+
+/* ── VALUATION ── */
+.val-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.val-method-card{background:var(--sur);border:1px solid var(--bdr);border-radius:var(--r);padding:12px}
+.vm-tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--txt2);margin-bottom:5px;display:flex;align-items:center;gap:6px}
+.vm-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.vm-price{font-family:var(--fm);font-size:22px;font-weight:500;color:var(--txt)}
+.vm-range{font-size:11px;color:var(--txt2);margin-top:2px}
+.vm-detail{font-size:10px;color:var(--txt3);margin-top:3px;line-height:1.6}
+.consensus{background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.28);border-radius:var(--r);padding:14px;margin-top:4px}
+.cons-top{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}
+.cons-label{font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.8px}
+.cons-price{font-family:var(--fm);font-size:30px;font-weight:500;color:var(--gold)}
+.cons-delta{font-size:12px;color:var(--txt2)}
+.conf-row{display:flex;align-items:center;gap:8px}
+.conf-bar{flex:1;height:4px;background:var(--bdr);border-radius:2px;overflow:hidden}
+.conf-fill{height:100%;border-radius:2px;transition:width .5s}
+.fill-hi{background:var(--grn)}.fill-med{background:var(--org)}.fill-lo{background:var(--red)}
+.conf-txt{font-size:11px;font-weight:600}
+.conf-txt.hi{color:var(--grn)}.conf-txt.med{color:var(--org)}.conf-txt.lo{color:var(--red)}
+.val-empty{color:var(--txt3);font-size:13px;padding:36px 16px;text-align:center;line-height:2}
+
+/* ── COMP TABLE ── */
+.tbl-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.tbl-label{font-size:12px;color:var(--txt2);font-family:var(--fm)}
+.tbl-btns{display:flex;gap:6px}
+.tbl-wrap{overflow-x:auto;max-height:320px;overflow-y:auto}
+.ctable{width:100%;border-collapse:collapse;font-size:11.5px}
+.ctable th{padding:7px 9px;text-align:left;color:var(--txt2);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--bdr);white-space:nowrap;cursor:pointer;user-select:none;position:sticky;top:0;background:var(--sur2);z-index:2}
+.ctable th:hover{color:var(--gold)}
+.ctable th.sa::after{content:' ↑';color:var(--gold)}.ctable th.sd::after{content:' ↓';color:var(--gold)}
+.ctable td{padding:6px 9px;border-bottom:1px solid rgba(40,51,79,.5);white-space:nowrap;vertical-align:middle}
+.ctable tr:hover td{background:rgba(255,255,255,.025)}
+.ctable tr.excl td{opacity:.3}
+.st-pill{font-size:10px;font-weight:700;border-radius:10px;padding:2px 8px;border:1px solid}
+.st-SLD{background:rgba(56,198,139,.1);color:var(--grn);border-color:rgba(56,198,139,.25)}
+.st-ACTV{background:rgba(62,142,247,.1);color:var(--blue);border-color:rgba(62,142,247,.25)}
+.st-PEND{background:rgba(245,162,58,.1);color:var(--org);border-color:rgba(245,162,58,.25)}
+.num{font-family:var(--fm)}.good{color:var(--grn)}.warn{color:var(--org)}.bad{color:var(--red)}
+.score-wrap{display:flex;align-items:center;gap:4px}
+.sbar{width:40px;height:4px;background:var(--bdr);border-radius:2px;overflow:hidden;flex-shrink:0}
+.sfill{height:100%;background:linear-gradient(90deg,var(--blue),var(--pur));border-radius:2px}
+.empty-r{text-align:center;color:var(--txt3);padding:28px;font-size:12px;line-height:2}
+.row-cb{width:13px;height:13px;accent-color:var(--gold);cursor:pointer}
+
+/* ── AGENT REPORT ── */
+.rpt-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px}
+.rpt-col{background:var(--sur);border:1px solid var(--bdr);border-radius:var(--r);padding:13px}
+.rpt-hd{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--txt2);margin-bottom:11px;display:flex;align-items:center;gap:7px}
+.rpt-hd::before{content:'';width:3px;height:12px;border-radius:2px}
+.hd-sell::before{background:var(--gold)}.hd-buy::before{background:var(--blue)}.hd-mkt::before{background:var(--grn)}
+.rpt-price{font-family:var(--fm);font-size:24px;font-weight:500;color:var(--gold);margin-bottom:3px}
+.rpt-range{font-size:11px;color:var(--txt2);margin-bottom:10px}
+.rpt-note{font-size:12px;color:var(--txt);line-height:1.75;padding:9px 11px;background:rgba(255,255,255,.03);border-radius:5px;border-left:2px solid var(--gold)}
+.stat-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid rgba(40,51,79,.5)}
+.stat-row:last-child{border-bottom:none}
+.sl{font-size:11px;color:var(--txt2)}.sv{font-family:var(--fm);font-size:12px}
+
+/* ── MAP ── */
+.map-wrap{border-radius:var(--r);overflow:hidden;border:1px solid var(--bdr)}
+#cma-map{height:280px}
+.map-note{font-size:11px;color:var(--txt2);margin-top:8px;text-align:center}
+.map-legend{display:flex;gap:12px;margin-top:8px;font-size:11px;color:var(--txt2)}
+.ldot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:3px}
+.ldot-sold{background:var(--grn)}.ldot-active{background:var(--blue)}.ldot-pend{background:var(--org)}.ldot-sub{background:var(--gold)}
+
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:9000;backdrop-filter:blur(4px)}
+.overlay.hidden{display:none}
+.modal{background:var(--sur);border:1px solid var(--bdr);border-radius:var(--r2);padding:24px;width:480px;max-width:92vw;max-height:82vh;overflow-y:auto}
+.modal-title{font-family:var(--fd);font-size:22px;color:var(--gold);margin-bottom:18px;font-weight:600}
+.m-drop{border:2px dashed var(--bdr);border-radius:var(--r);padding:28px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg);margin-bottom:14px}
+.m-drop:hover,.m-drop.over{border-color:var(--gold);background:rgba(201,168,76,.04)}
+.m-sum{background:var(--sur2);border:1px solid var(--bdr);border-radius:var(--r);padding:12px;display:none;margin-bottom:14px}
+.sum-g{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;text-align:center}
+.sg-n{font-family:var(--fm);font-size:22px;color:var(--txt)}.sg-l{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--txt2);margin-top:2px}
+.m-acts{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:22px;right:22px;background:var(--sur2);border:1px solid var(--bdr);border-radius:var(--r);padding:11px 18px;font-size:12px;z-index:9999;transform:translateY(60px);opacity:0;transition:all .25s;pointer-events:none}
+.toast.on{transform:translateY(0);opacity:1}
+.toast.ok{border-color:rgba(56,198,139,.4);color:var(--grn)}
+.toast.err{border-color:rgba(238,94,94,.4);color:var(--red)}
+.toast.inf{border-color:rgba(62,142,247,.4);color:var(--blue)}
+
+/* ── AUTOFIX HIGHLIGHT ── */
+.autofill-glow{animation:glow .8s ease-out}
+@keyframes glow{0%,100%{box-shadow:none}50%{box-shadow:0 0 12px rgba(201,168,76,.5)}}
+.leaflet-popup-content-wrapper{background:var(--sur)!important;color:var(--txt)!important;border:1px solid var(--bdr)!important;border-radius:var(--r)!important;box-shadow:0 8px 32px rgba(0,0,0,.6)!important}
+.leaflet-popup-tip{background:var(--sur)!important}
+.pu{font-size:12px;line-height:1.8;min-width:160px}
+.pu-addr{font-weight:700;color:var(--txt);margin-bottom:3px}
+.pu-price{font-family:var(--fm);font-size:15px;color:var(--gold);margin-bottom:4px}
+.pu-dt{color:var(--txt2);font-size:11px}
+/* ── DATE BAR ── */
+.date-bar{height:38px;background:rgba(201,168,76,.05);border-bottom:1px solid rgba(201,168,76,.18);display:flex;align-items:center;padding:0 16px;gap:8px;flex-shrink:0}
+.db-label{font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.6px;white-space:nowrap;margin-right:4px}
+.db-sel{background:var(--sur2);border:1px solid var(--bdr);border-radius:4px;color:var(--txt);font-family:var(--fm);font-size:11px;padding:3px 7px;outline:none;cursor:pointer}
+.db-sel:focus{border-color:var(--gold)}
+.db-sep{color:var(--txt3);font-weight:700;font-size:14px;padding:0 2px}
+.db-status{font-size:11px;color:var(--txt2);font-family:var(--fm);margin-left:6px;white-space:nowrap}
+.db-divider{width:1px;height:20px;background:var(--bdr);margin:0 6px}
+
+/* ── CITY FILTER BAR (horizontal, scrollable) ── */
+.city-fbar{display:flex;align-items:center;gap:0;padding:0;background:var(--sur);border-bottom:1px solid var(--bdr);overflow-x:auto;flex-shrink:0;height:52px}
+.city-fbar::-webkit-scrollbar{height:3px}.city-fbar::-webkit-scrollbar-thumb{background:var(--bdr)}
+.fb-grp{display:flex;flex-direction:column;gap:2px;padding:6px 10px;border-right:1px solid var(--bdr);flex-shrink:0;min-width:0}
+.fb-grp:last-child{border-right:none}
+.fb-lbl{font-size:9px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+.fb-row{display:flex;align-items:center;gap:3px}
+.fbi{width:58px;font-size:11px;padding:2px 5px;background:var(--sur2);border:1px solid var(--bdr);border-radius:4px;color:var(--txt);font-family:var(--fm);outline:none}
+.fbi:focus{border-color:var(--gold)}.fbi::placeholder{color:var(--txt3)}
+/* ── PROXIMITY TOGGLE ── */
+.tog-row{display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer}
+.tog-track{width:34px;height:18px;border-radius:9px;background:var(--bdr);position:relative;transition:background .2s;flex-shrink:0}
+.tog-track.on{background:var(--grn)}
+.tog-thumb{width:14px;height:14px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.tog-track.on .tog-thumb{left:18px}
+.tog-lbl{font-size:12px;color:var(--txt2);user-select:none}
+.radius-row{display:flex;gap:4px;margin-top:6px}
+
+/* ── ADJUSTMENT ENGINE ── */
+.adj-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.adj-meta{font-size:11px;color:var(--txt2);font-family:var(--fm)}
+.adj-tog-row{display:flex;align-items:center;gap:8px;cursor:pointer;padding:4px 10px;border:1px solid var(--bdr);border-radius:6px;background:var(--sur)}
+.adj-tog-row:hover{border-color:var(--gold)}
+.adj-tog-row.on{border-color:var(--gold);background:rgba(201,168,76,.07)}
+.adj-help{font-size:11px;color:var(--txt3);line-height:1.7;margin-bottom:8px;padding:8px 11px;background:var(--sur);border-left:2px solid var(--gold);border-radius:4px}
+.adj-wrap{overflow-x:auto;max-height:380px;overflow-y:auto}
+.adj-tbl{width:100%;border-collapse:collapse;font-size:11px}
+.adj-tbl th{padding:6px 7px;text-align:right;color:var(--txt2);font-weight:700;font-size:9.5px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--bdr);white-space:nowrap;position:sticky;top:0;background:var(--sur2);z-index:2}
+.adj-tbl th.lf{text-align:left}
+.adj-tbl td{padding:4px 5px;border-bottom:1px solid rgba(40,51,79,.4);white-space:nowrap;vertical-align:middle;font-family:var(--fm);text-align:right}
+.adj-tbl td.lf{text-align:left;font-family:var(--ff);font-size:11px;max-width:160px;overflow:hidden;text-overflow:ellipsis}
+.adj-inp{width:64px;background:var(--sur);border:1px solid var(--bdr);border-radius:3px;color:var(--txt);font-family:var(--fm);font-size:10.5px;padding:2px 4px;outline:none;text-align:right}
+.adj-inp:focus{border-color:var(--gold);background:rgba(201,168,76,.05)}
+.adj-inp.suggested{color:var(--teal)}
+.adj-inp.user{color:var(--gold);font-weight:600}
+.adj-flag{display:inline-block;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;margin-left:4px;letter-spacing:.4px}
+.adj-flag-ok{background:rgba(56,198,139,.12);color:var(--grn);border:1px solid rgba(56,198,139,.3)}
+.adj-flag-warn{background:rgba(245,162,58,.12);color:var(--org);border:1px solid rgba(245,162,58,.3)}
+.adj-flag-bad{background:rgba(238,94,94,.12);color:var(--red);border:1px solid rgba(238,94,94,.3)}
+.adj-net{font-family:var(--fm);font-weight:600}
+.adj-empty{padding:36px 16px;text-align:center;color:var(--txt3);font-size:13px;line-height:2}
+.adj-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:11px}
+.adj-sum-card{background:var(--sur);border:1px solid var(--bdr);border-radius:5px;padding:9px 11px}
+.adj-sum-lbl{font-size:9.5px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.adj-sum-val{font-family:var(--fm);font-size:18px;font-weight:500;color:var(--txt)}
+.adj-sum-sub{font-size:10px;color:var(--txt2);margin-top:1px}
+
+/* ── DATA COMPLETENESS ── */
+.dc-row{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--sur);border:1px solid var(--bdr);border-radius:5px;margin-top:8px;font-size:11px}
+.dc-bar{flex:1;height:4px;background:var(--bdr);border-radius:2px;overflow:hidden}
+.dc-fill{height:100%;border-radius:2px;transition:width .3s}
+.dc-lbl{color:var(--txt2);font-family:var(--fm)}
+
+/* ── MARKET INTEL TAB ── */
+.mi-pane{flex-direction:column;overflow-y:auto;padding:14px;gap:13px;display:none}
+.mi-pane.active{display:flex}
+.mi-row{display:grid;gap:13px}
+.mi-row-3{grid-template-columns:repeat(3,1fr)}
+.mi-row-2{grid-template-columns:repeat(2,1fr)}
+.mi-row-4{grid-template-columns:repeat(4,1fr)}
+.mi-card{background:var(--sur2);border:1px solid var(--bdr);border-radius:var(--r);padding:13px}
+.mi-title{font-family:var(--fd);font-size:14px;font-weight:600;color:var(--gold);letter-spacing:.3px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.mi-stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.mi-stat{padding:9px 11px;background:var(--sur);border:1px solid var(--bdr);border-radius:5px}
+.mi-stat-lbl{font-size:9.5px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.55px}
+.mi-stat-val{font-family:var(--fm);font-size:19px;font-weight:500;color:var(--txt);margin-top:2px}
+.mi-stat-sub{font-size:10px;color:var(--txt2);margin-top:1px}
+.mi-stat-val.up{color:var(--grn)}.mi-stat-val.down{color:var(--red)}
+.mi-bar-row{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:11px}
+.mi-bar-lbl{width:130px;color:var(--txt2);flex-shrink:0;font-family:var(--ff)}
+.mi-bar-track{flex:1;height:14px;background:var(--sur);border:1px solid var(--bdr);border-radius:7px;overflow:hidden;position:relative}
+.mi-bar-fill{height:100%;border-radius:6px}
+.mi-bar-fill.over{background:linear-gradient(90deg,rgba(238,94,94,.5),var(--red))}
+.mi-bar-fill.fair{background:linear-gradient(90deg,rgba(56,198,139,.4),var(--grn))}
+.mi-bar-fill.under{background:linear-gradient(90deg,rgba(62,142,247,.4),var(--blue))}
+.mi-bar-fill.warn{background:linear-gradient(90deg,rgba(245,162,58,.4),var(--org))}
+.mi-bar-num{font-family:var(--fm);font-size:11px;color:var(--txt);width:50px;text-align:right;flex-shrink:0}
+.mi-insight{padding:10px 12px;background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.2);border-left:3px solid var(--gold);border-radius:4px;font-size:12px;line-height:1.7;margin-bottom:8px}
+.mi-insight strong{color:var(--gold)}
+.mi-scope-pills{display:flex;gap:5px;margin-bottom:12px;flex-wrap:wrap}
+.mi-scope-pill{padding:5px 12px;border:1px solid var(--bdr);border-radius:14px;background:var(--sur);color:var(--txt2);font-size:11px;font-weight:600;cursor:pointer;font-family:var(--ff)}
+.mi-scope-pill:hover{color:var(--txt)}
+.mi-scope-pill.active{background:var(--gold);color:#0C0F1A;border-color:var(--gold)}
+.mi-empty{padding:60px 24px;text-align:center;color:var(--txt3);line-height:2}
+.mi-chart-wrap{height:240px;position:relative}
+
+/* ── OPPORTUNITIES TAB ── */
+.opp-pane{flex-direction:column;overflow-y:auto;padding:14px;gap:13px;display:none}
+.opp-pane.active{display:flex}
+.opp-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:11px 13px;background:var(--sur2);border:1px solid var(--bdr);border-radius:var(--r)}
+.opp-tool-grp{display:flex;flex-direction:column;gap:3px}
+.opp-tool-lbl{font-size:9px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px}
+.opp-tool-row{display:flex;gap:5px;align-items:center}
+.opp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:13px}
+.opp-card{background:var(--sur2);border:1px solid var(--bdr);border-radius:var(--r);padding:13px;display:flex;flex-direction:column;gap:9px;transition:all .15s}
+.opp-card:hover{border-color:rgba(201,168,76,.4);transform:translateY(-1px)}
+.opp-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.opp-addr{font-family:var(--fd);font-size:15px;font-weight:600;color:var(--txt);line-height:1.3}
+.opp-city{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.opp-tag{display:inline-block;font-size:10px;font-weight:700;padding:3px 9px;border-radius:11px;text-transform:uppercase;letter-spacing:.4px;border:1px solid;flex-shrink:0;white-space:nowrap}
+.opp-tag-deep{background:rgba(56,198,139,.15);color:var(--grn);border-color:rgba(56,198,139,.4)}
+.opp-tag-strong{background:rgba(62,142,247,.15);color:var(--blue);border-color:rgba(62,142,247,.4)}
+.opp-tag-buyer{background:rgba(43,192,203,.15);color:var(--teal);border-color:rgba(43,192,203,.4)}
+.opp-tag-fair{background:rgba(122,139,174,.12);color:var(--txt2);border-color:var(--bdr)}
+.opp-prices{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:9px;background:var(--sur);border-radius:5px}
+.opp-pr-cell{display:flex;flex-direction:column;align-items:flex-start}
+.opp-pr-lbl{font-size:9px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px}
+.opp-pr-val{font-family:var(--fm);font-size:14.5px;font-weight:500;margin-top:2px;color:var(--txt)}
+.opp-pr-val.gap-pos{color:var(--grn)}.opp-pr-val.gap-neg{color:var(--red)}
+.opp-meta{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;font-size:11px;color:var(--txt2)}
+.opp-meta div span{color:var(--txt);font-family:var(--fm)}
+.opp-section{font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.5px;margin-top:5px}
+.opp-bullet{font-size:11px;color:var(--txt);line-height:1.6;padding-left:14px;position:relative}
+.opp-bullet::before{content:'▸';position:absolute;left:2px;color:var(--gold);font-size:10px}
+.opp-risk-bullet{font-size:11px;color:var(--txt);line-height:1.6;padding-left:14px;position:relative}
+.opp-risk-bullet.sev-low::before{content:'●';position:absolute;left:2px;color:var(--grn);font-size:9px;top:4px}
+.opp-risk-bullet.sev-med::before{content:'●';position:absolute;left:2px;color:var(--org);font-size:9px;top:4px}
+.opp-risk-bullet.sev-hi::before{content:'●';position:absolute;left:2px;color:var(--red);font-size:9px;top:4px}
+.opp-score-row{display:flex;align-items:center;gap:7px;padding:7px 9px;background:var(--sur);border-radius:5px}
+.opp-score-lbl{font-size:9.5px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px}
+.opp-score-bar{flex:1;height:5px;background:var(--bdr);border-radius:3px;overflow:hidden}
+.opp-score-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--gold));border-radius:3px}
+.opp-score-num{font-family:var(--fm);font-size:13px;font-weight:600;color:var(--gold)}
+.opp-empty{padding:80px 24px;text-align:center;color:var(--txt3);line-height:2;grid-column:1/-1}
+.opp-stats-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:0;background:var(--sur2);border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden}
+.opp-stat{padding:11px 13px;border-right:1px solid var(--bdr);text-align:center}
+.opp-stat:last-child{border-right:none}
+.opp-stat-num{font-family:var(--fm);font-size:20px;font-weight:500;color:var(--txt)}
+.opp-stat-lbl{font-size:9.5px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+
+/* ── EXPLANATION CARD ── */
+.expl-card{background:var(--sur);border:1px solid var(--bdr);border-radius:5px;padding:9px 11px;margin-top:10px;font-size:11px;color:var(--txt2);line-height:1.7}
+.expl-card strong{color:var(--gold);font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:3px;font-weight:700}
+
+/* ── APPRAISER RECONCILIATION ── */
+.recon-card{background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.22);border-radius:var(--r);padding:12px;margin-top:10px}
+.recon-title{font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.recon-method-row{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:11px}
+.recon-method-name{width:180px;flex-shrink:0;color:var(--txt2)}
+.recon-bar-track{flex:1;height:6px;background:var(--bdr);border-radius:3px;overflow:hidden}
+.recon-bar-fill{height:100%;border-radius:3px;transition:width .5s}
+.fill-A{background:linear-gradient(90deg,#C9A84C,#E8C96A)}
+.fill-B{background:linear-gradient(90deg,#3E8EF7,#7BB8FF)}
+.fill-C{background:linear-gradient(90deg,#38C68B,#6DDFB0)}
+.fill-D{background:linear-gradient(90deg,#C9A84C,#F5A23A)}
+.recon-wt{font-family:var(--fm);font-size:10.5px;color:var(--txt3);width:36px;text-align:right;flex-shrink:0}
+.recon-val{font-family:var(--fm);font-size:11.5px;font-weight:500;width:76px;text-align:right;flex-shrink:0;color:var(--txt)}
+.recon-divider{height:1px;background:rgba(201,168,76,.15);margin:8px 0}
+.recon-note{font-size:11px;color:var(--txt2);line-height:1.8;margin-top:4px}
+.recon-spread{display:inline-flex;align-items:center;font-family:var(--fm);font-size:10px;padding:1px 7px;border-radius:8px;margin-left:6px;font-weight:700}
+.spread-tight{background:rgba(56,198,139,.12);color:var(--grn);border:1px solid rgba(56,198,139,.3)}
+.spread-mod{background:rgba(245,162,58,.12);color:var(--org);border:1px solid rgba(245,162,58,.3)}
+.spread-wide{background:rgba(238,94,94,.12);color:var(--red);border:1px solid rgba(238,94,94,.3)}
+/* ── DATA HEALTH ── */
+.data-range-badge{font-size:10px;color:var(--txt3);font-family:var(--fm);padding:1px 8px;border:1px solid var(--bdr);border-radius:10px;white-space:nowrap;margin-left:4px}
+/* ── COMP QUALITY GRADE ── */
+.cq-pill{font-size:9px;font-weight:700;padding:1px 5px;border-radius:6px;letter-spacing:.3px;border:1px solid;margin-left:3px}
+.cq-a{background:rgba(56,198,139,.12);color:var(--grn);border-color:rgba(56,198,139,.3)}
+.cq-b{background:rgba(62,142,247,.12);color:var(--blue);border-color:rgba(62,142,247,.3)}
+.cq-c{background:rgba(245,162,58,.12);color:var(--org);border-color:rgba(245,162,58,.3)}
+.cq-d{background:rgba(238,94,94,.12);color:var(--red);border-color:rgba(238,94,94,.3)}
+.ta-badge{font-size:9px;padding:1px 5px;border-radius:6px;background:rgba(43,192,203,.1);color:var(--teal);border:1px solid rgba(43,192,203,.25);margin-left:4px}
+
+@media print{.cma-sidebar,.tab-nav,.hdr-btns,.date-bar{display:none!important}.cma-main{padding:0}.card{break-inside:avoid}}
+</style>
+</head>
+<body>
+
+<!-- WELCOME -->
+<div id="welcome">
+  <div class="wl-logo">Team Parikh <em>Valuation Model</em></div>
+  <p class="wl-sub">Appraiser-grade valuations with time-adjusted comps, dynamic method weighting, reconciliation narratives, market diagnostics, and mispricing detection — powered by your MLS export. All analysis runs locally. Data auto-maintains a rolling 3-year window.</p>
+  <div class="drop-hero" id="wdrop" onclick="document.getElementById('wfile').click()">
+    <div class="dh-icon">📂</div>
+    <div class="dh-t">Drop your MLS Export CSV here</div>
+    <div class="dh-s">Supports Sold · Active · Pending listings<br>Data stays in your browser — never uploaded anywhere</div>
+  </div>
+  <input type="file" id="wfile" accept=".csv" style="display:none">
+  <p class="wl-note">After loading, you can drop new exports anytime to merge updated listings into the rolling 3-year database</p>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header class="hdr">
+    <div class="hdr-logo">Team Parikh <small>Valuation Model</small></div>
+    <div class="hdr-status">
+      <span class="status-chip chip-off" id="hdr-chip">No data loaded</span>
+      <span id="hdr-detail" style="font-size:11px;color:var(--txt2)"></span>
+      <span id="hdr-range" class="data-range-badge" style="display:none"></span>
+    </div>
+    <div class="hdr-btns">
+      <button class="btn btn-g" onclick="showModal()">📂 Load / Update</button>
+      <button class="btn btn-g" onclick="exportComps()">⬇ Export Comps</button>
+      <button class="btn btn-g" onclick="window.print()">🖨 Print</button>
+    </div>
+  </header>
+
+  <nav class="tab-nav" id="tab-nav">
+    <button class="tn-btn active" data-tab="cma" onclick="showTab('cma')">⚡ CMA Analysis</button>
+    <button class="tn-btn" data-tab="intel" onclick="showTab('intel')">📊 Market Intel</button>
+    <button class="tn-btn" data-tab="opps" onclick="showTab('opps')">🎯 Opportunities</button>
+    <!-- City tabs added by JS -->
+  </nav>
+
+  <!-- GLOBAL DATE RANGE BAR -->
+  <div class="date-bar" id="date-bar">
+    <span class="db-label">📅 Period</span>
+    <select id="dr-sm" class="db-sel" onchange="applyGlobalDateRange()"></select>
+    <select id="dr-sy" class="db-sel" onchange="applyGlobalDateRange()"></select>
+    <span class="db-sep">—</span>
+    <select id="dr-em" class="db-sel" onchange="applyGlobalDateRange()"></select>
+    <select id="dr-ey" class="db-sel" onchange="applyGlobalDateRange()"></select>
+    <button class="btn btn-g" style="padding:3px 10px;font-size:11px" onclick="clearGlobalDateRange()">✕ All Dates</button>
+    <div class="db-divider"></div>
+    <span class="db-status" id="db-status">Load data to enable date filter</span>
+  </div>
+
+  <div id="tab-content" style="flex:1;display:flex;overflow:hidden">
+
+    <!-- CMA PANE -->
+    <div class="tab-pane active" id="pane-cma">
+      <aside class="cma-sidebar">
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px">Subject Property</div>
+
+          <div class="fg">
+            <label>Street Address</label>
+            <input id="s-addr" type="text" placeholder="e.g. 3275 Dublin Blvd">
+          </div>
+          <div class="fr">
+            <div class="fg"><label>City</label><input id="s-city" type="text" placeholder="Dublin"></div>
+            <div class="fg"><label>Unit #</label><input id="s-unit" type="text" placeholder="—"></div>
+          </div>
+          <div class="fg">
+            <label>Property Type</label>
+            <select id="s-bt">
+              <option value="">— Any Type —</option>
+              <option value="DE">Detached (Single Family)</option>
+              <option value="CO">Condo</option>
+              <option value="TH">Townhome</option>
+            </select>
+          </div>
+          <div class="fr">
+            <div class="fg"><label>Sq Ft</label><input id="s-sqft" type="number" placeholder="1,500"></div>
+            <div class="fg"><label>Year Built</label><input id="s-yr" type="number" placeholder="2000"></div>
+          </div>
+          <div class="fr">
+            <div class="fg"><label>Beds</label><input id="s-br" type="number" placeholder="3" min="0"></div>
+            <div class="fg"><label>Baths</label><input id="s-bth" type="number" placeholder="2" step="0.5"></div>
+          </div>
+          <div class="fr">
+            <div class="fg"><label>Lot Sq Ft</label><input id="s-lot" type="number" placeholder="5,000"></div>
+            <div class="fg"><label>HOA / mo</label><input id="s-hoa" type="number" placeholder="0"></div>
+          </div>
+          <div class="fg">
+            <label>Target / List Price (optional)</label>
+            <input id="s-lp" type="number" placeholder="e.g. 750000">
+          </div>
+
+          <button class="btn-run" onclick="runCMA()">⚡ Run CMA Analysis</button>
+          <div id="autofill-msg" style="font-size:11px;color:var(--grn);text-align:center;margin-top:6px;display:none">✓ Auto-filled from MLS data</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="margin-bottom:11px">Geographic Scope</div>
+          <div class="fg" style="margin-bottom:8px">
+            <label>City Coverage</label>
+            <div class="scope-row" id="scope-row">
+              <button class="scope-pill active" onclick="setScope('same',this)">Same City</button>
+              <button class="scope-pill" onclick="setScope('adj',this)">+ Adjacent</button>
+              <button class="scope-pill" onclick="setScope('all',this)">All Cities</button>
+            </div>
+          </div>
+          <div style="border-top:1px solid var(--bdr);padding-top:9px">
+            <label style="font-size:10px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:6px">Proximity Filter</label>
+            <div class="tog-row" onclick="toggleProximity()">
+              <div class="tog-track" id="prox-track"><div class="tog-thumb"></div></div>
+              <span class="tog-lbl" id="prox-lbl">Off — city scope only</span>
+            </div>
+            <div id="prox-extra" style="display:none;margin-top:8px">
+              <div class="radius-row" id="radius-pills">
+                <button class="pill" onclick="setRadius(0.25,this)">0.25 mi</button>
+                <button class="pill active" onclick="setRadius(0.5,this)">0.5 mi</button>
+                <button class="pill" onclick="setRadius(0.75,this)">0.75 mi</button>
+                <button class="pill" onclick="setRadius(1.0,this)">1.0 mi</button>
+              </div>
+              <div style="font-size:10px;color:var(--txt3);margin-top:5px;line-height:1.6">Geocodes subject via OpenStreetMap. First run ~30s per address then cached permanently.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="margin-bottom:11px">Comp Filters</div>
+          <div class="fg">
+            <label>Status</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="f-sld" checked style="accent-color:var(--gold)"> Sold</label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="f-actv" style="accent-color:var(--gold)"> Active</label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="f-pend" style="accent-color:var(--gold)"> Pending</label>
+            </div>
+          </div>
+          <div class="fg">
+            <label>Sq Ft Range (auto-set from subject)</label>
+            <div class="rr"><input id="f-sf-min" type="number" placeholder="Min"><span>–</span><input id="f-sf-max" type="number" placeholder="Max"></div>
+          </div>
+          <div class="fg">
+            <label>Beds</label>
+            <div class="rr"><input id="f-br-min" type="number" placeholder="Min" min="0"><span>–</span><input id="f-br-max" type="number" placeholder="Max"></div>
+          </div>
+          <div class="fg">
+            <label>Baths</label>
+            <div class="rr"><input id="f-bth-min" type="number" placeholder="Min" step="0.5"><span>–</span><input id="f-bth-max" type="number" placeholder="Max" step="0.5"></div>
+          </div>
+          <div class="fg">
+            <label>Year Built</label>
+            <div class="rr"><input id="f-yr-min" type="number" placeholder="1960"><span>–</span><input id="f-yr-max" type="number" placeholder="2025"></div>
+          </div>
+          <div class="fg"><label>Max Days on Market</label><input id="f-dom" type="number" placeholder="No limit"></div>
+          <div class="fg" style="background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.2);border-radius:5px;padding:7px 9px">
+            <div style="font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">📅 Date Range</div>
+            <div style="font-size:11px;color:var(--txt2)">Controlled by the <strong style="color:var(--txt)">Period</strong> bar above the tabs — applies to both CMA and city views.</div>
+          </div>
+          <div class="fg">
+            <label>Stories</label>
+            <select id="f-stories"><option value="">Any</option><option value="1S">1 Story</option><option value="2S">2 Story</option><option value="3+S">3+ Story</option></select>
+          </div>
+          <div class="fg">
+            <label>Garage</label>
+            <select id="f-gar"><option value="">Any</option><option value="yes">Yes</option><option value="no">No</option></select>
+          </div>
+        </div>
+      </aside>
+
+      <main class="cma-main">
+        <!-- Valuation -->
+        <div class="card">
+          <div class="card-title">Valuation Analysis <span class="ct-chip" id="comp-badge">0 comps</span></div>
+          <div id="val-area"><div class="val-empty">Enter subject property details above and click <strong>Run CMA Analysis</strong>.<br>Results appear instantly — no internet connection needed for the analysis.</div></div>
+          <div id="val-explain" style="display:none"></div>
+        </div>
+
+        <!-- Adjustment Engine (Appraiser Layer) -->
+        <div class="card" id="adj-card">
+          <div class="adj-toolbar">
+            <div class="card-title" style="margin-bottom:0">Adjustment Grid <span class="ct-chip" id="adj-badge">Appraiser Layer · Gross Adj %</span></div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <div class="adj-tog-row" id="adj-tog" onclick="toggleAdjustmentMode()" title="When on, valuation uses adjusted comp prices">
+                <div class="tog-track" id="adj-track"><div class="tog-thumb"></div></div>
+                <span class="tog-lbl" id="adj-tog-lbl">Use adjusted prices in valuation</span>
+              </div>
+              <button class="btn btn-g" style="font-size:11px;padding:4px 10px" onclick="autoSuggestAdjustments()">✨ Auto-Suggest</button>
+              <button class="btn btn-g" style="font-size:11px;padding:4px 10px" onclick="clearAdjustments()">↺ Reset</button>
+            </div>
+          </div>
+          <div class="adj-help" id="adj-help">Each cell is editable. Auto-suggest fills appraiser defaults: <strong>Time</strong> uses Method C trend slope · <strong>Size</strong> uses median $/sqft × ½ marginal rate · <strong>Lot</strong> at $5/sqft · <strong>BR</strong> at $7K/unit · <strong>Bath</strong> at $10K/full ($5K half). <strong>Condition / Location / Amenities</strong> are manual. Net Adjustment %&nbsp;>&nbsp;25% triggers a comp-quality flag (appraiser red flag).</div>
+          <div id="adj-area"><div class="adj-empty">Run CMA to populate the adjustment grid with your top sold comps.<br>Subject's missing fields (Sq Ft, Year Built, Lot, Beds, Baths) are needed for auto-suggestions.</div></div>
+        </div>
+
+        <!-- Comp Table -->
+        <div class="card">
+          <div class="tbl-toolbar">
+            <div class="card-title" style="margin-bottom:0">Comparables <span class="tbl-label" id="tbl-count"></span></div>
+            <div class="tbl-btns">
+              <button class="btn btn-g" style="font-size:11px;padding:4px 10px" onclick="includeAll()">Include All</button>
+              <button class="btn btn-g" style="font-size:11px;padding:4px 10px" onclick="excludeAll()">Exclude All</button>
+            </div>
+          </div>
+          <div class="tbl-wrap">
+            <table class="ctable" id="comp-table">
+              <thead><tr>
+                <th title="Include in model">✓</th>
+                <th onclick="sortComps('address')">Address</th>
+                <th onclick="sortComps('city')">City</th>
+                <th onclick="sortComps('status')">Status</th>
+                <th onclick="sortComps('bt')">Type</th>
+                <th onclick="sortComps('closeDate')">Close Date</th>
+                <th onclick="sortComps('sp')">Sale $</th>
+                <th onclick="sortComps('lp')">List $</th>
+                <th onclick="sortComps('splp')">SP/LP</th>
+                <th onclick="sortComps('ppsf')">$/SqFt</th>
+                <th onclick="sortComps('sqft')">SqFt</th>
+                <th onclick="sortComps('br')">BR</th>
+                <th onclick="sortComps('bth')">Bth</th>
+                <th onclick="sortComps('yrBlt')">Built</th>
+                <th onclick="sortComps('stories')">Stories</th>
+                <th onclick="sortComps('lotSqFt')">Lot</th>
+                <th onclick="sortComps('hoaFee')">HOA/mo</th>
+                <th onclick="sortComps('cdom')">CDOM</th>
+                <th onclick="sortComps('score')">Score</th>
+              </tr></thead>
+              <tbody id="comp-tbody"><tr><td colspan="19" class="empty-r">Run CMA to see comparables</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Agent Report -->
+        <div class="card" id="rpt-card">
+          <div class="card-title">Agent Intelligence Report</div>
+          <div id="rpt-area"><div class="val-empty">Run CMA to generate your agent report.</div></div>
+        </div>
+
+        <!-- Map (non-blocking) -->
+        <div class="card" id="map-card">
+          <div class="card-title">Property Map <span style="font-size:11px;color:var(--txt3);font-family:var(--ff);font-weight:400">(geocoding in background)</span></div>
+          <div class="map-wrap"><div id="cma-map"></div></div>
+          <div class="map-legend"><span><span class="ldot ldot-sold"></span>Sold</span><span><span class="ldot ldot-active"></span>Active</span><span><span class="ldot ldot-pend"></span>Pending</span><span><span class="ldot ldot-sub"></span>Subject</span></div>
+          <div class="map-note" id="map-note">Map loads after geocoding subject address — analysis results are independent of the map.</div>
+        </div>
+      </main>
+    </div>
+    <!-- City panes added by JS -->
+
+    <!-- MARKET INTEL PANE -->
+    <div class="tab-pane mi-pane" id="pane-intel">
+      <div class="mi-scope-pills">
+        <span style="font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.6px;align-self:center;margin-right:6px">Geographic Scope:</span>
+        <button class="mi-scope-pill" id="mi-scope-all" onclick="setIntelScope('all',this)">All Cities</button>
+        <span id="mi-city-pills" style="display:flex;gap:5px;flex-wrap:wrap"></span>
+      </div>
+      <div id="mi-content"><div class="mi-empty">Load MLS data to view market intelligence.<br>Trends, pricing accuracy, and liquidity diagnostics appear here.</div></div>
+    </div>
+
+    <!-- OPPORTUNITIES PANE -->
+    <div class="tab-pane opp-pane" id="pane-opps">
+      <div class="opp-toolbar">
+        <div class="opp-tool-grp">
+          <div class="opp-tool-lbl">Geographic Scope</div>
+          <div class="opp-tool-row">
+            <select id="opp-city" class="fbi-sel" onchange="runOpportunityScanner()" style="font-size:12px;padding:4px 7px"><option value="">All Cities</option></select>
+          </div>
+        </div>
+        <div class="opp-tool-grp">
+          <div class="opp-tool-lbl">Property Type</div>
+          <div class="opp-tool-row">
+            <select id="opp-type" class="fbi-sel" onchange="runOpportunityScanner()" style="font-size:12px;padding:4px 7px"><option value="">Any</option><option value="DE">SFR</option><option value="CO">Condo</option><option value="TH">Townhome</option></select>
+          </div>
+        </div>
+        <div class="opp-tool-grp">
+          <div class="opp-tool-lbl">Min Tag</div>
+          <div class="opp-tool-row">
+            <select id="opp-mintag" class="fbi-sel" onchange="runOpportunityScanner()" style="font-size:12px;padding:4px 7px">
+              <option value="0">All deals (incl. Fair)</option>
+              <option value="3" selected>Buyer Advantage (3%+)</option>
+              <option value="7">Strong Opportunity (7%+)</option>
+              <option value="12">Deep Discount (12%+)</option>
+            </select>
+          </div>
+        </div>
+        <div class="opp-tool-grp">
+          <div class="opp-tool-lbl">Min Comps Required</div>
+          <div class="opp-tool-row">
+            <select id="opp-mincomp" class="fbi-sel" onchange="runOpportunityScanner()" style="font-size:12px;padding:4px 7px">
+              <option value="3">3 (loose)</option>
+              <option value="5" selected>5 (standard)</option>
+              <option value="8">8 (strict)</option>
+            </select>
+          </div>
+        </div>
+        <div class="opp-tool-grp">
+          <div class="opp-tool-lbl">Hide High Risk</div>
+          <div class="opp-tool-row">
+            <label style="display:flex;align-items:center;gap:5px;font-size:11px;cursor:pointer;color:var(--txt2)"><input type="checkbox" id="opp-hideRisk" style="accent-color:var(--gold)" onchange="runOpportunityScanner()"> Filter out</label>
+          </div>
+        </div>
+        <div class="opp-tool-grp" style="flex:1"></div>
+        <button class="btn btn-gold" onclick="runOpportunityScanner()">🔍 Scan</button>
+        <button class="btn btn-g" onclick="exportOpportunities()">⬇ Export</button>
+      </div>
+      <div id="opp-stats"></div>
+      <div class="opp-grid" id="opp-grid"><div class="opp-empty">Click <strong>Scan</strong> to find mispriced active listings.<br>Each opportunity is valued against local sold comps with risk flags.</div></div>
+    </div>
+
+    <!-- City panes appended by JS below this point -->
+  </div>
+</div>
+
+<!-- LOAD MODAL -->
+<div class="overlay hidden" id="load-modal">
+  <div class="modal">
+    <div class="modal-title">Load / Update MLS Data</div>
+    <div class="m-drop" id="mdrop" onclick="document.getElementById('mfile').click()">
+      <div style="font-size:28px;margin-bottom:10px">📂</div>
+      <div style="font-size:15px;font-weight:600;color:var(--txt);margin-bottom:5px">Drop MLS Export CSV or click to browse</div>
+      <div style="font-size:12px;color:var(--txt2)">New records merge cumulatively · duplicates skipped by MLS# · sold data older than 3 years auto-pruned</div>
+    </div>
+    <input type="file" id="mfile" accept=".csv" style="display:none">
+    <div class="m-sum" id="m-sum">
+      <div class="sum-g">
+        <div><div class="sg-n" id="s-total">0</div><div class="sg-l">Total</div></div>
+        <div><div class="sg-n" id="s-sold">0</div><div class="sg-l">Sold</div></div>
+        <div><div class="sg-n" id="s-actv">0</div><div class="sg-l">Active</div></div>
+        <div><div class="sg-n" id="s-cities">0</div><div class="sg-l">Cities</div></div>
+      </div>
+      <div id="m-data-health" style="margin-top:10px;font-size:11px;color:var(--txt2);line-height:1.8;padding:8px 10px;background:var(--sur);border:1px solid var(--bdr);border-radius:5px"></div>
+    </div>
+    <div class="m-acts">
+      <button class="btn btn-g" onclick="clearAll()">🗑 Clear All</button>
+      <button class="btn btn-g" onclick="hideModal()">Cancel</button>
+      <button class="btn btn-gold" onclick="hideModal()">Done</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+'use strict';
+
+// ═══════════════════════════════════
+// STATE
+// ═══════════════════════════════════
+const A = {
+  listings: [],
+  geoCache: {},
+  subject: null,
+  comps: [],
+  excluded: new Set(),
+  scope: 'same',
+  globalDateRange: {start: null, end: null},
+  proximityEnabled: false,
+  proximityRadius: 0.5,
+  map: null,
+  mapMarkers: [],
+  radiusCircle: null,
+  sortCol: 'score',
+  sortDir: -1,
+  // ── VIW v1.0 additions ──
+  adjustments: {},          // { mlsNo: { time:0, size:0, lot:0, br:0, bth:0, cond:0, loc:0, amen:0, _userEdited:Set } }
+  adjUseInValuation: false, // when on, valuation uses adjusted comp prices
+  adjAuditLog: [],          // [{ts, mlsNo, field, old, new}]
+  intelScope: 'all',        // 'all' or city name
+  opportunities: [],        // results of opportunity scanner
+};
+
+const STORAGE = 'piq_v5';
+const GEO_K   = 'piq_geo_v3';
+
+// ═══════════════════════════════════
+// CITY ADJACENCY — Dynamic, coordinate-based
+// Any city in CA_CITY_COORDS auto-resolves adjacency within radiusMi.
+// Cities NOT in the table fall back to same-city-only in "Adjacent" mode.
+// To add a new city: just import data from it — if coords below, adjacency is automatic.
+// ═══════════════════════════════════
+const CA_CITY_COORDS = {
+  // ── Tri-Valley / East Bay ──
+  'SAN RAMON':[37.7799,-121.9780],'DUBLIN':[37.7022,-121.9358],'DANVILLE':[37.8216,-121.9996],
+  'PLEASANTON':[37.6624,-121.8747],'LIVERMORE':[37.6819,-121.7681],'ALAMO':[37.8524,-121.9883],
+  'BLACKHAWK':[37.8113,-121.9154],'DIABLO':[37.8300,-121.9567],
+  // ── Central Contra Costa ──
+  'WALNUT CREEK':[37.9100,-122.0652],'CONCORD':[37.9780,-122.0311],'PLEASANT HILL':[37.9477,-122.0608],
+  'MARTINEZ':[37.9966,-122.1341],'LAFAYETTE':[37.8858,-122.1180],'ORINDA':[37.8771,-122.1797],
+  'MORAGA':[37.8349,-122.1302],'CLAYTON':[37.9413,-121.9358],
+  // ── Inner East Bay ──
+  'HAYWARD':[37.6688,-122.0808],'CASTRO VALLEY':[37.6938,-122.0858],'SAN LEANDRO':[37.7249,-122.1561],
+  'OAKLAND':[37.8044,-122.2712],'PIEDMONT':[37.8238,-122.2321],'BERKELEY':[37.8716,-122.2727],
+  'EMERYVILLE':[37.8309,-122.2854],'ALBANY':[37.8871,-122.2977],'EL CERRITO':[37.9235,-122.3177],
+  // ── South Alameda ──
+  'FREMONT':[37.5485,-121.9886],'UNION CITY':[37.5934,-122.0438],'NEWARK':[37.5296,-122.0402],
+  'MILPITAS':[37.4323,-121.8996],
+  // ── West Contra Costa ──
+  'RICHMOND':[37.9358,-122.3477],'SAN PABLO':[37.9616,-122.3408],'PINOLE':[37.9877,-122.2994],
+  'HERCULES':[38.0177,-122.2888],'RODEO':[38.0302,-122.2613],'EL SOBRANTE':[37.9622,-122.2888],
+  // ── East Contra Costa ──
+  'ANTIOCH':[37.9963,-121.8058],'PITTSBURG':[38.0280,-121.8847],'BRENTWOOD':[37.9318,-121.6960],
+  'OAKLEY':[37.9974,-121.7127],'DISCOVERY BAY':[37.9082,-121.5997],
+  // ── San Francisco ──
+  'SAN FRANCISCO':[37.7749,-122.4194],'DALY CITY':[37.6879,-122.4702],
+  'SOUTH SAN FRANCISCO':[37.6547,-122.4077],'BRISBANE':[37.6797,-122.3997],
+  // ── San Mateo County ──
+  'SAN MATEO':[37.5630,-122.3255],'FOSTER CITY':[37.5585,-122.2711],'BELMONT':[37.5202,-122.2752],
+  'SAN CARLOS':[37.5077,-122.2627],'REDWOOD CITY':[37.4852,-122.2364],'MENLO PARK':[37.4530,-122.1817],
+  'ATHERTON':[37.4613,-122.1983],'PORTOLA VALLEY':[37.3758,-122.2161],'WOODSIDE':[37.4293,-122.2538],
+  'HILLSBOROUGH':[37.5391,-122.3649],'SAN BRUNO':[37.6305,-122.4111],'MILLBRAE':[37.5985,-122.3869],
+  'BURLINGAME':[37.5841,-122.3660],'HALF MOON BAY':[37.4636,-122.4286],
+  // ── Santa Clara County ──
+  'PALO ALTO':[37.4419,-122.1430],'LOS ALTOS':[37.3855,-122.1141],'LOS ALTOS HILLS':[37.3786,-122.1386],
+  'MOUNTAIN VIEW':[37.3861,-122.0839],'SUNNYVALE':[37.3688,-122.0363],'CUPERTINO':[37.3230,-122.0322],
+  'SANTA CLARA':[37.3541,-121.9552],'SAN JOSE':[37.3382,-121.8863],'CAMPBELL':[37.2872,-121.9500],
+  'LOS GATOS':[37.2358,-121.9624],'SARATOGA':[37.2638,-122.0233],'MONTE SERENO':[37.2377,-121.9919],
+  'GILROY':[37.0058,-121.5683],'MORGAN HILL':[37.1305,-121.6544],
+  // ── Marin County ──
+  'SAN RAFAEL':[37.9735,-122.5311],'NOVATO':[38.1074,-122.5697],'MILL VALLEY':[37.9060,-122.5447],
+  'TIBURON':[37.8913,-122.4559],'CORTE MADERA':[37.9255,-122.5186],'LARKSPUR':[37.9346,-122.5330],
+  'GREENBRAE':[37.9363,-122.5122],'FAIRFAX':[37.9874,-122.5888],'SAN ANSELMO':[37.9746,-122.5621],
+  'ROSS':[37.9613,-122.5561],
+  // ── Solano County ──
+  'VALLEJO':[38.1041,-122.2566],'FAIRFIELD':[38.2494,-122.0397],'VACAVILLE':[38.3566,-121.9877],
+  'BENICIA':[38.0491,-122.1597],'AMERICAN CANYON':[38.1777,-122.2639],
+  // ── Sacramento ──
+  'SACRAMENTO':[38.5816,-121.4944],'ELK GROVE':[38.4088,-121.3716],'ROSEVILLE':[38.7521,-121.2880],
+  'ROCKLIN':[38.7907,-121.2357],'FOLSOM':[38.6779,-121.1760],'GRANITE BAY':[38.7546,-121.1660],
+  'LINCOLN':[38.8916,-121.2935],'RANCHO CORDOVA':[38.5891,-121.3024],'CITRUS HEIGHTS':[38.7073,-121.2811],
+  'FAIR OAKS':[38.6524,-121.2733],'CARMICHAEL':[38.6196,-121.3293],'ORANGEVALE':[38.6829,-121.2261],
+  'GOLD RIVER':[38.6291,-121.2249],
+  // ── Fresno / Central Valley ──
+  'FRESNO':[36.7378,-119.7871],'CLOVIS':[36.8252,-119.7029],'VISALIA':[36.3302,-119.2921],
+  'BAKERSFIELD':[35.3733,-119.0187],'STOCKTON':[37.9577,-121.2908],'MODESTO':[37.6391,-120.9969],
+  'TURLOCK':[37.4946,-120.8466],'MERCED':[37.3022,-120.4829],
+  // ── Los Angeles / SoCal ──
+  'LOS ANGELES':[34.0522,-118.2437],'PASADENA':[34.1478,-118.1445],'GLENDALE':[34.1425,-118.2551],
+  'BURBANK':[34.1808,-118.3090],'LONG BEACH':[33.7701,-118.1937],'TORRANCE':[33.8358,-118.3406],
+  'IRVINE':[33.6846,-117.8265],'ANAHEIM':[33.8366,-117.9143],'SANTA ANA':[33.7455,-117.8677],
+  'SANTA MONICA':[34.0195,-118.4912],'BEVERLY HILLS':[34.0736,-118.4004],
+  // ── San Diego ──
+  'SAN DIEGO':[32.7157,-117.1611],'CHULA VISTA':[32.6401,-117.0842],'EL CAJON':[32.7948,-116.9625],
+  'ESCONDIDO':[33.1192,-117.0864],'OCEANSIDE':[33.1959,-117.3795],'CARLSBAD':[33.1581,-117.3506],
+};
+
+/**
+ * Returns cities adjacent (within radiusMi) to the given city, using coordinate lookup.
+ * If city not in CA_CITY_COORDS, returns an empty array (same-city scope only).
+ * This makes the engine infinitely scalable — just feed it data from any city.
+ */
+function getAdjacentCities(city, radiusMi=15){
+  const coords=CA_CITY_COORDS[city];
+  if(!coords) return [];
+  const [la1,lo1]=coords;
+  // Collect cities present in loaded data that are within radiusMi
+  const loaded=new Set(A.listings.map(l=>l.city));
+  return Object.keys(CA_CITY_COORDS).filter(c2=>{
+    if(c2===city||!loaded.has(c2)) return false;
+    const [la2,lo2]=CA_CITY_COORDS[c2];
+    return haversine(la1,lo1,la2,lo2)<=radiusMi;
+  });
+}
+// ═══════════════════════════════════
+// UTILITIES
+// ═══════════════════════════════════
+const v = id => (document.getElementById(id)||{}).value||'';
+const el = id => document.getElementById(id);
+function parsePrice(s){if(!s||typeof s!=='string')return null;const n=parseFloat(s.replace(/[$,\s]/g,''));return isNaN(n)?null:n;}
+function parseLot(s){if(!s)return 0;const n=parseFloat(String(s).replace(/,/g,''));return isNaN(n)?0:n;}
+function hoaMo(fee,freq){const f=parseFloat(fee)||0;if(!f)return 0;const d={M:1,Q:3,A:12,S:6};return f/(d[(freq||'M').trim().toUpperCase()]||1);}
+function fmt(n){if(n==null||isNaN(n))return'—';return'$'+Math.round(n).toLocaleString();}
+function fmtK(n){if(n==null||isNaN(n))return'—';return n>=1e6?'$'+(n/1e6).toFixed(2)+'M':'$'+(n/1000).toFixed(0)+'K';}
+function fmtN(n,d=0){if(n==null||isNaN(n))return'—';return n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});}
+
+const S = {
+  mean:a=>a.length?a.reduce((s,x)=>s+x,0)/a.length:null,
+  median:a=>{if(!a.length)return null;const s=[...a].sort((x,y)=>x-y);const m=Math.floor(s.length/2);return s.length%2?s[m]:(s[m-1]+s[m])/2;},
+  stddev:a=>{if(a.length<2)return 0;const m=S.mean(a);return Math.sqrt(a.reduce((s,x)=>s+(x-m)**2,0)/(a.length-1));},
+  iqr:a=>{if(a.length<4)return a;const s=[...a].sort((x,y)=>x-y);const q1=s[Math.floor(s.length*.25)],q3=s[Math.floor(s.length*.75)],iqr=q3-q1;return a.filter(x=>x>=q1-1.5*iqr&&x<=q3+1.5*iqr);},
+  linReg:(xs,ys)=>{const n=xs.length;if(n<3)return null;const sx=xs.reduce((a,b)=>a+b,0),sy=ys.reduce((a,b)=>a+b,0),sxy=xs.reduce((s,x,i)=>s+x*ys[i],0),sxx=xs.reduce((s,x)=>s+x*x,0),den=n*sxx-sx*sx;if(!den)return null;const slope=(n*sxy-sx*sy)/den,intercept=(sy-slope*sx)/n,ym=sy/n,sst=ys.reduce((s,y)=>s+(y-ym)**2,0),sse=ys.reduce((s,y,i)=>s+(y-(slope*xs[i]+intercept))**2,0);return{slope,intercept,r2:sst?1-sse/sst:0};},
+};
+
+// Date utilities
+function parseDate(s){if(!s||!s.trim())return null;const p=s.trim().split('/');if(p.length!==3)return null;const d=new Date(parseInt(p[2]),parseInt(p[0])-1,parseInt(p[1]));return isNaN(d.getTime())?null:d;}
+function fmtDate(d){if(!d)return'—';return`${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`;}
+const TODAY=new Date();
+
+function haversine(la1,lo1,la2,lo2){const R=3958.8,r=Math.PI/180,dl=(la2-la1)*r,dn=(lo2-lo1)*r,a=Math.sin(dl/2)**2+Math.cos(la1*r)*Math.cos(la2*r)*Math.sin(dn/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
+
+// ═══════════════════════════════════
+// STORAGE
+// ═══════════════════════════════════
+function load(){
+  try{
+    const r=localStorage.getItem(STORAGE);
+    if(r) A.listings=JSON.parse(r);
+    else {
+      // Migration: try loading from previous storage key
+      const prev=localStorage.getItem('piq_v4');
+      if(prev){
+        A.listings=JSON.parse(prev);
+        // Apply 3-year prune on migration
+        const cutoff=new Date(TODAY);cutoff.setFullYear(cutoff.getFullYear()-3);
+        A.listings=A.listings.filter(l=>{
+          if(!l.closeDate)return true; // no date = keep
+          const d=typeof l.closeDate==='string'?new Date(l.closeDate):l.closeDate;
+          return !(l.status==='SLD'&&d<cutoff);
+        });
+        // Fix dates (stored as strings)
+        A.listings.forEach(l=>{if(l.closeDate&&typeof l.closeDate==='string')l.closeDate=new Date(l.closeDate);if(l.listDate&&typeof l.listDate==='string')l.listDate=new Date(l.listDate);});
+        save(); // migrate to new key
+      }
+    }
+    // Ensure dates are Date objects (they serialize to strings in JSON)
+    A.listings.forEach(l=>{
+      if(l.closeDate&&typeof l.closeDate==='string')l.closeDate=new Date(l.closeDate);
+      if(l.listDate&&typeof l.listDate==='string')l.listDate=new Date(l.listDate);
+    });
+    const g=localStorage.getItem(GEO_K);if(g)A.geoCache=JSON.parse(g);
+  }catch(e){console.warn('Load error:',e);}
+}
+function save(){try{localStorage.setItem(STORAGE,JSON.stringify(A.listings));}catch(e){toast('Storage full — try clearing old data','err');}}
+function saveGeo(){try{localStorage.setItem(GEO_K,JSON.stringify(A.geoCache));}catch(e){}}
+
+function clearAll(){
+  if(!confirm('Clear all stored MLS data? This cannot be undone.'))return;
+  localStorage.removeItem(STORAGE);localStorage.removeItem(GEO_K);
+  A.listings=[];A.geoCache={};A.comps=[];A.excluded.clear();
+  updateHeader();rebuildCityTabs();toast('All data cleared','inf');
+}
+
+// ═══════════════════════════════════
+// CSV PARSING
+// ═══════════════════════════════════
+function parseRow(row){
+  const listPPSF=parsePrice(row['List$/SqFt']);  // e.g. "$409" → 409
+  const salePPSF=parsePrice(row['Sale/SqFt']);   // e.g. "$458" → 458
+  const sqft=parseInt(row['SqFt'])||0;
+  // LP was removed from export — reconstruct from List$/SqFt × SqFt
+  const lp=(listPPSF&&sqft)?Math.round(listPPSF*sqft):parsePrice(row['LP'])||null;
+  const sp=parsePrice(row['SP']);
+  // Use Sale/SqFt directly if present (more accurate); fallback to SP/SqFt
+  const ppsf=salePPSF||(sqft&&sp?sp/sqft:null);
+  const closeDate=parseDate(row['Close Date']);
+  const listDate=parseDate(row['LD']);
+  return{
+    mlsNo:(row['MLS No']||'').trim(),
+    status:(row['Status']||'').trim().toUpperCase(),
+    dom:parseInt(row['DOM'])||0,
+    cdom:parseInt(row['CDOM'])||0,
+    address:(row['Address']||'').trim(),
+    unit:(row['Unit']||'').trim(),
+    city:(row['City']||'').trim().toUpperCase(),
+    county:(row['County']||'').trim(),
+    lp,sp,
+    bt:(row['BT']||'OT').trim().toUpperCase(),
+    sqft,
+    br:parseInt(row['BR'])||0,
+    bth:parseFloat(row['Bth'])||0,
+    pb:parseInt(row['PB'])||0,
+    gar:(row['Gar']||'').trim().toUpperCase()==='Y',
+    garSp:parseInt(row['GarSp'])||0,
+    yrBlt:parseInt(row['YrBlt'])||0,
+    lotSqFt:parseLot(row['Lot SqFt']),
+    hoaFee:hoaMo(row['HOA Fee'],row['Freq']),
+    stories:(row['Stories']||'').trim(),
+    listPPSF,salePPSF,ppsf,
+    closeDate,listDate,
+    lat:null,lng:null,
+  };
+}
+
+function mergeCSV(text){
+  const rows=Papa.parse(text,{header:true,skipEmptyLines:true,trimHeaders:true}).data.map(parseRow).filter(r=>r.mlsNo&&r.address);
+  const map=new Map(A.listings.map(l=>[l.mlsNo,l]));
+  let added=0,updated=0;
+  rows.forEach(r=>{
+    if(!r.mlsNo||(!r.lp&&!r.sp&&!r.listPPSF))return;
+    if(map.has(r.mlsNo)){const old=map.get(r.mlsNo);r.lat=old.lat;r.lng=old.lng;map.set(r.mlsNo,r);updated++;}
+    else{map.set(r.mlsNo,r);added++;}
+  });
+  A.listings=Array.from(map.values());
+
+  // ── 3-Year Data Retention: auto-prune sold records older than 36 months ──
+  // Active/Pending listings are retained regardless of age.
+  // This keeps the comp pool fresh and the storage footprint bounded.
+  const cutoff=new Date(TODAY);cutoff.setFullYear(cutoff.getFullYear()-3);
+  const beforePrune=A.listings.length;
+  A.listings=A.listings.filter(l=>!(l.status==='SLD'&&l.closeDate&&l.closeDate<cutoff));
+  const pruned=beforePrune-A.listings.length;
+
+  save();
+  return{added,updated,pruned,total:A.listings.length};
+}
+
+// ═══════════════════════════════════
+// HEADER + TABS
+// ═══════════════════════════════════
+function updateHeader(){
+  const n=A.listings.length;
+  const chip=el('hdr-chip');
+  const rangeBadge=el('hdr-range');
+  if(!n){chip.textContent='No data loaded';chip.className='status-chip chip-off';el('hdr-detail').textContent='';if(rangeBadge)rangeBadge.style.display='none';return;}
+  const sold=A.listings.filter(l=>l.status==='SLD').length;
+  const actv=A.listings.filter(l=>l.status==='ACTV').length;
+  const cities=new Set(A.listings.map(l=>l.city)).size;
+  chip.textContent=n.toLocaleString()+' listings';chip.className='status-chip chip-ok';
+  el('hdr-detail').textContent=`${sold.toLocaleString()} sold · ${actv.toLocaleString()} active · ${cities} cities`;
+  // Show data date range badge
+  if(rangeBadge){
+    const dated=A.listings.filter(l=>l.closeDate);
+    if(dated.length){
+      const dts=dated.map(l=>l.closeDate.getTime());
+      const minD=new Date(Math.min(...dts)),maxD=new Date(Math.max(...dts));
+      const fmt2=d=>`${d.getMonth()+1}/${d.getFullYear()}`;
+      rangeBadge.textContent=`${fmt2(minD)} – ${fmt2(maxD)}`;
+      rangeBadge.style.display='inline-block';
+    }
+  }
+}
+
+let activeTab='cma';
+function showTab(id){
+  activeTab=id;
+  document.querySelectorAll('.tn-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.toggle('active',p.id==='pane-'+id));
+  // Re-render city pane on switch so global date range applies
+  if(id!=='cma'&&id!=='intel'&&id!=='opps'&&el('ctbody-'+id)) renderCityPane(id);
+  if(id==='intel') renderMarketIntel();
+  if(id==='opps') populateOppCityDropdown();
+}
+
+function rebuildCityTabs(){
+  document.querySelectorAll('.tn-btn.tn-city').forEach(b=>b.remove());
+  document.querySelectorAll('.tab-pane.city-pane').forEach(p=>p.remove());
+  if(!A.listings.length)return;
+
+  const cities=[...new Set(A.listings.map(l=>l.city))].filter(Boolean).sort();
+  const nav=el('tab-nav');
+  const shell=el('tab-content');
+  // Build month/year options string from data range
+  const dated=A.listings.filter(l=>l.closeDate);
+  const years=dated.length?[...new Set(dated.map(l=>l.closeDate.getFullYear()))].sort():[2023,2024,2025,2026];
+  const mOpts=MONTHS.map((m,i)=>`<option value="${i+1}">${m}</option>`).join('');
+  const yOpts=years.map(y=>`<option value="${y}">${y}</option>`).join('');
+  const yOptsAll=[Math.min(...years),Math.max(...years)].reduce((s,_,i,a)=>{let r='';for(let y=a[0];y<=a[1];y++)r+=`<option value="${y}">${y}</option>`;return r;},'');
+
+  cities.forEach(city=>{
+    const btn=document.createElement('button');
+    btn.className='tn-btn tn-city';btn.dataset.tab=city;
+    btn.textContent=toTitle(city);
+    btn.onclick=()=>{showTab(city);renderCityPane(city);};
+    nav.appendChild(btn);
+
+    const pane=document.createElement('div');
+    pane.className='tab-pane city-pane';pane.id='pane-'+city;
+    const c=city;
+    // Min year for start, max year for end defaults
+    const minY=Math.min(...years), maxY=Math.max(...years);
+    pane.innerHTML=`
+      <div class="city-stats" id="cstats-${c}"></div>
+      <div class="city-fbar" id="cfbar-${c}">
+        <div class="fb-grp">
+          <div class="fb-lbl">Status</div>
+          <div class="fb-row"><select class="fbi fbi-sel" id="cf-status-${c}" onchange="renderCityPane('${c}')">
+            <option value="">All</option><option value="SLD">Sold</option><option value="ACTV">Active</option><option value="PEND">Pending</option>
+          </select></div>
+        </div>
+        <div class="fb-grp">
+          <div class="fb-lbl">Type</div>
+          <div class="fb-row"><select class="fbi fbi-sel" id="cf-type-${c}" onchange="renderCityPane('${c}')">
+            <option value="">All</option><option value="DE">SFR</option><option value="CO">Condo</option><option value="TH">TH</option>
+          </select></div>
+        </div>
+        <div class="fb-grp">
+          <div class="fb-lbl">Stories</div>
+          <div class="fb-row"><select class="fbi fbi-sel" id="cf-stories-${c}" onchange="renderCityPane('${c}')">
+            <option value="">Any</option><option value="1S">1S</option><option value="2S">2S</option><option value="3+S">3+</option>
+          </select></div>
+        </div>
+        <div class="fb-grp">
+          <div class="fb-lbl">Sq Ft</div>
+          <div class="fb-row">
+            <input class="fbi fbi-n" id="cf-sf-min-${c}" type="number" placeholder="Min" oninput="renderCityPane('${c}')">
+            <span class="fb-dash">–</span>
+            <input class="fbi fbi-n" id="cf-sf-max-${c}" type="number" placeholder="Max" oninput="renderCityPane('${c}')">
+          </div>
+        </div>
+        <div class="fb-grp">
+          <div class="fb-lbl">Beds</div>
+          <div class="fb-row">
+            <input class="fbi fbi-s" id="cf-br-min-${c}" type="number" placeholder="Min" min="0" oninput="renderCityPane('${c}')">
+            <span class="fb-dash">–</span>
+            <input class="fbi fbi-s" id="cf-br-max-${c}" type="number" placeholder="Max" oninput="renderCityPane('${c}')">
+          </div>
+        </div>
+        <div class="fb-grp">
+          <div class="fb-lbl">Baths</div>
+          <div class="fb-row">
+            <input class="fbi fbi-s" id="cf-bth-min-${c}" type="number" placeholder="Min" step="0.5" oninput="renderCityPane('${c}')">
+            <span class="fb-dash">–</span>
+            <input class="fbi fbi-s" id="cf-bth-max-${c}" type="number" placeholder="Max" step="0.5" oninput="renderCityPane('${c}')">
+          </div>
+        </div>
+        <div class="fb-grp">
+          <div class="fb-lbl">Lot SqFt</div>
+          <div class="fb-row">
+            <input class="fbi fbi-n" id="cf-lot-min-${c}" type="number" placeholder="Min" oninput="renderCityPane('${c}')">
+            <span class="fb-dash">–</span>
+            <input class="fbi fbi-n" id="cf-lot-max-${c}" type="number" placeholder="Max" oninput="renderCityPane('${c}')">
+          </div>
+        </div>
+        <div class="fb-grp">
+          <div class="fb-lbl">Close Date (M/Y)</div>
+          <div class="fb-row">
+            <select class="fbi fbi-sel" id="cf-dm-s-${c}" onchange="renderCityPane('${c}')">${mOpts}</select>
+            <select class="fbi fbi-sel" id="cf-dy-s-${c}" onchange="renderCityPane('${c}')">${yOptsAll}</select>
+            <span class="fb-dash">–</span>
+            <select class="fbi fbi-sel" id="cf-dm-e-${c}" onchange="renderCityPane('${c}')">${mOpts}</select>
+            <select class="fbi fbi-sel" id="cf-dy-e-${c}" onchange="renderCityPane('${c}')">${yOptsAll}</select>
+          </div>
+        </div>
+        <div class="fb-grp">
+          <div class="fb-lbl">List Price $</div>
+          <div class="fb-row">
+            <input class="fbi fbi-n" id="cf-lp-min-${c}" type="number" placeholder="Min" oninput="renderCityPane('${c}')">
+            <span class="fb-dash">–</span>
+            <input class="fbi fbi-n" id="cf-lp-max-${c}" type="number" placeholder="Max" oninput="renderCityPane('${c}')">
+          </div>
+        </div>
+        <div class="fb-grp">
+          <div class="fb-lbl">Sale Price $</div>
+          <div class="fb-row">
+            <input class="fbi fbi-n" id="cf-sp-min-${c}" type="number" placeholder="Min" oninput="renderCityPane('${c}')">
+            <span class="fb-dash">–</span>
+            <input class="fbi fbi-n" id="cf-sp-max-${c}" type="number" placeholder="Max" oninput="renderCityPane('${c}')">
+          </div>
+        </div>
+        <div class="fb-grp">
+          <div class="fb-lbl">$/SqFt</div>
+          <div class="fb-row">
+            <input class="fbi fbi-s" id="cf-ppsf-min-${c}" type="number" placeholder="Min" oninput="renderCityPane('${c}')">
+            <span class="fb-dash">–</span>
+            <input class="fbi fbi-s" id="cf-ppsf-max-${c}" type="number" placeholder="Max" oninput="renderCityPane('${c}')">
+          </div>
+        </div>
+        <div class="fb-grp">
+          <div class="fb-lbl">SP/LP %</div>
+          <div class="fb-row">
+            <input class="fbi fbi-s" id="cf-splp-min-${c}" type="number" placeholder="Min" step="0.1" oninput="renderCityPane('${c}')">
+            <span class="fb-dash">–</span>
+            <input class="fbi fbi-s" id="cf-splp-max-${c}" type="number" placeholder="Max" step="0.1" oninput="renderCityPane('${c}')">
+          </div>
+        </div>
+        <div class="fb-grp">
+          <div class="fb-lbl">HOA / mo</div>
+          <div class="fb-row">
+            <input class="fbi fbi-n" id="cf-hoa-min-${c}" type="number" placeholder="Min" oninput="renderCityPane('${c}')">
+            <span class="fb-dash">–</span>
+            <input class="fbi fbi-n" id="cf-hoa-max-${c}" type="number" placeholder="Max" oninput="renderCityPane('${c}')">
+          </div>
+        </div>
+        <div class="fb-grp">
+          <div class="fb-lbl">Yr Built</div>
+          <div class="fb-row">
+            <input class="fbi fbi-n" id="cf-yr-min-${c}" type="number" placeholder="From" oninput="renderCityPane('${c}')">
+            <span class="fb-dash">–</span>
+            <input class="fbi fbi-n" id="cf-yr-max-${c}" type="number" placeholder="To" oninput="renderCityPane('${c}')">
+          </div>
+        </div>
+        <div class="fb-grp">
+          <div class="fb-lbl">CDOM</div>
+          <div class="fb-row">
+            <input class="fbi fbi-s" id="cf-cdom-min-${c}" type="number" placeholder="Min" oninput="renderCityPane('${c}')">
+            <span class="fb-dash">–</span>
+            <input class="fbi fbi-s" id="cf-cdom-max-${c}" type="number" placeholder="Max" oninput="renderCityPane('${c}')">
+          </div>
+        </div>
+        <div class="fb-grp">
+          <div class="fb-lbl">Address</div>
+          <div class="fb-row"><input class="fbi fbi-addr" id="cf-search-${c}" type="text" placeholder="Search address..." oninput="renderCityPane('${c}')"></div>
+        </div>
+        <button class="fb-clear-btn" onclick="clearCityFilters('${c}')">✕ Clear</button>
+      </div>
+      <div class="city-table-wrap"><table class="ctable"><thead><tr>
+        <th>Status</th><th>Address</th><th>Type</th><th>Close Date</th><th>List $</th><th>Sale $</th><th>SP/LP</th><th>$/SqFt</th><th>SqFt</th><th>BR</th><th>Bth</th><th>Built</th><th>Stories</th><th>Lot</th><th>HOA/mo</th><th>CDOM</th>
+      </tr></thead><tbody id="ctbody-${c}"></tbody></table></div>`;
+    shell.appendChild(pane);
+
+    // Set default close date selects to show all data (min year start, max year end)
+    requestAnimationFrame(()=>{
+      const ds=el('cf-dm-s-'+c); if(ds){ds.value=1;}
+      const dys=el('cf-dy-s-'+c); if(dys){dys.value=minY;}
+      const de=el('cf-dm-e-'+c); if(de){de.value=12;}
+      const dye=el('cf-dy-e-'+c); if(dye){dye.value=maxY;}
+    });
+  });
+
+  initDatePickers();
+}
+
+function renderCityPane(city){
+  const g=id=>(el(id+city)||{}).value||'';
+  const n=id=>parseFloat(g(id))||0;
+  const listings=A.listings.filter(l=>l.city===city);
+
+  const fStatus=g('cf-status-'), fType=g('cf-type-'), fStories=g('cf-stories-');
+  const fSearch=g('cf-search-').toLowerCase();
+  const fSfMin=n('cf-sf-min-'), fSfMax=n('cf-sf-max-')||Infinity;
+  const fBrMin=n('cf-br-min-'), fBrMax=n('cf-br-max-')||Infinity;
+  const fBthMin=n('cf-bth-min-'), fBthMax=n('cf-bth-max-')||Infinity;
+  const fLotMin=n('cf-lot-min-'), fLotMax=n('cf-lot-max-')||Infinity;
+  const fLpMin=n('cf-lp-min-'), fLpMax=n('cf-lp-max-')||Infinity;
+  const fSpMin=n('cf-sp-min-'), fSpMax=n('cf-sp-max-')||Infinity;
+  const fPpsfMin=n('cf-ppsf-min-'), fPpsfMax=n('cf-ppsf-max-')||Infinity;
+  const fHoaMin=n('cf-hoa-min-'), fHoaMax=n('cf-hoa-max-')||Infinity;
+  const fYrMin=n('cf-yr-min-'), fYrMax=n('cf-yr-max-')||9999;
+  const fCdomMin=n('cf-cdom-min-'), fCdomMax=n('cf-cdom-max-')||Infinity;
+  const fSplpHasFilter=g('cf-splp-min-')||g('cf-splp-max-');
+  const fSplpMin=parseFloat(g('cf-splp-min-'))||-Infinity, fSplpMax=parseFloat(g('cf-splp-max-'))||Infinity;
+
+  // Local date range (month/year selects in filter bar)
+  const dms=parseInt(g('cf-dm-s-'))||0, dys=parseInt(g('cf-dy-s-'))||0;
+  const dme=parseInt(g('cf-dm-e-'))||0, dye=parseInt(g('cf-dy-e-'))||0;
+  const localStart=(dms&&dys)?new Date(dys,dms-1,1):null;
+  const localEnd=(dme&&dye)?new Date(dye,dme,0,23,59,59):null;
+  // Global date range from header bar
+  const gdr=A.globalDateRange;
+
+  const filtered=listings.filter(l=>{
+    if(fStatus&&l.status!==fStatus)return false;
+    if(fType&&l.bt!==fType)return false;
+    if(fStories&&l.stories!==fStories)return false;
+    if(fSearch&&!l.address.toLowerCase().includes(fSearch))return false;
+    if(fSfMin&&l.sqft&&l.sqft<fSfMin)return false;
+    if(fSfMax<Infinity&&l.sqft&&l.sqft>fSfMax)return false;
+    if(fBrMin&&l.br<fBrMin)return false;
+    if(fBrMax<Infinity&&l.br&&l.br>fBrMax)return false;
+    if(fBthMin&&l.bth<fBthMin)return false;
+    if(fBthMax<Infinity&&l.bth&&l.bth>fBthMax)return false;
+    if(fLotMin&&l.lotSqFt&&l.lotSqFt<fLotMin)return false;
+    if(fLotMax<Infinity&&l.lotSqFt&&l.lotSqFt>fLotMax)return false;
+    if(fLpMin&&l.lp&&l.lp<fLpMin)return false;
+    if(fLpMax<Infinity&&l.lp&&l.lp>fLpMax)return false;
+    if(fSpMin&&l.sp&&l.sp<fSpMin)return false;
+    if(fSpMax<Infinity&&l.sp&&l.sp>fSpMax)return false;
+    if(fPpsfMin&&l.ppsf&&l.ppsf<fPpsfMin)return false;
+    if(fPpsfMax<Infinity&&l.ppsf&&l.ppsf>fPpsfMax)return false;
+    if(fHoaMin&&l.hoaFee&&l.hoaFee<fHoaMin)return false;
+    if(fHoaMax<Infinity&&l.hoaFee&&l.hoaFee>fHoaMax)return false;
+    if(fYrMin&&l.yrBlt&&l.yrBlt<fYrMin)return false;
+    if(fYrMax<9999&&l.yrBlt&&l.yrBlt>fYrMax)return false;
+    const cdom=l.cdom||l.dom||0;
+    if(fCdomMin&&cdom<fCdomMin)return false;
+    if(fCdomMax<Infinity&&cdom>fCdomMax)return false;
+    if(fSplpHasFilter&&l.sp&&l.lp){const sp=((l.sp/l.lp-1)*100);if(sp<fSplpMin||sp>fSplpMax)return false;}
+    // Date: local filter takes precedence over global when set
+    const effStart=localStart||gdr.start, effEnd=localEnd||gdr.end;
+    if(effStart&&l.closeDate&&l.closeDate<effStart)return false;
+    if(effEnd&&l.closeDate&&l.closeDate>effEnd)return false;
+    return true;
+  }).sort((a,b)=>(b.sp||b.lp||0)-(a.sp||a.lp||0));
+
+  // Stats
+  const sold=listings.filter(l=>l.status==='SLD');
+  const actv=listings.filter(l=>l.status==='ACTV');
+  const medPPSF=S.median(filtered.filter(l=>l.ppsf&&l.status==='SLD').map(l=>l.ppsf));
+  const medPrice=S.median(filtered.filter(l=>l.sp).map(l=>l.sp));
+  const effStart=localStart||gdr.start, effEnd=localEnd||gdr.end;
+  const drStr=effStart||effEnd?`<div class="cs-item"><div class="cs-num" style="color:var(--pur);font-size:11px">${effStart?effStart.toLocaleDateString('en-US',{month:'short',year:'numeric'}):'—'}&nbsp;–&nbsp;${effEnd?effEnd.toLocaleDateString('en-US',{month:'short',year:'numeric'}):'now'}</div><div class="cs-lbl">Period</div></div>`:'';
+  el('cstats-'+city).innerHTML=`
+    <div class="cs-item"><div class="cs-num">${listings.length}</div><div class="cs-lbl">Total</div></div>
+    <div class="cs-item"><div class="cs-num" style="color:var(--grn)">${sold.length}</div><div class="cs-lbl">Sold</div></div>
+    <div class="cs-item"><div class="cs-num" style="color:var(--blue)">${actv.length}</div><div class="cs-lbl">Active</div></div>
+    <div class="cs-item"><div class="cs-num">${listings.filter(l=>l.status==='PEND').length}</div><div class="cs-lbl">Pending</div></div>
+    <div class="cs-item"><div class="cs-num" style="color:var(--gold)">${medPrice?fmtK(medPrice):'—'}</div><div class="cs-lbl">Med Sale $</div></div>
+    <div class="cs-item"><div class="cs-num" style="color:var(--teal)">${medPPSF?'$'+Math.round(medPPSF):'—'}</div><div class="cs-lbl">Med $/SqFt</div></div>
+    <div class="cs-item"><div class="cs-num" style="color:var(--txt2)">${filtered.length}</div><div class="cs-lbl">Showing</div></div>
+    ${drStr}`;
+
+  el('ctbody-'+city).innerHTML=filtered.length?filtered.map(l=>{
+    const spLp=l.sp&&l.lp?((l.sp/l.lp-1)*100).toFixed(1)+'%':'—';
+    const spLpCls=l.sp&&l.lp?(l.sp>l.lp?'good':l.sp<l.lp*.97?'bad':''):'';
+    const btLbl=l.bt==='DE'?'SFR':l.bt==='CO'?'Condo':l.bt==='TH'?'TH':l.bt;
+    return`<tr>
+      <td><span class="st-pill st-${l.status}">${l.status}</span></td>
+      <td title="${l.address}${l.unit?' #'+l.unit:''}" style="max-width:200px;overflow:hidden;text-overflow:ellipsis">${l.address}${l.unit?' #'+l.unit:''}</td>
+      <td style="color:var(--txt2)">${btLbl}</td>
+      <td style="font-family:var(--fm);font-size:11px;color:var(--txt2)">${fmtDate(l.closeDate)}</td>
+      <td class="num">${fmt(l.lp)}</td>
+      <td class="num">${l.status==='SLD'?fmt(l.sp):'—'}</td>
+      <td class="num ${spLpCls}">${spLp}</td>
+      <td class="num">${l.ppsf?'$'+Math.round(l.ppsf):'—'}</td>
+      <td class="num">${l.sqft?fmtN(l.sqft):'—'}</td>
+      <td>${l.br||'—'}</td><td>${l.bth||'—'}</td>
+      <td style="color:var(--txt2)">${l.yrBlt||'—'}</td>
+      <td style="color:var(--txt2);font-size:11px">${l.stories||'—'}</td>
+      <td style="color:var(--txt2)">${l.lotSqFt?fmtN(l.lotSqFt):'—'}</td>
+      <td class="num">${l.hoaFee?'$'+Math.round(l.hoaFee):'—'}</td>
+      <td class="num">${l.cdom??l.dom??'—'}</td>
+    </tr>`;
+  }).join(''):`<tr><td colspan="16" class="empty-r">No listings match current filters in ${toTitle(city)}</td></tr>`;
+}
+
+function clearCityFilters(city){
+  ['cf-status-','cf-type-','cf-stories-','cf-search-',
+   'cf-sf-min-','cf-sf-max-','cf-br-min-','cf-br-max-',
+   'cf-bth-min-','cf-bth-max-','cf-lot-min-','cf-lot-max-',
+   'cf-lp-min-','cf-lp-max-','cf-sp-min-','cf-sp-max-',
+   'cf-ppsf-min-','cf-ppsf-max-','cf-splp-min-','cf-splp-max-',
+   'cf-hoa-min-','cf-hoa-max-','cf-yr-min-','cf-yr-max-',
+   'cf-cdom-min-','cf-cdom-max-','cf-dm-s-','cf-dm-e-']
+  .forEach(id=>{const e=el(id+city);if(e)e.value='';});
+  // Reset year selects to extremes
+  const dated=A.listings.filter(l=>l.closeDate);
+  if(dated.length){
+    const years=dated.map(l=>l.closeDate.getFullYear());
+    const ys=el('cf-dy-s-'+city),ye=el('cf-dy-e-'+city);
+    if(ys)ys.value=Math.min(...years); if(ye)ye.value=Math.max(...years);
+    const ms=el('cf-dm-s-'+city),me=el('cf-dm-e-'+city);
+    if(ms)ms.value=1; if(me)me.value=12;
+  }
+  renderCityPane(city);
+}
+
+function toTitle(s){return s.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());}
+
+// ═══════════════════════════════════
+// GLOBAL DATE RANGE
+// ═══════════════════════════════════
+const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function initDatePickers(){
+  const dated=A.listings.filter(l=>l.closeDate);
+  if(!dated.length){el('db-status').textContent='No date data available';return;}
+  const years=dated.map(l=>l.closeDate.getFullYear());
+  const minYear=Math.min(...years);
+  const maxYear=Math.max(Math.max(...years),TODAY.getFullYear());
+
+  const mHtml=MONTHS.map((m,i)=>`<option value="${i+1}">${m}</option>`).join('');
+  el('dr-sm').innerHTML=mHtml; el('dr-em').innerHTML=mHtml;
+
+  let yHtml='';
+  for(let y=minYear;y<=maxYear;y++) yHtml+=`<option value="${y}">${y}</option>`;
+  el('dr-sy').innerHTML=yHtml; el('dr-ey').innerHTML=yHtml;
+
+  // Default: 12 months ago → today
+  const ago12=new Date(TODAY); ago12.setFullYear(ago12.getFullYear()-1);
+  el('dr-sm').value=ago12.getMonth()+1; el('dr-sy').value=ago12.getFullYear();
+  el('dr-em').value=TODAY.getMonth()+1; el('dr-ey').value=TODAY.getFullYear();
+  applyGlobalDateRange(false);
+}
+
+function applyGlobalDateRange(showToast=true){
+  const sm=parseInt(el('dr-sm').value)||1, sy=parseInt(el('dr-sy').value)||2023;
+  const em=parseInt(el('dr-em').value)||12, ey=parseInt(el('dr-ey').value)||2026;
+  A.globalDateRange={
+    start:new Date(sy,sm-1,1),
+    end:new Date(ey,em,0,23,59,59), // last ms of end month
+  };
+  el('db-status').textContent=`${MONTHS[sm-1]} ${sy} – ${MONTHS[em-1]} ${ey}`;
+  if(showToast) toast(`Date filter: ${MONTHS[sm-1]} ${sy} – ${MONTHS[em-1]} ${ey}`,'ok');
+  // Re-render active city pane if open
+  const active=document.querySelector('.tn-btn.tn-city.active');
+  if(active) renderCityPane(active.dataset.tab);
+}
+
+function clearGlobalDateRange(){
+  A.globalDateRange={start:null,end:null};
+  el('db-status').textContent='All dates (no filter)';
+  // Reset selects to full range
+  const dated=A.listings.filter(l=>l.closeDate);
+  if(dated.length){
+    const years=dated.map(l=>l.closeDate.getFullYear());
+    el('dr-sm').value=1; el('dr-sy').value=Math.min(...years);
+    el('dr-em').value=12; el('dr-ey').value=Math.max(...years);
+  }
+  toast('Date filter cleared — showing all dates','inf');
+  const active=document.querySelector('.tn-btn.tn-city.active');
+  if(active) renderCityPane(active.dataset.tab);
+}
+
+// ═══════════════════════════════════
+// AUTO-FILL FROM MLS DATA
+// ═══════════════════════════════════
+function tryAutoFill(){
+  const addr=(v('s-addr')||'').trim().toLowerCase();
+  const city=(v('s-city')||'').trim().toUpperCase();
+  if(!addr||!city)return;
+  const match=A.listings.find(l=>l.address.toLowerCase()===addr&&l.city===city);
+  if(!match)return;
+  const set=(id,val)=>{const e=el(id);if(e&&val){e.value=val;e.classList.add('autofill-glow');setTimeout(()=>e.classList.remove('autofill-glow'),800);}};
+  set('s-sqft',match.sqft||'');set('s-br',match.br||'');set('s-bth',match.bth||'');
+  set('s-yr',match.yrBlt||'');set('s-lot',match.lotSqFt||'');set('s-hoa',match.hoaFee||'');
+  set('s-lp',match.lp||'');if(match.bt){el('s-bt').value=match.bt;}
+  el('autofill-msg').style.display='block';
+  toast('Subject found in MLS data — fields auto-filled ✓','ok');
+}
+
+// ═══════════════════════════════════
+// SCOPE
+// ═══════════════════════════════════
+function setScope(s,btn){
+  A.scope=s;
+  document.querySelectorAll('.scope-pill').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function toggleProximity(){
+  A.proximityEnabled=!A.proximityEnabled;
+  el('prox-track').classList.toggle('on',A.proximityEnabled);
+  el('prox-lbl').textContent=A.proximityEnabled?'On — radius filter active':'Off — city scope only';
+  el('prox-extra').style.display=A.proximityEnabled?'block':'none';
+  if(A.proximityEnabled) toast('Proximity on — geocoding runs when you click Run CMA','inf');
+}
+
+function setRadius(r,btn){
+  A.proximityRadius=r;
+  document.querySelectorAll('#radius-pills .pill').forEach(p=>p.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
+
+// ═══════════════════════════════════
+// PROXIMITY FILTER (geocode + radius)
+// ═══════════════════════════════════
+async function applyProximityFilter(candidates){
+  const subj=A.subject;
+  if(!subj)return;
+  // Geocode subject if not already done
+  if(!subj.lat||!subj.lng){
+    toast('Geocoding subject address for radius filter…','inf');
+    try{
+      const url=`https://nominatim.openstreetmap.org/search?`+new URLSearchParams({q:`${subj.addr}, ${subj.city}, California, USA`,format:'json',limit:'1',countrycodes:'us'});
+      const r=await fetch(url);const d=await r.json();
+      if(d.length){subj.lat=parseFloat(d[0].lat);subj.lng=parseFloat(d[0].lon);}
+      else{toast('Could not geocode subject — proximity filter skipped','err');return;}
+    }catch(e){toast('Geocoding failed — check internet connection','err');return;}
+  }
+  // Geocode candidates that aren't cached
+  const radius=A.proximityRadius;
+  let geocoded=0;
+  for(const c of candidates){
+    const key=`${c.address}, ${c.city}, CA`.toLowerCase();
+    if(A.geoCache[key]){c.lat=A.geoCache[key].lat;c.lng=A.geoCache[key].lng;}
+    else{
+      try{
+        const url=`https://nominatim.openstreetmap.org/search?`+new URLSearchParams({q:`${c.address}, ${c.city}, California, USA`,format:'json',limit:'1',countrycodes:'us'});
+        const r=await fetch(url);const d=await r.json();
+        if(d.length){c.lat=parseFloat(d[0].lat);c.lng=parseFloat(d[0].lon);A.geoCache[key]={lat:c.lat,lng:c.lng};geocoded++;}
+      }catch(e){}
+      await new Promise(r=>setTimeout(r,1100)); // Nominatim rate limit
+    }
+    if(c.lat&&c.lng) c.distance=haversine(subj.lat,subj.lng,c.lat,c.lng);
+  }
+  if(geocoded>0)saveGeo();
+  // Apply radius filter — keep comps within radius OR those without coords (can't discard unknown)
+  A.comps=candidates.filter(c=>!c.lat||c.distance==null||c.distance<=radius);
+  // Re-score with distance component
+  A.comps.forEach(c=>{
+    if(c.distance!=null) c.score=Math.min(100,c.score+(1-Math.min(1,c.distance/radius))*15);
+  });
+  A.comps.sort((a,b)=>b.score-a.score);
+  toast(`Proximity filter applied — ${A.comps.length} comps within ${radius} mi`,'ok');
+}
+
+// ═══════════════════════════════════
+// SIMILARITY SCORING — Appraiser-Grade Comp Selection
+// ═══════════════════════════════════
+function score(subj,comp){
+  let s=100;
+  // SqFt — 30 pts (largest driver of value per appraisal standards)
+  if(subj.sqft&&comp.sqft){const d=Math.abs(comp.sqft-subj.sqft)/subj.sqft;s-=Math.min(30,d*100);}
+  // BR — 18 pts (functional utility)
+  if(subj.br&&comp.br){const d=Math.abs(comp.br-subj.br);s-=Math.min(18,d*9);}
+  // Bth — 12 pts
+  if(subj.bth&&comp.bth){const d=Math.abs(comp.bth-subj.bth);s-=Math.min(12,d*6);}
+  // YrBlt — 12 pts (condition/depreciation proxy)
+  if(subj.yrBlt&&comp.yrBlt){const d=Math.abs(comp.yrBlt-subj.yrBlt);s-=Math.min(12,d*0.7);}
+  // Property Type — 10 pts
+  if(subj.bt&&subj.bt!=='ANY'&&comp.bt&&comp.bt!==subj.bt)s-=10;
+  // Lot size — 8 pts (appraisers always compare site)
+  if(subj.lotSqFt&&comp.lotSqFt&&subj.lotSqFt>0&&comp.lotSqFt>0){
+    const d=Math.abs(comp.lotSqFt-subj.lotSqFt)/subj.lotSqFt;s-=Math.min(8,d*15);
+  }
+  // Recency bonus — fresher comps are more reliable (appraisers prefer <6 months)
+  if(comp.closeDate){
+    const daysSince=(TODAY.getTime()-comp.closeDate.getTime())/(864e5);
+    if(daysSince<=90) s+=8;
+    else if(daysSince<=180) s+=5;
+    else if(daysSince<=365) s+=2;
+    else if(daysSince>720) s-=5; // penalize stale comps > 2 years
+  }
+  // Same city bonus
+  if(comp.city===subj.city) s+=5;
+  // Garage match — small but appraisers note it
+  if(subj.gar!==undefined&&comp.gar!==undefined&&subj.gar!==comp.gar) s-=3;
+  return Math.max(0,Math.min(100,Math.round(s)));
+}
+
+// Comp quality grade for display (appraiser terminology: Grade 1-4)
+function compGrade(sc){
+  if(sc>=80) return {grade:'A',cls:'cq-a',label:'Excellent'};
+  if(sc>=65) return {grade:'B',cls:'cq-b',label:'Good'};
+  if(sc>=50) return {grade:'C',cls:'cq-c',label:'Fair'};
+  return {grade:'D',cls:'cq-d',label:'Weak'};
+}
+
+// ═══════════════════════════════════
+// VALUATION MODELS
+// ═══════════════════════════════════
+
+/**
+ * Compute trend slope ($/sqft/day) from dated sold comps.
+ * Returns null if insufficient data or flat/noise-level trend.
+ */
+function getTrendSlope(sold){
+  const dated=sold.filter(c=>c.closeDate&&c.ppsf&&c.sqft&&!A.excluded.has(c.mlsNo));
+  if(dated.length<5)return null;
+  const t0=Math.min(...dated.map(c=>c.closeDate.getTime()));
+  const xs=dated.map(c=>(c.closeDate.getTime()-t0)/(864e5));
+  const ys=dated.map(c=>c.ppsf);
+  const reg=S.linReg(xs,ys);
+  if(!reg||reg.r2<0.04)return null;
+  return{slope:reg.slope,intercept:reg.intercept,r2:reg.r2,t0,n:dated.length};
+}
+
+function modelA(subj,sold){
+  const priced=sold.filter(c=>c.sp&&c.sqft>0&&!A.excluded.has(c.mlsNo));
+  if(priced.length<2)return null;
+
+  // ── Time-adjust each comp's PPSF to present day ──────────────────────
+  // Core appraiser technique: comps from 18 months ago need market-time adjustment.
+  // We use the linear trend slope to bring each comp's PPSF to "today's dollars".
+  const trend=getTrendSlope(priced);
+  let timeAdjusted=false;
+  const raw=priced.map(c=>{
+    let ppsf=c.sp/c.sqft;
+    if(trend&&c.closeDate){
+      const daysSince=(TODAY.getTime()-c.closeDate.getTime())/(864e5);
+      ppsf+=trend.slope*daysSince; // e.g. +$0.15/sqft/day × 365 days = +$55/sqft
+      timeAdjusted=true;
+    }
+    return Math.max(ppsf,50); // floor at $50/sqft
+  });
+  const clean=S.iqr(raw);
+  const med=S.median(clean);
+  if(!med||!subj.sqft)return null;
+  let adj=med;
+  // Size adjustment (marginal rate: larger homes = lower PPSF)
+  if(subj.sqft){const ms=S.median(priced.map(c=>c.sqft));if(ms){const d=(subj.sqft-ms)/ms;adj*=(1-d*0.07);}}
+  // Age adjustment
+  if(subj.yrBlt){const my=S.median(priced.filter(c=>c.yrBlt).map(c=>c.yrBlt));if(my){adj*=(1+(subj.yrBlt-my)*0.003);}}
+  // HOA adjustment (higher HOA = lower effective $/sqft because buyer pays monthly)
+  if(subj.hoaFee!=null){const mh=S.median(priced.map(c=>c.hoaFee||0));const diff=(subj.hoaFee||0)-mh;adj+=diff*80/Math.max(subj.sqft,1);}
+  adj=Math.max(adj,50);
+  const mid=adj*subj.sqft;
+  const sig=S.stddev(clean)*subj.sqft;
+  const spread=Math.max(sig,mid*0.04);
+  return{lo:Math.round(mid-spread),mid:Math.round(mid),hi:Math.round(mid+spread),ppsf:Math.round(adj),sig:Math.round(S.stddev(clean)),n:priced.length,timeAdjusted};
+}
+
+function modelB(subj,sold){
+  const usable=sold.filter(c=>c.sp&&c.score>0&&!A.excluded.has(c.mlsNo));
+  if(usable.length<2)return null;
+  // Weight by score AND recency — fresher, more-similar comps get more pull
+  const wts=usable.map(c=>{
+    let w=c.score;
+    if(c.closeDate){
+      const daysSince=(TODAY.getTime()-c.closeDate.getTime())/(864e5);
+      if(daysSince<=90) w*=1.25;
+      else if(daysSince<=180) w*=1.10;
+      else if(daysSince>540) w*=0.75; // stale comp discount
+    }
+    return Math.max(w,1);
+  });
+  const tw=wts.reduce((s,x)=>s+x,0);
+  if(!tw)return null;
+  const est=Math.round(usable.reduce((s,c,i)=>s+c.sp*wts[i],0)/tw);
+  const sc=usable.map(c=>c.score);
+  return{est,n:usable.length,avgSc:Math.round(S.mean(sc)),minSc:Math.min(...sc),maxSc:Math.max(...sc)};
+}
+
+function modelC(subj,sold){
+  const usable=sold.filter(c=>c.sp&&c.ppsf&&c.sqft&&!A.excluded.has(c.mlsNo));
+  if(usable.length<3)return null;
+
+  // ── Real trend regression on Close Date ──────────────────────────────
+  const dated=usable.filter(c=>c.closeDate);
+  let trendEst=null,trendInfo=null;
+  if(dated.length>=5){
+    const t0=Math.min(...dated.map(c=>c.closeDate.getTime()));
+    const xs=dated.map(c=>(c.closeDate.getTime()-t0)/(864e5)); // days since oldest sale
+    const ys=dated.map(c=>c.ppsf);
+    const reg=S.linReg(xs,ys);
+    if(reg&&reg.r2>0.04&&subj.sqft){
+      const daysToToday=(TODAY.getTime()-t0)/(864e5);
+      const projPPSF=reg.slope*daysToToday+reg.intercept;
+      trendEst=Math.round(projPPSF*subj.sqft);
+      const annualChg=(reg.slope*365)/(reg.intercept||1)*100;
+      trendInfo={slope:reg.slope.toFixed(4),r2:reg.r2.toFixed(2),annualPct:annualChg.toFixed(1),projPPSF:Math.round(projPPSF),n:dated.length};
+    }
+  }
+
+  // ── Market health index (SP/LP + DOM) ────────────────────────────────
+  const ratios=usable.filter(c=>c.sp&&c.lp).map(c=>c.sp/c.lp);
+  const avgRatio=ratios.length?S.mean(ratios):1;
+  const avgDOM=S.mean(usable.map(c=>c.dom))||30;
+  const medPPSF=S.median(usable.map(c=>c.ppsf));
+  const domScore=Math.max(0,1-avgDOM/90);
+  const mktIdx=(avgRatio*0.7+domScore*0.3);
+  const base=modelA(subj,sold);
+  if(!base)return null;
+  const mktEst=Math.round(base.mid*mktIdx);
+
+  // Blend: if trend available, weight 55% trend + 45% market-index
+  const finalEst=trendEst?Math.round(trendEst*0.55+mktEst*0.45):mktEst;
+  const mkt=avgRatio>=1.02?"Hot Seller's Market":avgRatio>=0.99?'Balanced Market':avgRatio>=0.96?'Soft Market':"Buyer's Market";
+  return{est:finalEst,trendEst,trendInfo,mktIdx,avgRatio:avgRatio*100,avgDOM:Math.round(avgDOM),medPPSF:Math.round(medPPSF||0),n:usable.length,mkt};
+}
+
+// ── Module 4 (Adjusted): when adjustment grid is active, value via adjusted comp prices
+function modelAdj(subj,sold){
+  if(!A.adjUseInValuation) return null;
+  const usable=sold.filter(c=>c.sp&&c.score>0&&!A.excluded.has(c.mlsNo));
+  if(usable.length<2)return null;
+  const adjPrices=usable.map(c=>{const a=A.adjustments[c.mlsNo];const sum=a?(a.time+a.size+a.lot+a.br+a.bth+a.cond+a.loc+a.amen):0;return c.sp+sum;});
+  const wts=usable.map(c=>c.score);
+  const tw=wts.reduce((s,x)=>s+x,0);if(!tw)return null;
+  const est=Math.round(adjPrices.reduce((s,p,i)=>s+p*wts[i],0)/tw);
+  // Confidence from gross adjustment magnitude — appraiser standard: <15% is solid, >25% is weak
+  const grossPcts=usable.map(c=>{const a=A.adjustments[c.mlsNo];if(!a)return 0;const g=Math.abs(a.time)+Math.abs(a.size)+Math.abs(a.lot)+Math.abs(a.br)+Math.abs(a.bth)+Math.abs(a.cond)+Math.abs(a.loc)+Math.abs(a.amen);return c.sp?g/c.sp*100:0;});
+  const avgGross=S.mean(grossPcts)||0;
+  const lo=Math.round(est*(1-Math.max(.02,avgGross/200)));
+  const hi=Math.round(est*(1+Math.max(.02,avgGross/200)));
+  return{est,lo,hi,n:usable.length,avgGross:avgGross.toFixed(1),adjPrices};
+}
+
+/**
+ * Dynamic Method Weighting — think like an appraiser.
+ * Appraisers don't use fixed weights; they weight methods based on data reliability.
+ * - Strong trend (R² > 0.55): lean on Method C more
+ * - Very similar comps (avgSc > 80): lean on Method B more
+ * - High PPSF variance (CV > 12%): reduce reliance on Method A
+ * Returns normalized weights summing to 1.0
+ */
+function dynamicWeights(A_,B_,C_){
+  let wA=0.40,wB=0.40,wC=0.20;
+  // Trend signal — if regression is strong, price trend is real, weight it higher
+  if(C_?.trendInfo){
+    const r2=parseFloat(C_.trendInfo.r2);
+    if(r2>0.60){wC+=0.14;wA-=0.08;wB-=0.06;}
+    else if(r2>0.35){wC+=0.06;wA-=0.03;wB-=0.03;}
+  }
+  // Comp similarity — high-quality close comps = direct match is more reliable
+  if(B_){
+    if(B_.avgSc>=80){wB+=0.09;wA-=0.09;}
+    else if(B_.avgSc<50){wB-=0.10;wA+=0.10;}
+  }
+  // PPSF variance — if $/sqft is wildly inconsistent, the market is heterogeneous
+  // and the median PPSF approach (Method A) becomes less reliable
+  if(A_&&A_.ppsf){
+    const cv=A_.sig/A_.ppsf;
+    if(cv>0.15){wA-=0.08;wB+=0.08;}
+    else if(cv<0.05&&A_.n>=6){wA+=0.05;wB-=0.05;} // very consistent PPSF = Method A is dependable
+  }
+  // Normalize to sum to 1.0
+  const tot=wA+wB+wC;
+  return{wA:Math.max(0,wA/tot),wB:Math.max(0,wB/tot),wC:Math.max(0,wC/tot)};
+}
+
+function calcAll(subj,comps){
+  const sold=comps.filter(c=>c.status==='SLD');
+  const actv=comps.filter(c=>c.status==='ACTV');
+  const A_=modelA(subj,sold);
+  const B_=modelB(subj,sold);
+  const C_=modelC(subj,sold);
+  const D_=modelAdj(subj,sold);
+  const ests=[];
+  let weights={wA:0.40,wB:0.40,wC:0.20};
+
+  // When adjustment mode is ON, weight the appraiser-adjusted model heavily
+  if(A.adjUseInValuation && D_){
+    if(A_)ests.push({v:A_.mid,w:.20,label:'A',name:'Method A ($/SqFt, Time-Adj.)'});
+    if(D_)ests.push({v:D_.est,w:.55,label:'D',name:'Method D (Appraiser Adjusted)'});
+    if(C_)ests.push({v:C_.est,w:.25,label:'C',name:'Method C (Trend + Market)'});
+  } else {
+    // Dynamic weights — appraisal-style, based on data quality
+    weights=dynamicWeights(A_,B_,C_);
+    if(A_)ests.push({v:A_.mid,w:weights.wA,label:'A',name:'Method A ($/SqFt, Time-Adj.)'});
+    if(B_)ests.push({v:B_.est,w:weights.wB,label:'B',name:'Method B (Similarity)'});
+    if(C_)ests.push({v:C_.est,w:weights.wC,label:'C',name:'Method C (Trend + Market)'});
+  }
+
+  let consensus=null;
+  if(ests.length){const tw=ests.reduce((s,e)=>s+e.w,0);consensus=Math.round(ests.reduce((s,e)=>s+e.v*e.w,0)/tw);}
+
+  // ── Method Agreement (Reconciliation Spread) ──
+  const vals=ests.map(e=>e.v).filter(Boolean);
+  const spreadPct=vals.length>1&&consensus?((Math.max(...vals)-Math.min(...vals))/consensus*100):0;
+
+  // ── Confidence ─────────────────────────────────────────────
+  // Multi-factor: comp count, PPSF variance, method agreement, trend quality
+  let conf='LOW',confPct=28;
+  if(sold.length>=5){
+    const cv=A_&&A_.ppsf?(A_.sig/A_.ppsf):0.25;
+    if(cv<0.08&&spreadPct<5) {conf='HIGH';confPct=92;}
+    else if(cv<0.12&&spreadPct<8) {conf='HIGH';confPct=84;}
+    else if(cv<0.18&&spreadPct<12){conf='MEDIUM';confPct=62;}
+    else {conf='MEDIUM';confPct=48;}
+  } else if(sold.length>=3){conf='MEDIUM';confPct=50;}
+  // Boost for strong trend
+  if(C_?.trendInfo&&parseFloat(C_.trendInfo.r2)>0.55) confPct=Math.min(96,confPct+6);
+  // Adjustment-mode boost
+  if(A.adjUseInValuation&&D_&&parseFloat(D_.avgGross)<15) confPct=Math.min(96,confPct+8);
+  // Wide spread = confidence penalty
+  if(spreadPct>12) confPct=Math.max(20,confPct-10);
+
+  const medDOM=S.median(sold.map(c=>c.dom));
+  const avgRatio=sold.length?S.mean(sold.filter(c=>c.sp&&c.lp).map(c=>c.sp/c.lp))*100:null;
+  return{A:A_,B:B_,C:C_,D:D_,consensus,conf,confPct,soldN:sold.length,actvN:actv.length,medDOM,avgRatio,weights,ests,spreadPct};
+}
+
+// ═══════════════════════════════════
+// MAIN CMA RUN
+// ═══════════════════════════════════
+function runCMA(){
+  const addr=(v('s-addr')||'').trim();
+  const city=(v('s-city')||'').trim().toUpperCase();
+  if(!addr){toast('Enter a subject street address','err');return;}
+  if(!city){toast('Enter the subject city','err');return;}
+  if(!A.listings.length){toast('Load MLS data first — click "Load / Update"','err');return;}
+
+  const sqft=parseFloat(v('s-sqft'))||0;
+  const br=parseFloat(v('s-br'))||0;
+  const bth=parseFloat(v('s-bth'))||0;
+  const yrBlt=parseFloat(v('s-yr'))||0;
+  const lot=parseFloat(v('s-lot'))||0;
+  const hoa=parseFloat(v('s-hoa'))||0;
+  const lp=parseFloat(v('s-lp'))||0;
+  const bt=v('s-bt')||'';
+
+  A.subject={addr,city,sqft,br,bth,yrBlt,lotSqFt:lot,hoaFee:hoa,lp,bt,address:addr};
+
+  // Auto-set sqft range if blank
+  if(sqft&&!v('f-sf-min')){el('f-sf-min').value=Math.round(sqft*0.75);el('f-sf-max').value=Math.round(sqft*1.3);}
+
+  // Determine cities in scope
+  let cities=[city];
+  if(A.scope==='adj'){cities=[city,...getAdjacentCities(city)].filter((c,i,a)=>a.indexOf(c)===i);}
+  if(A.scope==='all'){cities=null;} // null = all
+
+  // Build filter
+  const fSfMin=parseFloat(v('f-sf-min'))||0,fSfMax=parseFloat(v('f-sf-max'))||Infinity;
+  const fBrMin=parseFloat(v('f-br-min'))||0,fBrMax=parseFloat(v('f-br-max'))||Infinity;
+  const fBthMin=parseFloat(v('f-bth-min'))||0,fBthMax=parseFloat(v('f-bth-max'))||Infinity;
+  const fYrMin=parseFloat(v('f-yr-min'))||0,fYrMax=parseFloat(v('f-yr-max'))||9999;
+  const fDom=parseFloat(v('f-dom'))||Infinity;
+  const fGar=v('f-gar')||'';
+  const fStories=v('f-stories')||'';
+  // Date cutoff: use global date range bar (applies to sold comps)
+  const gdr=A.globalDateRange;
+  const fSld=el('f-sld').checked,fActv=el('f-actv').checked,fPend=el('f-pend').checked;
+
+  const statuses=[];
+  if(fSld)statuses.push('SLD');if(fActv)statuses.push('ACTV');if(fPend)statuses.push('PEND');
+  if(!statuses.length){toast('Select at least one status (Sold/Active/Pending)','err');return;}
+
+  // Filter candidates
+  let candidates=A.listings.filter(l=>{
+    if(!statuses.includes(l.status))return false;
+    if(cities&&!cities.includes(l.city))return false;
+    if(bt&&bt!=='ANY'&&l.bt&&l.bt!==bt)return false;
+    if(fSfMin&&l.sqft&&l.sqft<fSfMin)return false;
+    if(fSfMax<Infinity&&l.sqft&&l.sqft>fSfMax)return false;
+    if(fBrMin&&l.br&&l.br<fBrMin)return false;
+    if(fBrMax<Infinity&&l.br&&l.br>fBrMax)return false;
+    if(fBthMin&&l.bth&&l.bth<fBthMin)return false;
+    if(fBthMax<Infinity&&l.bth&&l.bth>fBthMax)return false;
+    if(fYrMin&&l.yrBlt&&l.yrBlt<fYrMin)return false;
+    if(fYrMax<9999&&l.yrBlt&&l.yrBlt>fYrMax)return false;
+    if(l.dom>fDom)return false;
+    if(fGar==='yes'&&!l.gar)return false;
+    if(fGar==='no'&&l.gar)return false;
+    if(fStories&&l.stories&&l.stories!==fStories)return false;
+    // Date filter from global date bar (applies only to sold listings with a close date)
+    if(gdr.start&&l.status==='SLD'&&l.closeDate&&l.closeDate<gdr.start)return false;
+    if(gdr.end&&l.status==='SLD'&&l.closeDate&&l.closeDate>gdr.end)return false;
+    // Exclude exact match
+    if(l.address.toLowerCase()===addr.toLowerCase()&&l.city===city)return false;
+    return true;
+  });
+
+  // Score each candidate
+  candidates.forEach(c=>c.score=score(A.subject,c));
+  candidates.sort((a,b)=>b.score-a.score);
+  A.comps=candidates;
+
+  // Render immediately from city-scope results
+  renderCompTable();
+  // Reset adjustments for fresh CMA run (only the auto-suggested ones; preserve user edits across re-scoring? No - clean slate per CMA run is cleaner for users)
+  A.adjustments = {};
+  const res=calcAll(A.subject,A.comps);
+  renderValuation(res);
+  renderReport(res);
+  renderAdjustmentGrid();   // VIW v1: render appraiser layer
+
+  const scopeStr=cities?cities.map(toTitle).join(', '):'all cities';
+  toast(`CMA complete — ${candidates.length} comps in ${scopeStr}`+(A.proximityEnabled?' · applying radius filter…':''),'ok');
+
+  // Async: geocode subject + apply radius (non-blocking) then map
+  if(A.proximityEnabled){
+    applyProximityFilter(candidates).then(()=>{
+      renderCompTable();
+      const r2=calcAll(A.subject,A.comps);
+      renderValuation(r2);renderReport(r2);renderAdjustmentGrid();
+    });
+  }
+  tryGeocodeMap();
+}
+
+// ═══════════════════════════════════
+// RENDER VALUATION — Appraiser-Grade Output
+// ═══════════════════════════════════
+function renderValuation(r){
+  el('comp-badge').textContent=r.soldN+' sold comps';
+  if(!r.consensus){
+    el('val-area').innerHTML=`<div class="val-empty">Not enough sold comparables to generate a valuation.<br><strong>Try:</strong> expanding city scope to "Adjacent", checking status filters, or relaxing SqFt range.</div>`;
+    el('val-explain').style.display='none';
+    return;
+  }
+  const cfCls=r.conf==='HIGH'?'fill-hi':r.conf==='MEDIUM'?'fill-med':'fill-lo';
+  const cfTxt=r.conf==='HIGH'?'hi':r.conf==='MEDIUM'?'med':'lo';
+  const taNote=r.A?.timeAdjusted?'<span class="ta-badge">Time-Adj.</span>':'';
+
+  // Methods grid — when adjustment mode is on, show Method D in place of B
+  const methodB=A.adjUseInValuation&&r.D
+    ? `<div class="val-method-card" style="border-color:rgba(201,168,76,.4);background:rgba(201,168,76,.04)">
+        <div class="vm-tag"><div class="vm-dot" style="background:var(--gold)"></div>Method D — Appraiser Adjusted ★</div>
+        <div class="vm-price">${fmtK(r.D.est)}</div>
+        <div class="vm-range">Range: ${fmtK(r.D.lo)} – ${fmtK(r.D.hi)}</div>
+        <div class="vm-detail">Weighted by similarity · gross adj ${r.D.avgGross}% · ${r.D.n} comps</div>
+       </div>`
+    : `<div class="val-method-card">
+        <div class="vm-tag"><div class="vm-dot" style="background:var(--blue)"></div>Method B — Similarity Weighted</div>
+        ${r.B?`<div class="vm-price">${fmtK(r.B.est)}</div>
+        <div class="vm-range">Scores ${r.B.minSc}–${r.B.maxSc} · avg ${r.B.avgSc}</div>
+        <div class="vm-detail">Scored on sqft, BR/BTH, age, lot, recency, type · ${r.B.n} comps</div>`
+        :`<div class="vm-detail" style="color:var(--txt3)">Insufficient sold data</div>`}
+       </div>`;
+
+  el('val-area').innerHTML=`
+  <div class="val-grid">
+    <div class="val-method-card">
+      <div class="vm-tag"><div class="vm-dot" style="background:var(--gold)"></div>Method A — $/SqFt Adjusted ${taNote}</div>
+      ${r.A?`<div class="vm-price">${fmtK(r.A.mid)}</div>
+      <div class="vm-range">Range: ${fmtK(r.A.lo)} – ${fmtK(r.A.hi)}</div>
+      <div class="vm-detail">Time-adj $/SqFt: $${r.A.ppsf} · σ $${r.A.sig}/sqft · ${r.A.n} comps · wt ${r.weights?Math.round(r.weights.wA*100):40}%</div>`
+      :`<div class="vm-detail" style="color:var(--txt3)">Insufficient sold data</div>`}
+    </div>
+    ${methodB}
+    <div class="val-method-card">
+      <div class="vm-tag"><div class="vm-dot" style="background:var(--grn)"></div>Method C — Trend + Market Index</div>
+      ${r.C?`<div class="vm-price">${fmtK(r.C.est)}</div>
+      <div class="vm-range">${r.C.mkt} · SP/LP ${r.C.avgRatio.toFixed(1)}%</div>
+      ${r.C.trendInfo?`<div class="vm-detail" style="color:var(--teal)">📈 ${r.C.trendInfo.annualPct>0?'+':''}${r.C.trendInfo.annualPct}%/yr · $${r.C.trendInfo.projPPSF}/sqft · R²=${r.C.trendInfo.r2} · wt ${r.weights?Math.round(r.weights.wC*100):20}%</div>`
+      :`<div class="vm-detail">Avg DOM ${r.C.avgDOM} · $${r.C.medPPSF}/sqft · no dated comps for trend</div>`}`
+      :`<div class="vm-detail" style="color:var(--txt3)">Insufficient data</div>`}
+    </div>
+    <div class="consensus">
+      <div class="cons-top">
+        <span class="cons-label">${A.adjUseInValuation?'Appraiser Value Opinion':'Most Probable Value'}</span>
+      </div>
+      <div class="cons-price">${fmt(r.consensus)}</div>
+      ${A.subject?.lp?`<div class="cons-delta" style="margin-bottom:8px">vs target ${fmt(A.subject.lp)} (${((A.subject.lp/r.consensus-1)*100).toFixed(1)}%)</div>`:''}
+      <div class="conf-row">
+        <div class="conf-bar"><div class="conf-fill ${cfCls}" style="width:${r.confPct}%"></div></div>
+        <span class="conf-txt ${cfTxt}">${r.conf} Confidence</span>
+      </div>
+      <div style="font-size:10px;color:var(--txt3);margin-top:5px">${r.soldN} sold comps · ${r.actvN} active · method spread ${r.spreadPct?.toFixed(1)||0}%</div>
+    </div>
+  </div>
+
+  ${buildReconciliationCard(r)}`;
+
+  // Explanation card
+  const expEl=el('val-explain');
+  expEl.style.display='block';
+  const wExpl = A.adjUseInValuation && r.D
+    ? `Method D (Appraiser Adjusted) is weighted at <strong>55%</strong>, Method C (Trend) at <strong>25%</strong>, Method A ($/SqFt) at <strong>20%</strong>. Adjustments applied per grid below.`
+    : `Weights are <strong>dynamically assigned</strong> based on data quality — trend strength (R²), comp similarity scores, and PPSF variance all influence allocation. Toggle the adjustment grid to switch to appraiser-adjusted weighting.`;
+  expEl.innerHTML = `<div class="expl-card"><strong>How This Value Was Derived</strong>${wExpl} Time adjustment is applied to each comp's $/sqft using the market trend slope, bringing older sales to present-day equivalents before averaging.</div>`;
+}
+
+/**
+ * Appraiser Reconciliation Card
+ * Shows method weights visually and provides a narrative on agreement vs divergence.
+ * This is what separates an appraiser's work from a simple AVM — the reconciliation.
+ */
+function buildReconciliationCard(r){
+  if(!r.ests||!r.ests.length||!r.consensus) return '';
+  const fillMap={A:'fill-A',B:'fill-B',C:'fill-C',D:'fill-D'};
+  const rows=r.ests.map(e=>{
+    const wPct=Math.round(e.w*100);
+    const barW=Math.round(e.w*100); // proportional to weight
+    return `<div class="recon-method-row">
+      <div class="recon-method-name">${e.name}</div>
+      <div class="recon-bar-track"><div class="recon-bar-fill ${fillMap[e.label]}" style="width:${barW}%"></div></div>
+      <div class="recon-wt">${wPct}%</div>
+      <div class="recon-val">${fmt(e.v)}</div>
+    </div>`;
+  }).join('');
+
+  // Spread classification (appraiser standard: <5% = strong, <10% = acceptable, >10% = weak)
+  const sp=r.spreadPct||0;
+  let spreadCls,spreadLbl,reconcNote;
+  if(sp<4){
+    spreadCls='spread-tight'; spreadLbl=`${sp.toFixed(1)}% — Tight`;
+    reconcNote=`Methods are in <strong>strong agreement</strong>. All three approaches converge near the same value, which is the strongest indicator of an accurate estimate. The Most Probable Value of <strong>${fmt(r.consensus)}</strong> is well-supported.`;
+  } else if(sp<10){
+    spreadCls='spread-mod'; spreadLbl=`${sp.toFixed(1)}% — Moderate`;
+    const topM=r.ests.reduce((a,b)=>b.w>a.w?b:a,r.ests[0]);
+    reconcNote=`Methods show <strong>moderate divergence</strong>. The ${topM.name} received the highest weight (${Math.round(topM.w*100)}%) based on data quality signals. Review comp selection and consider manual adjustments in the grid below.`;
+  } else {
+    spreadCls='spread-wide'; spreadLbl=`${sp.toFixed(1)}% — Wide`;
+    reconcNote=`Methods <strong>diverge significantly</strong> — this usually indicates a heterogeneous comp pool, rapid market movement, or insufficient data. Use the Adjustment Grid to manually reconcile. Widen the comp scope or add more data before finalizing a value opinion.`;
+  }
+
+  // Confidence narrative (appraiser language)
+  const confNarrative=r.conf==='HIGH'
+    ?`Confidence is <strong>HIGH</strong> — supported by ${r.soldN} sold comps with consistent pricing and strong method agreement.`
+    :r.conf==='MEDIUM'
+    ?`Confidence is <strong>MEDIUM</strong> — ${r.soldN} comps available but pricing variance or method divergence limits certainty. Adjust and verify.`
+    :`Confidence is <strong>LOW</strong> — limited sold comps (${r.soldN}) or high pricing variance. Treat this estimate as a starting range only; expand comp scope or add data.`;
+
+  return `<div class="recon-card">
+    <div class="recon-title">⚖ Appraiser Reconciliation <span class="recon-spread ${spreadCls}">${spreadLbl}</span></div>
+    ${rows}
+    <div class="recon-divider"></div>
+    <div class="recon-note">${reconcNote} ${confNarrative}</div>
+  </div>`;
+}
+
+// ═══════════════════════════════════
+// RENDER COMP TABLE
+// ═══════════════════════════════════
+function renderCompTable(){
+  const comps=A.comps;
+  el('tbl-count').textContent=comps.length?`— ${comps.length} properties`:'';
+  if(!comps.length){el('comp-tbody').innerHTML='<tr><td colspan="19" class="empty-r">No comparables match current filters</td></tr>';return;}
+  const sc=A.sortCol,sd=A.sortDir;
+  const sorted=[...comps].sort((a,b)=>{
+    if(sc==='address')return sd*(a.address||'').localeCompare(b.address||'');
+    if(sc==='city')return sd*(a.city||'').localeCompare(b.city||'');
+    if(sc==='status')return sd*(a.status||'').localeCompare(b.status||'');
+    if(sc==='bt')return sd*(a.bt||'').localeCompare(b.bt||'');
+    if(sc==='stories')return sd*(a.stories||'').localeCompare(b.stories||'');
+    if(sc==='splp'){const av=a.sp&&a.lp?a.sp/a.lp:null,bv=b.sp&&b.lp?b.sp/b.lp:null;if(av==null&&bv==null)return 0;if(av==null)return 1;if(bv==null)return -1;return sd*(av-bv);}
+    if(sc==='closeDate'){const av=a.closeDate?a.closeDate.getTime():null,bv=b.closeDate?b.closeDate.getTime():null;if(av==null&&bv==null)return 0;if(av==null)return 1;if(bv==null)return -1;return sd*(av-bv);}
+    const nf={sp:'sp',lp:'lp',ppsf:'ppsf',sqft:'sqft',br:'br',bth:'bth',yrBlt:'yrBlt',lotSqFt:'lotSqFt',hoaFee:'hoaFee',dom:'dom',cdom:'cdom',score:'score'}[sc];
+    if(nf){const av=a[nf],bv=b[nf];if(av==null&&bv==null)return 0;if(av==null)return 1;if(bv==null)return -1;return sd*(av-bv);}
+    return 0;
+  });
+
+  el('comp-tbody').innerHTML=sorted.map(c=>{
+    const ex=A.excluded.has(c.mlsNo);
+    const spLp=c.sp&&c.lp?((c.sp/c.lp-1)*100).toFixed(1)+'%':'—';
+    const spCls=c.sp&&c.lp?(c.sp>c.lp*1.005?'good':c.sp<c.lp*.97?'bad':''):'';
+    const btL=c.bt==='DE'?'SFR':c.bt==='CO'?'Condo':c.bt==='TH'?'TH':c.bt;
+    const sameCityCls=c.city!==A.subject?.city?'style="color:var(--org)"':'';
+    return`<tr class="${ex?'excl':''}" id="row-${c.mlsNo}">
+      <td><input type="checkbox" class="row-cb" ${ex?'':'checked'} onchange="toggleComp('${c.mlsNo}',this.checked)"></td>
+      <td title="${c.address}" style="max-width:150px;overflow:hidden;text-overflow:ellipsis">${c.address}${c.unit?' #'+c.unit:''}</td>
+      <td ${sameCityCls}>${toTitle(c.city)}</td>
+      <td><span class="st-pill st-${c.status}">${c.status}</span></td>
+      <td style="color:var(--txt2);font-size:11px">${btL}</td>
+      <td style="font-family:var(--fm);font-size:11px;color:var(--txt2)">${fmtDate(c.closeDate)}</td>
+      <td class="num">${c.status==='SLD'?fmt(c.sp):'—'}</td>
+      <td class="num" style="color:var(--txt2)">${fmt(c.lp)}</td>
+      <td class="num ${spCls}">${spLp}</td>
+      <td class="num">${c.ppsf?'$'+Math.round(c.ppsf):'—'}</td>
+      <td class="num">${c.sqft?fmtN(c.sqft):'—'}</td>
+      <td>${c.br||'—'}</td><td>${c.bth||'—'}</td>
+      <td style="color:var(--txt2)">${c.yrBlt||'—'}</td>
+      <td style="color:var(--txt2);font-size:11px">${c.stories||'—'}</td>
+      <td style="font-size:11px;color:var(--txt2)">${c.lotSqFt?fmtN(c.lotSqFt):'—'}</td>
+      <td class="num">${c.hoaFee?'$'+Math.round(c.hoaFee):'—'}</td>
+      <td class="num">${c.cdom??c.dom??'—'}</td>
+      <td><div class="score-wrap"><div class="sbar"><div class="sfill" style="width:${c.score||0}%"></div></div><span style="font-family:var(--fm);font-size:10px;color:var(--txt2)">${c.score??'—'}</span>${c.score!=null?`<span class="cq-pill ${compGrade(c.score).cls}">${compGrade(c.score).grade}</span>`:''}</div></td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════
+// COMP TOGGLES
+// ═══════════════════════════════════
+function toggleComp(mlsNo,include){
+  if(include)A.excluded.delete(mlsNo);else A.excluded.add(mlsNo);
+  const row=el('row-'+mlsNo);if(row)row.classList.toggle('excl',!include);
+  if(A.subject&&A.comps.length){const r=calcAll(A.subject,A.comps);renderValuation(r);renderReport(r);renderAdjustmentGrid();}
+}
+function includeAll(){A.excluded.clear();document.querySelectorAll('.row-cb').forEach(c=>c.checked=true);document.querySelectorAll('#comp-tbody tr').forEach(r=>r.classList.remove('excl'));reCalc();}
+function excludeAll(){A.comps.forEach(c=>A.excluded.add(c.mlsNo));document.querySelectorAll('.row-cb').forEach(c=>c.checked=false);document.querySelectorAll('#comp-tbody tr').forEach(r=>r.classList.add('excl'));reCalc();}
+function reCalc(){if(A.subject&&A.comps.length){const r=calcAll(A.subject,A.comps);renderValuation(r);renderReport(r);renderAdjustmentGrid();}}
+
+function sortComps(col){
+  if(A.sortCol===col)A.sortDir*=-1;else{A.sortCol=col;A.sortDir=-1;}
+  document.querySelectorAll('.ctable th').forEach(th=>{th.className='';});
+  renderCompTable();
+}
+
+// ═══════════════════════════════════
+// AGENT REPORT
+// ═══════════════════════════════════
+function renderReport(r){
+  if(!r.consensus){el('rpt-area').innerHTML='<div class="val-empty">Run CMA to generate report.</div>';return;}
+  const c=r.consensus;
+  const slo=Math.round(c*.99),shi=Math.round(c*1.025),blo=Math.round(c*.97),bhi=Math.round(c*1.03);
+  const hot=r.avgRatio&&r.avgRatio>101,soft=r.avgRatio&&r.avgRatio<98;
+  const sellNote=hot?`Market is running hot — SP/LP at ${r.avgRatio?.toFixed(1)}%. List at or above consensus for multiple offers. Recommended: ${fmt(c)}–${fmt(shi)}.`
+    :soft?`Market showing softness — SP/LP at ${r.avgRatio?.toFixed(1)}%. Price at or just below consensus to drive traffic. Recommended: ${fmt(slo)}–${fmt(c)}.`
+    :`Balanced market conditions. List near consensus for maximum showing activity. Recommended: ${fmt(c)}–${fmt(shi)}.`;
+  const buyNote=hot?`Competitive market — expect bidding wars. Open with a strong offer at or above list. Consider escalation clause. Range: ${fmt(c)}–${fmt(bhi)}.`
+    :soft?`Buyers have leverage. Comps support an offer below asking. Anchor at ${fmt(blo)} and negotiate up. Fair range: ${fmt(blo)}–${fmt(c)}.`
+    :`Balanced conditions. Lead with a clean offer near consensus. Range: ${fmt(Math.round(c*.99))}–${fmt(bhi)}.`;
+  const absLbl=!isNaN(parseFloat(r.actvN))&&r.actvN>0?(r.soldN/r.actvN>3?'Strong (Seller)':r.soldN/r.actvN>1?'Balanced':'Soft (Buyer)'):'—';
+  el('rpt-area').innerHTML=`<div class="rpt-grid">
+    <div class="rpt-col">
+      <div class="rpt-hd hd-sell">Seller Strategy</div>
+      <div class="rpt-price">${fmt(c)}</div>
+      <div class="rpt-range">List range: ${fmt(slo)} – ${fmt(shi)}</div>
+      <div class="rpt-note">${sellNote}</div>
+      <div style="margin-top:11px">
+        <div class="stat-row"><span class="sl">Aggressive</span><span class="sv">${fmt(shi)}</span></div>
+        <div class="stat-row"><span class="sl">Market Price</span><span class="sv good">${fmt(c)}</span></div>
+        <div class="stat-row"><span class="sl">Conservative</span><span class="sv">${fmt(slo)}</span></div>
+      </div>
+    </div>
+    <div class="rpt-col">
+      <div class="rpt-hd hd-buy">Buyer Strategy</div>
+      <div class="rpt-price">${fmt(c)}</div>
+      <div class="rpt-range">Offer range: ${fmt(blo)} – ${fmt(bhi)}</div>
+      <div class="rpt-note">${buyNote}</div>
+      <div style="margin-top:11px">
+        <div class="stat-row"><span class="sl">Strong Offer</span><span class="sv ${hot?'warn':''}">${fmt(bhi)}</span></div>
+        <div class="stat-row"><span class="sl">Fair Value</span><span class="sv good">${fmt(c)}</span></div>
+        <div class="stat-row"><span class="sl">Opening Offer</span><span class="sv">${fmt(blo)}</span></div>
+      </div>
+    </div>
+    <div class="rpt-col">
+      <div class="rpt-hd hd-mkt">Market Context</div>
+      <div class="stat-row"><span class="sl">SP/LP Ratio</span><span class="sv ${hot?'good':soft?'bad':''}">${r.avgRatio?r.avgRatio.toFixed(1)+'%':'—'}</span></div>
+      <div class="stat-row"><span class="sl">Median DOM</span><span class="sv">${r.medDOM!=null?Math.round(r.medDOM)+' days':'—'}</span></div>
+      <div class="stat-row"><span class="sl">Sold Comps Used</span><span class="sv">${r.soldN}</span></div>
+      <div class="stat-row"><span class="sl">Active Competition</span><span class="sv">${r.actvN}</span></div>
+      <div class="stat-row"><span class="sl">Absorption Rate</span><span class="sv">${r.actvN>0?(r.soldN/r.actvN).toFixed(1)+'x':'—'}</span></div>
+      <div class="stat-row"><span class="sl">Market Condition</span><span class="sv ${hot?'good':soft?'bad':''}">${absLbl}</span></div>
+      <div class="stat-row"><span class="sl">Model Confidence</span><span class="sv ${r.conf==='HIGH'?'good':r.conf==='MEDIUM'?'warn':'bad'}">${r.conf}</span></div>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════
+// MAP (non-blocking, optional)
+// ═══════════════════════════════════
+async function tryGeocodeMap(){
+  if(!A.subject)return;
+  el('map-note').textContent='Geocoding subject address…';
+  try{
+    const url=`https://nominatim.openstreetmap.org/search?`+new URLSearchParams({q:`${A.subject.addr}, ${A.subject.city}, California, USA`,format:'json',limit:'1',countrycodes:'us'});
+    const resp=await fetch(url);const data=await resp.json();
+    if(!data.length){el('map-note').textContent='Could not geocode address — map unavailable (CMA results above are unaffected)';return;}
+    const lat=parseFloat(data[0].lat),lng=parseFloat(data[0].lon);
+    A.subject.lat=lat;A.subject.lng=lng;
+    if(!A.map){
+      A.map=L.map('cma-map').setView([lat,lng],14);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors'}).addTo(A.map);
+    }else{A.map.setView([lat,lng],14);}
+    A.mapMarkers.forEach(m=>m.remove());A.mapMarkers=[];
+    if(A.radiusCircle){A.radiusCircle.remove();A.radiusCircle=null;}
+    const subIcon=L.divIcon({html:'<div style="width:16px;height:16px;background:#C9A84C;transform:rotate(45deg);border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.7)"></div>',iconSize:[16,16],iconAnchor:[8,8],className:''});
+    L.marker([lat,lng],{icon:subIcon,zIndexOffset:1000}).addTo(A.map).bindPopup(`<div class="pu"><div class="pu-addr">★ ${A.subject.addr}</div><div class="pu-price">Subject Property</div></div>`);
+
+    // Plot comps that have cached coords
+    let plotted=0;
+    A.comps.forEach(c=>{
+      const k=`${c.address}, ${c.city}, CA`.toLowerCase();
+      if(A.geoCache[k]){const{lat:cla,lng:clo}=A.geoCache[k];const col=c.status==='SLD'?'#38C68B':c.status==='ACTV'?'#3E8EF7':'#F5A23A';
+        const ic=L.divIcon({html:`<div style="width:10px;height:10px;border-radius:50%;background:${col};border:1.5px solid rgba(255,255,255,.7);box-shadow:0 1px 4px rgba(0,0,0,.5)"></div>`,iconSize:[10,10],iconAnchor:[5,5],className:''});
+        const price=c.status==='SLD'?fmt(c.sp):fmt(c.lp);
+        const m=L.marker([cla,clo],{icon:ic}).addTo(A.map).bindPopup(`<div class="pu"><div class="pu-addr">${c.address}</div><div class="pu-price">${price}</div><div class="pu-dt">${c.sqft?fmtN(c.sqft)+' sqft · ':''} ${c.br}BR/${c.bth}BTH</div></div>`);
+        A.mapMarkers.push(m);plotted++;}
+    });
+    el('map-note').textContent=`Map loaded · ${plotted} comps plotted (more appear as addresses are geocoded)`;
+  }catch(e){el('map-note').textContent='Map unavailable — CMA results above are unaffected';}
+}
+
+// ═══════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════
+function exportComps(){
+  if(!A.comps.length){toast('Run CMA first to generate comps','err');return;}
+  const hdr=['MLS#','Status','Address','Unit','City','Type','List$','Sale$','SP/LP%','$/SqFt','SqFt','BR','Bth','YrBlt','LotSqFt','HOA/mo','DOM','Score'];
+  const rows=A.comps.map(c=>[c.mlsNo,c.status,c.address,c.unit,c.city,c.bt,c.lp||'',c.sp||'',c.sp&&c.lp?((c.sp/c.lp-1)*100).toFixed(1)+'%':'',c.ppsf?Math.round(c.ppsf):'',c.sqft,c.br,c.bth,c.yrBlt,c.lotSqFt,c.hoaFee?Math.round(c.hoaFee):'',c.dom,c.score||'']);
+  const csv=[hdr,...rows].map(r=>r.map(x=>`"${String(x||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='TeamParikh_CMA_Comps.csv';a.click();
+  toast('Comps exported','ok');
+}
+
+// ═══════════════════════════════════
+// FILE HANDLING
+// ═══════════════════════════════════
+function handleFile(file,isModal){
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const r=mergeCSV(e.target.result);
+      updateHeader();rebuildCityTabs();
+      // VIW v2: refresh Intel and Opps tab population
+      populateIntelCityPills();
+      populateOppCityDropdown();
+      if(isModal){
+        el('m-sum').style.display='block';
+        el('s-total').textContent=A.listings.length.toLocaleString();
+        el('s-sold').textContent=A.listings.filter(l=>l.status==='SLD').length.toLocaleString();
+        el('s-actv').textContent=A.listings.filter(l=>l.status==='ACTV').length.toLocaleString();
+        el('s-cities').textContent=new Set(A.listings.map(l=>l.city)).size;
+        // Data health details
+        const dh=el('m-data-health');
+        if(dh){
+          const dated=A.listings.filter(l=>l.closeDate);
+          let rangeStr='';
+          if(dated.length){
+            const dts=dated.map(l=>l.closeDate.getTime());
+            const minD=new Date(Math.min(...dts)),maxD=new Date(Math.max(...dts));
+            const fD=d=>`${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+            rangeStr=`📅 Date range: <strong style="color:var(--txt)">${fD(minD)}</strong> → <strong style="color:var(--txt)">${fD(maxD)}</strong>`;
+          }
+          const citiesArr=[...new Set(A.listings.map(l=>l.city))].filter(Boolean).sort();
+          dh.innerHTML=`${rangeStr}<br>🏙 Cities in database: <strong style="color:var(--txt)">${citiesArr.map(c=>toTitle(c)).join(', ')}</strong>${r.pruned?`<br>🗑 <span style="color:var(--org)">${r.pruned} sold record(s) older than 3 years were auto-pruned</span>`:''}`;
+        }
+      }else{
+        el('welcome').style.display='none';el('app').classList.add('show');
+        setTimeout(()=>initDefaultMap(),300);
+      }
+      const pruneMsg=r.pruned?` · ${r.pruned} old records pruned`:'';
+      toast(`Loaded ${r.added.toLocaleString()} new + ${r.updated.toLocaleString()} updated listings${pruneMsg}`,'ok');
+    }catch(err){toast('CSV parse error: '+err.message,'err');console.error(err);}
+  };
+  reader.readAsText(file);
+}
+
+function initDefaultMap(){
+  if(A.map)return;
+  A.map=L.map('cma-map').setView([37.75,-121.97],11);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors'}).addTo(A.map);
+}
+
+// ═══════════════════════════════════
+// MODAL + TOAST
+// ═══════════════════════════════════
+function showModal(){el('load-modal').classList.remove('hidden');}
+function hideModal(){el('load-modal').classList.add('hidden');}
+let _tt;
+function toast(msg,type='inf'){const e=el('toast');e.textContent=msg;e.className='toast on '+type;clearTimeout(_tt);_tt=setTimeout(()=>e.classList.remove('on'),3500);}
+
+// ═══════════════════════════════════
+// DRAG AND DROP
+// ═══════════════════════════════════
+function setupDrop(zone,fileInput,isModal){
+  zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('over');});
+  zone.addEventListener('dragleave',()=>zone.classList.remove('over'));
+  zone.addEventListener('drop',e=>{
+    e.preventDefault();zone.classList.remove('over');
+    const f=e.dataTransfer.files[0];if(f){handleFile(f,isModal);}
+  });
+  fileInput.addEventListener('change',function(){if(this.files[0])handleFile(this.files[0],isModal);});
+}
+
+// ═══════════════════════════════════
+// ▼▼▼ VIW v1.0 — APPRAISER, INTEL, OPPS ▼▼▼
+// ═══════════════════════════════════
+
+// ───────────────────────────────────────────────────────────
+// MODULE 3 — ADJUSTMENT ENGINE (Appraiser Layer)
+// PRD: Editable grid · Auto-suggested adjustments · Audit log · Manual override
+// ───────────────────────────────────────────────────────────
+
+// Suggest adjustments for a single comp vs subject. Conservative appraiser defaults.
+function suggestAdj(subj, comp, comps){
+  const a = {time:0, size:0, lot:0, br:0, bth:0, cond:0, loc:0, amen:0};
+  if(!subj || !comp || !comp.sp) return a;
+
+  // ── Time adjustment: use shared getTrendSlope helper ──────────────────
+  // Brings comp's sale price to present-day equivalent using market trend.
+  if(comp.closeDate){
+    const sold=comps.filter(c=>c.sp&&c.sqft&&!A.excluded.has(c.mlsNo));
+    const trend=getTrendSlope(sold);
+    if(trend){
+      const daysSinceComp=(TODAY.getTime()-comp.closeDate.getTime())/(864e5);
+      const ppsfDelta=trend.slope*daysSinceComp;
+      a.time=Math.round(ppsfDelta*(comp.sqft||subj.sqft||0));
+    }
+  }
+
+  // ── Size adjustment: ($/sqft × delta × marginal rate of 0.5) ──────────
+  if(subj.sqft && comp.sqft && comp.ppsf){
+    const delta=subj.sqft-comp.sqft;
+    a.size=Math.round(comp.ppsf*delta*0.5);
+  }
+
+  // ── Lot size: $5/sqft conservative CA suburban ────────────────────────
+  if(subj.lotSqFt && comp.lotSqFt){
+    a.lot=Math.round((subj.lotSqFt-comp.lotSqFt)*5);
+  }
+
+  // ── Beds: $7K per delta ($5K for condos) ─────────────────────────────
+  if(subj.br && comp.br){
+    const perBR=(comp.bt==='CO'||subj.bt==='CO')?5000:7000;
+    a.br=(subj.br-comp.br)*perBR;
+  }
+
+  // ── Baths: $10K full, $5K half ────────────────────────────────────────
+  if(subj.bth && comp.bth){
+    const delta=subj.bth-comp.bth;
+    const fulls=Math.floor(Math.abs(delta));
+    const halves=Math.round((Math.abs(delta)-fulls)*2)>0?1:0;
+    a.bth=Math.sign(delta)*(fulls*10000+halves*5000);
+  }
+
+  // Condition / Location / Amenities default to 0 (manual — appraiser judgment required)
+  return a;
+}
+
+function autoSuggestAdjustments(){
+  if(!A.subject || !A.comps.length){toast('Run CMA first','err');return;}
+  const sold = A.comps.filter(c=>c.status==='SLD' && !A.excluded.has(c.mlsNo));
+  if(!sold.length){toast('No included sold comps to adjust','err');return;}
+  let n = 0;
+  sold.forEach(c=>{
+    const sug = suggestAdj(A.subject, c, sold);
+    A.adjustments[c.mlsNo] = {...sug, _userEdited:new Set()};
+    n++;
+  });
+  A.adjAuditLog.push({ts:new Date().toISOString(), action:'auto-suggest', count:n});
+  renderAdjustmentGrid();
+  if(A.subject){const r=calcAll(A.subject,A.comps);renderValuation(r);renderReport(r);}
+  toast(`Auto-suggested adjustments for ${n} comps`,'ok');
+}
+
+function clearAdjustments(){
+  if(!confirm('Clear all adjustments? User edits will be lost.'))return;
+  A.adjustments = {};
+  A.adjAuditLog.push({ts:new Date().toISOString(), action:'clear-all'});
+  renderAdjustmentGrid();
+  if(A.subject && A.comps.length){const r=calcAll(A.subject,A.comps);renderValuation(r);renderReport(r);}
+  toast('Adjustments cleared','inf');
+}
+
+function toggleAdjustmentMode(){
+  A.adjUseInValuation = !A.adjUseInValuation;
+  const tog = el('adj-track');
+  const lbl = el('adj-tog-lbl');
+  const row = el('adj-tog');
+  if(A.adjUseInValuation){tog.classList.add('on');row.classList.add('on');lbl.textContent='Adjustments ON — driving valuation';}
+  else{tog.classList.remove('on');row.classList.remove('on');lbl.textContent='Use adjusted prices in valuation';}
+  if(A.subject && A.comps.length){const r=calcAll(A.subject,A.comps);renderValuation(r);renderReport(r);renderAdjustmentGrid();}
+}
+
+function setAdjustment(mlsNo, field, value){
+  const v = parseFloat(value) || 0;
+  if(!A.adjustments[mlsNo]) A.adjustments[mlsNo] = {time:0, size:0, lot:0, br:0, bth:0, cond:0, loc:0, amen:0, _userEdited:new Set()};
+  const old = A.adjustments[mlsNo][field] || 0;
+  A.adjustments[mlsNo][field] = v;
+  A.adjustments[mlsNo]._userEdited.add(field);
+  A.adjAuditLog.push({ts:new Date().toISOString(), mlsNo, field, old, new:v});
+  // Recompute net % for this row only (cheap update) — full re-render keeps things simple
+  renderAdjustmentGrid();
+  if(A.subject){const r=calcAll(A.subject,A.comps);renderValuation(r);renderReport(r);}
+}
+
+function renderAdjustmentGrid(){
+  const area = el('adj-area');
+  if(!A.subject || !A.comps.length){
+    area.innerHTML = `<div class="adj-empty">Run CMA to populate the adjustment grid with your top sold comps.<br>Subject's missing fields (Sq Ft, Year Built, Lot, Beds, Baths) are needed for auto-suggestions.</div>`;
+    return;
+  }
+  const sold = A.comps.filter(c=>c.status==='SLD' && !A.excluded.has(c.mlsNo)).slice(0, 12);
+  if(!sold.length){
+    area.innerHTML = `<div class="adj-empty">No included sold comps. Tick comps in the table below to enable adjustments.</div>`;
+    return;
+  }
+  const rows = sold.map(c=>{
+    const a = A.adjustments[c.mlsNo] || {time:0,size:0,lot:0,br:0,bth:0,cond:0,loc:0,amen:0,_userEdited:new Set()};
+    const sum = a.time + a.size + a.lot + a.br + a.bth + a.cond + a.loc + a.amen;
+    const adjSP = c.sp + sum;
+    const gross = Math.abs(a.time)+Math.abs(a.size)+Math.abs(a.lot)+Math.abs(a.br)+Math.abs(a.bth)+Math.abs(a.cond)+Math.abs(a.loc)+Math.abs(a.amen);
+    const grossPct = c.sp ? (gross/c.sp*100) : 0;
+    let flagCls = 'adj-flag-ok', flagTxt = 'Strong';
+    if(grossPct > 25){flagCls='adj-flag-bad'; flagTxt='Weak';}
+    else if(grossPct > 15){flagCls='adj-flag-warn'; flagTxt='Moderate';}
+    const cellInput = (field, val) => {
+      const edited = a._userEdited && a._userEdited.has(field);
+      const isSuggested = !edited && val !== 0;
+      const cls = edited ? 'adj-inp user' : (isSuggested ? 'adj-inp suggested' : 'adj-inp');
+      return `<input type="number" class="${cls}" value="${val||''}" placeholder="0" onchange="setAdjustment('${c.mlsNo}','${field}',this.value)">`;
+    };
+    return `<tr>
+      <td class="lf" title="${c.address}, ${toTitle(c.city)}">${c.address}<div style="font-size:9.5px;color:var(--txt3);font-family:var(--ff)">${toTitle(c.city)} · ${c.sqft?fmtN(c.sqft)+' sqft':'?'} · ${c.br}/${c.bth} · ${c.yrBlt||'?'}</div></td>
+      <td>${fmt(c.sp)}</td>
+      <td>${cellInput('time', a.time)}</td>
+      <td>${cellInput('size', a.size)}</td>
+      <td>${cellInput('lot', a.lot)}</td>
+      <td>${cellInput('br', a.br)}</td>
+      <td>${cellInput('bth', a.bth)}</td>
+      <td>${cellInput('cond', a.cond)}</td>
+      <td>${cellInput('loc', a.loc)}</td>
+      <td>${cellInput('amen', a.amen)}</td>
+      <td class="adj-net ${sum>=0?'good':'bad'}">${sum>=0?'+':''}${fmt(sum).replace('$','$')}</td>
+      <td><strong>${fmt(adjSP)}</strong></td>
+      <td>${grossPct.toFixed(1)}%<span class="adj-flag ${flagCls}">${flagTxt}</span></td>
+    </tr>`;
+  }).join('');
+
+  // Summary stats across all included sold comps
+  const allSoldIncl = A.comps.filter(c=>c.status==='SLD' && !A.excluded.has(c.mlsNo));
+  const adjPrices = allSoldIncl.map(c=>{const a=A.adjustments[c.mlsNo];const s=a?(a.time+a.size+a.lot+a.br+a.bth+a.cond+a.loc+a.amen):0;return c.sp+s;});
+  const grossList = allSoldIncl.map(c=>{const a=A.adjustments[c.mlsNo];if(!a)return 0;const g=Math.abs(a.time)+Math.abs(a.size)+Math.abs(a.lot)+Math.abs(a.br)+Math.abs(a.bth)+Math.abs(a.cond)+Math.abs(a.loc)+Math.abs(a.amen);return c.sp?g/c.sp*100:0;});
+  const medAdj = S.median(adjPrices);
+  const meanGross = S.mean(grossList) || 0;
+  const aboveThresh = grossList.filter(g=>g>25).length;
+  const adjModelEst = (function(){
+    const wts = allSoldIncl.map(c=>c.score);
+    const tw = wts.reduce((s,x)=>s+x,0);
+    if(!tw) return null;
+    return Math.round(adjPrices.reduce((s,p,i)=>s+p*wts[i],0)/tw);
+  })();
+
+  area.innerHTML = `
+    <div class="adj-wrap">
+      <table class="adj-tbl">
+        <thead><tr>
+          <th class="lf">Comp</th>
+          <th>Sale $</th>
+          <th title="Time / market trend">Time</th>
+          <th title="Size delta × marginal $/sqft">Size</th>
+          <th title="Lot delta × $/sqft">Lot</th>
+          <th title="Bedrooms delta">BR</th>
+          <th title="Bathrooms delta">Bth</th>
+          <th title="Condition (manual)">Cond</th>
+          <th title="Location (manual)">Loc</th>
+          <th title="Amenities (manual)">Amen</th>
+          <th>Net Adj</th>
+          <th>Adj Sale $</th>
+          <th>Gross %</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div class="adj-summary">
+      <div class="adj-sum-card">
+        <div class="adj-sum-lbl">Median Adj Sale</div>
+        <div class="adj-sum-val">${fmt(medAdj)}</div>
+        <div class="adj-sum-sub">across ${allSoldIncl.length} comps</div>
+      </div>
+      <div class="adj-sum-card">
+        <div class="adj-sum-lbl">Weighted Adj Estimate</div>
+        <div class="adj-sum-val" style="color:var(--gold)">${fmt(adjModelEst)}</div>
+        <div class="adj-sum-sub">similarity-weighted</div>
+      </div>
+      <div class="adj-sum-card">
+        <div class="adj-sum-lbl">Avg Gross Adj</div>
+        <div class="adj-sum-val ${meanGross>20?'down':meanGross>10?'':'up'}">${meanGross.toFixed(1)}%</div>
+        <div class="adj-sum-sub">${meanGross<15?'comp set is solid':meanGross<25?'moderate stretch':'comp set is weak'}</div>
+      </div>
+      <div class="adj-sum-card">
+        <div class="adj-sum-lbl">Comps Over 25% Gross</div>
+        <div class="adj-sum-val ${aboveThresh?'down':''}">${aboveThresh}</div>
+        <div class="adj-sum-sub">appraiser red-flag count</div>
+      </div>
+    </div>`;
+}
+
+// ───────────────────────────────────────────────────────────
+// MODULE 5/6/7 — MARKET INTEL TAB (Trends, Pricing Accuracy, Liquidity)
+// ───────────────────────────────────────────────────────────
+
+function setIntelScope(scope, btn){
+  A.intelScope = scope;
+  document.querySelectorAll('.mi-scope-pill').forEach(p=>p.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderMarketIntel();
+}
+
+function populateIntelCityPills(){
+  const wrap = el('mi-city-pills');
+  if(!wrap) return;
+  const cities = [...new Set(A.listings.map(l=>l.city))].filter(Boolean).sort();
+  wrap.innerHTML = cities.map(c=>`<button class="mi-scope-pill" onclick="setIntelScope('${c}',this)">${toTitle(c)}</button>`).join('');
+  // Default to "All"
+  el('mi-scope-all').classList.add('active');
+}
+
+// Quick valuation helper: estimate value of one listing using local sold comps
+// Used for both pricing accuracy and opportunity scanning
+function valueOneListing(target, allListings, opts={}){
+  const minComps = opts.minComps || 5;
+  const candidates = allListings.filter(l=>{
+    if(l.mlsNo === target.mlsNo) return false;
+    if(l.status !== 'SLD') return false;
+    if(!l.sp || !l.sqft) return false;
+    if(l.city !== target.city) return false;            // same city only
+    if(target.bt && l.bt && l.bt !== target.bt) return false; // same property type
+    // Sqft band ±25%
+    if(target.sqft && l.sqft && (l.sqft < target.sqft*0.75 || l.sqft > target.sqft*1.3)) return false;
+    // Year band ±25 years (loose)
+    if(target.yrBlt && l.yrBlt && Math.abs(l.yrBlt - target.yrBlt) > 30) return false;
+    // Bed match ±1
+    if(target.br && l.br && Math.abs(l.br - target.br) > 1) return false;
+    // Recency: prefer last 18 months when dated
+    if(l.closeDate){
+      const days = (TODAY.getTime() - l.closeDate.getTime()) / (864e5);
+      if(days > 540) return false;
+    }
+    return true;
+  });
+  if(candidates.length < minComps) return null;
+  // Score each
+  const scored = candidates.map(c=>({...c, _score: score(target, c)})).sort((a,b)=>b._score - a._score);
+  const top = scored.slice(0, 12);
+  // Weighted PPSF estimate
+  const tw = top.reduce((s,c)=>s+c._score, 0);
+  if(!tw) return null;
+  const wPPSF = top.reduce((s,c)=>s + (c.ppsf||(c.sp/c.sqft))*c._score, 0)/tw;
+  if(!wPPSF || !target.sqft) return null;
+  const est = Math.round(wPPSF * target.sqft);
+  // Confidence band
+  const ppsfs = top.map(c=>c.ppsf||(c.sp/c.sqft));
+  const sd = S.stddev(ppsfs);
+  const sdPct = wPPSF ? sd/wPPSF : 0.15;
+  const lo = Math.round(est * (1 - Math.max(0.04, sdPct)));
+  const hi = Math.round(est * (1 + Math.max(0.04, sdPct)));
+  return {est, lo, hi, n: top.length, ppsf: Math.round(wPPSF), sdPct: (sdPct*100).toFixed(1), comps: top.slice(0,5)};
+}
+
+// PRD Module 6 — Pricing Accuracy classification
+function classifyVariance(pct){
+  if(pct > 10)  return {category:'Significantly Overpriced', cls:'over', short:'Sig. Over'};
+  if(pct > 5)   return {category:'Moderately Overpriced',    cls:'over', short:'Mod. Over'};
+  if(pct >= -5) return {category:'Fairly Priced',            cls:'fair', short:'Fair'};
+  if(pct >= -10)return {category:'Underpriced',              cls:'under',short:'Under'};
+  return         {category:'Significantly Underpriced',       cls:'under',short:'Sig. Under'};
+}
+
+function renderMarketIntel(){
+  if(!A.listings.length){
+    el('mi-content').innerHTML = `<div class="mi-empty">Load MLS data to view market intelligence.<br>Trends, pricing accuracy, and liquidity diagnostics appear here.</div>`;
+    populateIntelCityPills();
+    return;
+  }
+  populateIntelCityPills();
+  // Filter listings by intel scope
+  const inScope = A.intelScope==='all' ? A.listings : A.listings.filter(l=>l.city===A.intelScope);
+  // Apply global date range (sold listings only)
+  const gdr = A.globalDateRange;
+  const filtered = inScope.filter(l=>{
+    if(gdr.start && l.status==='SLD' && l.closeDate && l.closeDate < gdr.start) return false;
+    if(gdr.end   && l.status==='SLD' && l.closeDate && l.closeDate > gdr.end)   return false;
+    return true;
+  });
+
+  const sold = filtered.filter(l=>l.status==='SLD');
+  const actv = filtered.filter(l=>l.status==='ACTV');
+  const pend = filtered.filter(l=>l.status==='PEND');
+
+  // ── Module 5: Trends — counts, DOM, SP/LP, $/SqFt, time series
+  const medDOM   = S.median(sold.map(l=>l.dom).filter(x=>x>=0));
+  const medCDOM  = S.median(sold.map(l=>l.cdom||l.dom).filter(x=>x>=0));
+  const splp     = sold.filter(l=>l.sp&&l.lp).map(l=>l.sp/l.lp);
+  const medSPLP  = S.median(splp);
+  const medPPSF  = S.median(sold.filter(l=>l.ppsf).map(l=>l.ppsf));
+  const medActPPSF = S.median(actv.filter(l=>l.listPPSF || (l.lp&&l.sqft)).map(l=>l.listPPSF || l.lp/l.sqft));
+
+  // 30/60/90-day windows on close date
+  const byWindow = (days) => {
+    const cutoff = new Date(TODAY.getTime() - days*864e5);
+    return sold.filter(l=>l.closeDate && l.closeDate >= cutoff);
+  };
+  const w30 = byWindow(30), w60 = byWindow(60), w90 = byWindow(90);
+
+  // Absorption (sold/actv ratio) — proxy for market velocity
+  const absorption = actv.length ? (sold.length/actv.length) : null;
+
+  // ── Module 6: Pricing Accuracy — classify each active listing
+  let acc = {sigOver:0, modOver:0, fair:0, under:0, sigUnder:0, valued:0, unvaluable:0};
+  let varianceList = [];
+  actv.forEach(a=>{
+    if(!a.lp || !a.sqft){acc.unvaluable++; return;}
+    const v = valueOneListing(a, A.listings, {minComps:5});
+    if(!v){acc.unvaluable++; return;}
+    const pct = (a.lp - v.est)/v.est * 100;
+    const cls = classifyVariance(pct);
+    acc.valued++;
+    if(cls.cls==='over' && pct>10) acc.sigOver++;
+    else if(cls.cls==='over')      acc.modOver++;
+    else if(cls.cls==='fair')      acc.fair++;
+    else if(pct >= -10)             acc.under++;
+    else                            acc.sigUnder++;
+    varianceList.push({mlsNo:a.mlsNo, addr:a.address, lp:a.lp, est:v.est, pct, dom:a.dom, cdom:a.cdom||a.dom});
+  });
+
+  // ── Module 7: Liquidity — DOM/CDOM vs variance correlation
+  // Bucket: overpriced (>5%) vs fair (-5..5) vs underpriced (<-5)
+  const byBucket = {over:[], fair:[], under:[]};
+  varianceList.forEach(v=>{
+    if(v.pct > 5) byBucket.over.push(v);
+    else if(v.pct >= -5) byBucket.fair.push(v);
+    else byBucket.under.push(v);
+  });
+  const avgDOM = b => S.mean(b.map(v=>v.cdom||v.dom).filter(x=>x>=0)) || 0;
+  const overDOM = avgDOM(byBucket.over), fairDOM = avgDOM(byBucket.fair), underDOM = avgDOM(byBucket.under);
+
+  // Build insights (PRD Module 7 AC1: minimum 3 insights, with cause→effect)
+  const insights = [];
+  if(byBucket.over.length>=3 && byBucket.fair.length>=3){
+    const ratio = fairDOM ? (overDOM/fairDOM) : 1;
+    if(ratio > 1.2){
+      insights.push(`Listings priced <strong>more than 5% above model value</strong> are sitting on the market about <strong>${ratio.toFixed(1)}× longer</strong> than fairly-priced ones (${Math.round(overDOM)} vs ${Math.round(fairDOM)} CDOM). Pricing discipline matters more than market lift in this scope.`);
+    } else if(ratio < 0.95){
+      insights.push(`Overpriced listings are clearing about as fast as fairly-priced ones in this scope — buyers are reaching for inventory regardless of price. Consistent with a hot market or low absorption (currently ${absorption?absorption.toFixed(1)+'×':'n/a'}).`);
+    }
+  }
+  if(medSPLP){
+    const pct = (medSPLP*100);
+    if(pct >= 102) insights.push(`Median sale closes at <strong>${pct.toFixed(1)}% of list</strong> — buyers paying over ask. Conditions favor sellers; underwrite list prices accordingly.`);
+    else if(pct < 98) insights.push(`Median sale closes at <strong>${pct.toFixed(1)}% of list</strong> — buyers negotiating concessions. List 2–3% above target to absorb the typical haircut.`);
+    else insights.push(`Median sale closes at <strong>${pct.toFixed(1)}% of list</strong> — balanced pricing pressure in both directions.`);
+  }
+  if(w30.length>=3 && w90.length>=10){
+    const p30 = S.median(w30.filter(l=>l.ppsf).map(l=>l.ppsf));
+    const p90 = S.median(w90.filter(l=>l.ppsf).map(l=>l.ppsf));
+    if(p30 && p90){
+      const pct = ((p30-p90)/p90*100);
+      if(Math.abs(pct) > 1.5){
+        insights.push(`Median <strong>$/sqft moved ${pct>0?'up':'down'} ${Math.abs(pct).toFixed(1)}%</strong> in the last 30 days vs the trailing 90-day window. ${pct>0?'Pricing momentum is building.':'Pricing momentum is softening — anchor list prices conservatively.'}`);
+      }
+    }
+  }
+  if(acc.valued >= 5){
+    const overShare = ((acc.sigOver+acc.modOver)/acc.valued*100);
+    if(overShare > 35) insights.push(`Of <strong>${acc.valued} active listings</strong> we could value, <strong>${overShare.toFixed(0)}% are overpriced</strong> vs comps. Below-list offers and slow contract velocity are likely.`);
+    else if(overShare < 15) insights.push(`Only <strong>${overShare.toFixed(0)}% of ${acc.valued} active listings</strong> show overpricing — sellers are reading the market well. Expect tighter negotiation room for buyers.`);
+  }
+  if(absorption !== null){
+    if(absorption > 3) insights.push(`Absorption of <strong>${absorption.toFixed(1)}× sold per active</strong> indicates strong demand. Months of supply runs about ${(actv.length / Math.max(1,sold.length/(sold.length?12:1))).toFixed(1)}.`);
+    else if(absorption < 1) insights.push(`Absorption of <strong>${absorption.toFixed(1)}× sold per active</strong> means inventory is accumulating relative to clearance. Buyer leverage is increasing.`);
+  }
+  if(insights.length < 3){
+    insights.push(`Add more sold and active listings to this scope to surface stronger statistical patterns. Currently working with ${sold.length} sold and ${actv.length} active.`);
+  }
+
+  // Histogram of $/sqft for sold listings
+  const ppsfs = sold.map(l=>l.ppsf).filter(x=>x>0).sort((a,b)=>a-b);
+  let histRows = '';
+  if(ppsfs.length >= 5){
+    const lo = ppsfs[Math.floor(ppsfs.length*0.05)], hi = ppsfs[Math.floor(ppsfs.length*0.95)];
+    const buckets = 10;
+    const step = Math.max(1,(hi-lo)/buckets);
+    const counts = Array(buckets).fill(0);
+    ppsfs.forEach(p=>{const i=Math.min(buckets-1, Math.max(0, Math.floor((p-lo)/step))); counts[i]++;});
+    const max = Math.max(...counts);
+    histRows = counts.map((c,i)=>{
+      const lab = `$${Math.round(lo+i*step)}–${Math.round(lo+(i+1)*step)}`;
+      const w = max ? (c/max*100) : 0;
+      return `<div class="mi-bar-row"><div class="mi-bar-lbl">${lab}</div><div class="mi-bar-track"><div class="mi-bar-fill fair" style="width:${w}%"></div></div><div class="mi-bar-num">${c}</div></div>`;
+    }).join('');
+  }
+
+  // Render
+  el('mi-content').innerHTML = `
+    <!-- Trends row -->
+    <div class="mi-row mi-row-4">
+      <div class="mi-card">
+        <div class="mi-title">Active Inventory <span class="ct-chip">Module 5</span></div>
+        <div class="mi-stat-grid">
+          <div class="mi-stat"><div class="mi-stat-lbl">Active</div><div class="mi-stat-val">${actv.length}</div><div class="mi-stat-sub">${actv.length?fmt(S.median(actv.filter(l=>l.lp).map(l=>l.lp)))+' median list':'—'}</div></div>
+          <div class="mi-stat"><div class="mi-stat-lbl">Pending</div><div class="mi-stat-val">${pend.length}</div><div class="mi-stat-sub">in escrow</div></div>
+          <div class="mi-stat"><div class="mi-stat-lbl">Sold (in scope)</div><div class="mi-stat-val">${sold.length}</div><div class="mi-stat-sub">${sold.length?fmt(S.median(sold.filter(l=>l.sp).map(l=>l.sp)))+' median sale':'—'}</div></div>
+          <div class="mi-stat"><div class="mi-stat-lbl">Absorption</div><div class="mi-stat-val ${absorption&&absorption>2?'up':absorption&&absorption<1?'down':''}">${absorption?absorption.toFixed(1)+'×':'—'}</div><div class="mi-stat-sub">sold per active</div></div>
+        </div>
+      </div>
+      <div class="mi-card">
+        <div class="mi-title">Pricing Discipline</div>
+        <div class="mi-stat-grid">
+          <div class="mi-stat"><div class="mi-stat-lbl">Median SP/LP</div><div class="mi-stat-val ${medSPLP&&medSPLP>1.01?'up':medSPLP&&medSPLP<0.98?'down':''}">${medSPLP?(medSPLP*100).toFixed(1)+'%':'—'}</div><div class="mi-stat-sub">${medSPLP&&medSPLP>=1.02?"Hot Seller's":medSPLP&&medSPLP>=0.99?'Balanced':medSPLP&&medSPLP>=0.96?'Soft':"Buyer's"}</div></div>
+          <div class="mi-stat"><div class="mi-stat-lbl">Median DOM</div><div class="mi-stat-val">${medDOM?Math.round(medDOM):'—'}</div><div class="mi-stat-sub">days on market</div></div>
+          <div class="mi-stat"><div class="mi-stat-lbl">Median CDOM</div><div class="mi-stat-val">${medCDOM?Math.round(medCDOM):'—'}</div><div class="mi-stat-sub">cumulative DOM</div></div>
+          <div class="mi-stat"><div class="mi-stat-lbl">Median Sold $/SqFt</div><div class="mi-stat-val">${medPPSF?'$'+Math.round(medPPSF):'—'}</div><div class="mi-stat-sub">${medActPPSF?'list: $'+Math.round(medActPPSF):''}</div></div>
+        </div>
+      </div>
+      <div class="mi-card">
+        <div class="mi-title">Recency Windows</div>
+        <div class="mi-stat-grid">
+          <div class="mi-stat"><div class="mi-stat-lbl">Sold · 30 days</div><div class="mi-stat-val">${w30.length}</div><div class="mi-stat-sub">${w30.length?'med $'+Math.round(S.median(w30.filter(l=>l.ppsf).map(l=>l.ppsf))||0)+'/sqft':'—'}</div></div>
+          <div class="mi-stat"><div class="mi-stat-lbl">Sold · 60 days</div><div class="mi-stat-val">${w60.length}</div><div class="mi-stat-sub">${w60.length?'med $'+Math.round(S.median(w60.filter(l=>l.ppsf).map(l=>l.ppsf))||0)+'/sqft':'—'}</div></div>
+          <div class="mi-stat"><div class="mi-stat-lbl">Sold · 90 days</div><div class="mi-stat-val">${w90.length}</div><div class="mi-stat-sub">${w90.length?'med $'+Math.round(S.median(w90.filter(l=>l.ppsf).map(l=>l.ppsf))||0)+'/sqft':'—'}</div></div>
+          <div class="mi-stat"><div class="mi-stat-lbl">SP/LP · 90d</div><div class="mi-stat-val">${(()=>{const a=w90.filter(l=>l.sp&&l.lp).map(l=>l.sp/l.lp);return a.length?(S.median(a)*100).toFixed(1)+'%':'—';})()}</div><div class="mi-stat-sub">recent ratio</div></div>
+        </div>
+      </div>
+      <div class="mi-card">
+        <div class="mi-title">Geography</div>
+        <div class="mi-stat-grid">
+          <div class="mi-stat"><div class="mi-stat-lbl">Scope</div><div class="mi-stat-val" style="font-size:14px;font-family:var(--ff)">${A.intelScope==='all'?'All Cities':toTitle(A.intelScope)}</div><div class="mi-stat-sub">${[...new Set(filtered.map(l=>l.city))].length} cities in scope</div></div>
+          <div class="mi-stat"><div class="mi-stat-lbl">Counties</div><div class="mi-stat-val" style="font-size:14px;font-family:var(--ff)">${[...new Set(filtered.map(l=>l.county).filter(Boolean))].length}</div><div class="mi-stat-sub">${[...new Set(filtered.map(l=>l.county).filter(Boolean))].slice(0,2).join(', ')||'—'}</div></div>
+          <div class="mi-stat"><div class="mi-stat-lbl">SFR / Condo / TH</div><div class="mi-stat-val" style="font-size:14px;font-family:var(--fm)">${filtered.filter(l=>l.bt==='DE').length} / ${filtered.filter(l=>l.bt==='CO').length} / ${filtered.filter(l=>l.bt==='TH').length}</div><div class="mi-stat-sub">by property type</div></div>
+          <div class="mi-stat"><div class="mi-stat-lbl">Total Records</div><div class="mi-stat-val">${filtered.length}</div><div class="mi-stat-sub">in current filter</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pricing Accuracy + Histogram row -->
+    <div class="mi-row mi-row-2">
+      <div class="mi-card">
+        <div class="mi-title">Pricing Accuracy of Active Listings <span class="ct-chip">Module 6</span></div>
+        ${acc.valued ? `
+          <div class="mi-bar-row"><div class="mi-bar-lbl">Sig. Overpriced (>10%)</div><div class="mi-bar-track"><div class="mi-bar-fill over" style="width:${acc.sigOver/acc.valued*100}%"></div></div><div class="mi-bar-num">${acc.sigOver}</div></div>
+          <div class="mi-bar-row"><div class="mi-bar-lbl">Mod. Overpriced (5–10%)</div><div class="mi-bar-track"><div class="mi-bar-fill warn" style="width:${acc.modOver/acc.valued*100}%"></div></div><div class="mi-bar-num">${acc.modOver}</div></div>
+          <div class="mi-bar-row"><div class="mi-bar-lbl">Fairly Priced (±5%)</div><div class="mi-bar-track"><div class="mi-bar-fill fair" style="width:${acc.fair/acc.valued*100}%"></div></div><div class="mi-bar-num">${acc.fair}</div></div>
+          <div class="mi-bar-row"><div class="mi-bar-lbl">Underpriced (5–10%)</div><div class="mi-bar-track"><div class="mi-bar-fill under" style="width:${acc.under/acc.valued*100}%"></div></div><div class="mi-bar-num">${acc.under}</div></div>
+          <div class="mi-bar-row"><div class="mi-bar-lbl">Sig. Underpriced (>10%)</div><div class="mi-bar-track"><div class="mi-bar-fill under" style="width:${acc.sigUnder/acc.valued*100}%"></div></div><div class="mi-bar-num">${acc.sigUnder}</div></div>
+          <div class="expl-card"><strong>Methodology</strong>Each active is valued against same-city sold comps within ±25% sqft, ±1 BR, ±30yr age, sold within 18 months. Variance % = (List − Model) / Model. ${acc.unvaluable} listing(s) lacked enough comps to value.</div>
+        ` : `<div class="mi-empty" style="padding:30px 12px">Not enough active listings or sold comps to compute pricing accuracy in this scope.</div>`}
+      </div>
+      <div class="mi-card">
+        <div class="mi-title">$/SqFt Distribution — Sold</div>
+        ${histRows ? histRows : `<div class="mi-empty" style="padding:30px 12px">Not enough sold listings.</div>`}
+        ${histRows ? `<div class="expl-card" style="margin-top:8px"><strong>How to read</strong>Each bar is one $/sqft bucket. Fat tails indicate heterogeneity (mixed product types or condition). Tight bell shape means the market is pricing consistently — adjustments will be modest.</div>` : ''}
+      </div>
+    </div>
+
+    <!-- Liquidity / Discipline row -->
+    <div class="mi-row mi-row-2">
+      <div class="mi-card">
+        <div class="mi-title">Liquidity vs Pricing Discipline <span class="ct-chip">Module 7</span></div>
+        ${byBucket.over.length+byBucket.fair.length+byBucket.under.length >= 5 ? `
+          <div class="mi-bar-row"><div class="mi-bar-lbl">Overpriced (>5%)</div><div class="mi-bar-track"><div class="mi-bar-fill over" style="width:${Math.min(100, overDOM/Math.max(overDOM,fairDOM,underDOM,1)*100)}%"></div></div><div class="mi-bar-num">${Math.round(overDOM)} d</div></div>
+          <div class="mi-bar-row"><div class="mi-bar-lbl">Fair (±5%)</div><div class="mi-bar-track"><div class="mi-bar-fill fair" style="width:${Math.min(100, fairDOM/Math.max(overDOM,fairDOM,underDOM,1)*100)}%"></div></div><div class="mi-bar-num">${Math.round(fairDOM)} d</div></div>
+          <div class="mi-bar-row"><div class="mi-bar-lbl">Underpriced (<−5%)</div><div class="mi-bar-track"><div class="mi-bar-fill under" style="width:${Math.min(100, underDOM/Math.max(overDOM,fairDOM,underDOM,1)*100)}%"></div></div><div class="mi-bar-num">${Math.round(underDOM)} d</div></div>
+          <div class="expl-card" style="margin-top:8px"><strong>How to read</strong>Average CDOM (cumulative days on market) by pricing band. Long bars on overpriced rows mean discipline matters; flat bars across all rows mean a hot market hides pricing mistakes (risky comp interpretation).</div>
+        ` : `<div class="mi-empty" style="padding:30px 12px">Not enough valued active listings to compare DOM by pricing band.</div>`}
+      </div>
+      <div class="mi-card">
+        <div class="mi-title">Insights</div>
+        ${insights.map(t=>`<div class="mi-insight">${t}</div>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ───────────────────────────────────────────────────────────
+// MODULE 8 — BUYER OPPORTUNITY SCANNER
+// MODULE 9 — RISK ENGINE (drives risk flags on opportunities)
+// ───────────────────────────────────────────────────────────
+
+function populateOppCityDropdown(){
+  const sel = el('opp-city');
+  if(!sel) return;
+  const cur = sel.value;
+  const cities = [...new Set(A.listings.map(l=>l.city))].filter(Boolean).sort();
+  sel.innerHTML = '<option value="">All Cities</option>' + cities.map(c=>`<option value="${c}">${toTitle(c)}</option>`).join('');
+  if(cur) sel.value = cur;
+}
+
+// PRD Module 9: Risk Engine
+function assessRisk(listing, valuation){
+  const risks = [];
+  // Data Completeness
+  let blanks = 0; const fields = ['sqft','br','bth','yrBlt','lotSqFt'];
+  fields.forEach(f=>{ if(!listing[f]) blanks++; });
+  if(blanks >= 3) risks.push({type:'data', sev:'hi',  desc:`Listing missing ${blanks} of ${fields.length} core attributes — data quality is poor`});
+  else if(blanks >= 1) risks.push({type:'data', sev:'low', desc:`Listing missing ${blanks} core attribute(s)`});
+  // Stale listing — high CDOM
+  const cdom = listing.cdom || listing.dom || 0;
+  if(cdom > 90) risks.push({type:'stale', sev:'hi',  desc:`On market ${cdom}+ days — likely showing reasons not visible in data (condition, location, prior failed escrow)`});
+  else if(cdom > 60) risks.push({type:'stale', sev:'med', desc:`On market ${cdom} days — investigate for unstated issues`});
+  else if(cdom > 30) risks.push({type:'stale', sev:'low', desc:`On market ${cdom} days — light investigation warranted`});
+  // Lot mismatch
+  if(valuation && valuation.comps && listing.lotSqFt){
+    const compLots = valuation.comps.map(c=>c.lotSqFt).filter(x=>x>0);
+    if(compLots.length){
+      const medLot = S.median(compLots);
+      const ratio = listing.lotSqFt / medLot;
+      if(ratio > 2)      risks.push({type:'lot', sev:'med', desc:`Lot is ${ratio.toFixed(1)}× larger than comp median — may carry premium not captured by sqft model`});
+      else if(ratio < 0.5) risks.push({type:'lot', sev:'med', desc:`Lot is ${ratio.toFixed(1)}× smaller than comp median — model likely overstates value`});
+    }
+  }
+  // Outlier $/SqFt — list price way out of comp band
+  if(valuation && listing.lp && listing.sqft){
+    const listPPSF = listing.lp / listing.sqft;
+    if(valuation.ppsf){
+      const ratio = listPPSF / valuation.ppsf;
+      if(ratio < 0.65) risks.push({type:'outlier', sev:'med', desc:`List $/sqft ($${Math.round(listPPSF)}) is far below comp norm ($${valuation.ppsf}) — likely condition issues, leasehold, or special status not visible in data`});
+      else if(ratio > 1.5) risks.push({type:'outlier', sev:'low', desc:`List $/sqft is ${((ratio-1)*100).toFixed(0)}% above comp norm — verify upgrades or premium location justify the asking`});
+    }
+  }
+  // Confidence-derived risk: wide model spread
+  if(valuation && parseFloat(valuation.sdPct) > 18){
+    risks.push({type:'spread', sev:'med', desc:`Comp spread is wide (σ ${valuation.sdPct}% of $/sqft) — neighborhood lacks pricing consistency, opportunity may be illusory`});
+  }
+  return risks;
+}
+
+function runOpportunityScanner(){
+  if(!A.listings.length){toast('Load MLS data first','err');return;}
+  const cityFilt = el('opp-city').value || '';
+  const typeFilt = el('opp-type').value || '';
+  const minTagPct = parseFloat(el('opp-mintag').value) || 0;
+  const minComps = parseInt(el('opp-mincomp').value) || 5;
+  const hideRisk = el('opp-hideRisk').checked;
+
+  const candidates = A.listings.filter(l=>{
+    if(l.status !== 'ACTV') return false;
+    if(cityFilt && l.city !== cityFilt) return false;
+    if(typeFilt && l.bt !== typeFilt) return false;
+    if(!l.lp || !l.sqft) return false;
+    return true;
+  });
+
+  toast(`Scanning ${candidates.length} active listings…`,'inf');
+
+  const results = [];
+  candidates.forEach(target=>{
+    const v = valueOneListing(target, A.listings, {minComps});
+    if(!v) return;
+    const gap = (v.est - target.lp)/v.est;
+    const gapPct = gap * 100;
+    if(gapPct < minTagPct) return; // listed at or above model — not an opportunity
+    let tag = 'Fair Deal', cls = 'opp-tag-fair';
+    if(gapPct >= 12){tag='Deep Discount'; cls='opp-tag-deep';}
+    else if(gapPct >= 7){tag='Strong Opportunity'; cls='opp-tag-strong';}
+    else if(gapPct >= 3){tag='Buyer Advantage'; cls='opp-tag-buyer';}
+    // Reasons (PRD AC2: each opportunity includes explanation)
+    const reasons = [];
+    reasons.push(`Listed ${gapPct.toFixed(1)}% below model value of ${fmt(v.est)} (range ${fmtK(v.lo)}–${fmtK(v.hi)})`);
+    const listPPSF = target.lp/target.sqft;
+    if(v.ppsf && listPPSF < v.ppsf*0.95) reasons.push(`List $/sqft ($${Math.round(listPPSF)}) is below comp $/sqft ($${v.ppsf})`);
+    reasons.push(`Valued against ${v.n} similar sold comp(s) in ${toTitle(target.city)} within last 18 months`);
+    if(target.cdom && target.cdom < 14) reasons.push(`Fresh listing (${target.cdom} days on market) — opportunity may close fast`);
+    // Risks (PRD Module 9)
+    const risks = assessRisk(target, v);
+    // Opportunity score = gap% × confidence factor − risk penalty
+    const confFactor = Math.max(0.4, 1 - parseFloat(v.sdPct)/100);
+    const riskPenalty = risks.reduce((s,r)=>s + (r.sev==='hi'?10:r.sev==='med'?4:1), 0);
+    const oppScore = Math.max(0, Math.min(100, Math.round(gapPct * 4 * confFactor - riskPenalty)));
+    if(hideRisk && risks.some(r=>r.sev==='hi')) return;
+    results.push({target, v, gapPct, tag, cls, reasons, risks, oppScore});
+  });
+
+  results.sort((a,b)=>b.oppScore - a.oppScore);
+  A.opportunities = results;
+
+  // Stats bar
+  const sb = el('opp-stats');
+  if(results.length){
+    const deep = results.filter(r=>r.tag==='Deep Discount').length;
+    const strong = results.filter(r=>r.tag==='Strong Opportunity').length;
+    const buyer = results.filter(r=>r.tag==='Buyer Advantage').length;
+    const fair  = results.filter(r=>r.tag==='Fair Deal').length;
+    const totalEqty = results.reduce((s,r)=>s+(r.v.est - r.target.lp), 0);
+    sb.innerHTML = `<div class="opp-stats-bar">
+      <div class="opp-stat"><div class="opp-stat-num">${results.length}</div><div class="opp-stat-lbl">Total Opportunities</div></div>
+      <div class="opp-stat"><div class="opp-stat-num" style="color:var(--grn)">${deep}</div><div class="opp-stat-lbl">Deep Discount</div></div>
+      <div class="opp-stat"><div class="opp-stat-num" style="color:var(--blue)">${strong}</div><div class="opp-stat-lbl">Strong</div></div>
+      <div class="opp-stat"><div class="opp-stat-num" style="color:var(--teal)">${buyer}</div><div class="opp-stat-lbl">Buyer Advantage</div></div>
+      <div class="opp-stat"><div class="opp-stat-num">${fmt(totalEqty)}</div><div class="opp-stat-lbl">Aggregate Day-1 Equity</div></div>
+    </div>`;
+  } else {
+    sb.innerHTML = '';
+  }
+
+  const grid = el('opp-grid');
+  if(!results.length){
+    grid.innerHTML = `<div class="opp-empty">No opportunities found.<br>Try lowering the <strong>Min Tag</strong> threshold or expanding the city scope.<br><br>Note: scanner needs at least ${minComps} qualified sold comps per active listing — sparse data limits findings.</div>`;
+    toast(`Scan complete — 0 opportunities`,'inf');
+    return;
+  }
+
+  grid.innerHTML = results.map(r=>{
+    const t = r.target;
+    const meta = `
+      <div><span>${t.sqft?fmtN(t.sqft):'—'}</span> sqft</div>
+      <div><span>${t.br||'—'}</span> bd / <span>${t.bth||'—'}</span> ba</div>
+      <div>Built <span>${t.yrBlt||'—'}</span></div>
+      <div>${t.cdom||t.dom||0} <span>cdom</span></div>`;
+    const riskHTML = r.risks.length
+      ? r.risks.map(rk=>`<div class="opp-risk-bullet sev-${rk.sev}">${rk.desc}</div>`).join('')
+      : `<div class="opp-risk-bullet sev-low">No flagged risks from available data — verify in person and via disclosures</div>`;
+    return `<div class="opp-card">
+      <div class="opp-head">
+        <div>
+          <div class="opp-addr">${t.address}${t.unit?' #'+t.unit:''}</div>
+          <div class="opp-city">${toTitle(t.city)} · ${t.bt==='DE'?'SFR':t.bt==='CO'?'Condo':t.bt==='TH'?'Townhome':t.bt}</div>
+        </div>
+        <span class="opp-tag ${r.cls}">${r.tag}</span>
+      </div>
+      <div class="opp-prices">
+        <div class="opp-pr-cell"><div class="opp-pr-lbl">List Price</div><div class="opp-pr-val">${fmt(t.lp)}</div></div>
+        <div class="opp-pr-cell"><div class="opp-pr-lbl">Model Value</div><div class="opp-pr-val" style="color:var(--gold)">${fmt(r.v.est)}</div></div>
+        <div class="opp-pr-cell"><div class="opp-pr-lbl">Gap (Day-1 Equity)</div><div class="opp-pr-val gap-pos">+${r.gapPct.toFixed(1)}%</div></div>
+      </div>
+      <div class="opp-meta">${meta}</div>
+      <div class="opp-score-row">
+        <span class="opp-score-lbl">Opportunity Score</span>
+        <div class="opp-score-bar"><div class="opp-score-fill" style="width:${r.oppScore}%"></div></div>
+        <span class="opp-score-num">${r.oppScore}</span>
+      </div>
+      <div class="opp-section">Why This Looks Mispriced</div>
+      ${r.reasons.map(rs=>`<div class="opp-bullet">${rs}</div>`).join('')}
+      <div class="opp-section">Risk Flags</div>
+      ${riskHTML}
+    </div>`;
+  }).join('');
+
+  toast(`Scan complete — ${results.length} opportunities`,'ok');
+}
+
+function exportOpportunities(){
+  if(!A.opportunities.length){toast('Run scan first','err');return;}
+  const hdr = ['MLS#','Address','City','Type','List$','Model Value','Gap%','Tag','OppScore','SqFt','BR','Bth','YrBlt','CDOM','RiskFlags','TopReason'];
+  const rows = A.opportunities.map(r=>[
+    r.target.mlsNo, r.target.address, r.target.city, r.target.bt,
+    r.target.lp, r.v.est, r.gapPct.toFixed(1)+'%',
+    r.tag, r.oppScore, r.target.sqft, r.target.br, r.target.bth,
+    r.target.yrBlt, r.target.cdom||r.target.dom,
+    r.risks.map(rk=>rk.sev+':'+rk.type).join(' | '),
+    (r.reasons[0]||'').replace(/"/g,"'")
+  ]);
+  const csv = [hdr, ...rows].map(r=>r.map(x=>`"${String(x||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download = 'TeamParikh_Opportunities.csv';
+  a.click();
+  toast('Opportunities exported','ok');
+}
+
+// ═══════════════════════════════════
+// ▲▲▲ END VIW v1.0 MODULES ▲▲▲
+// ═══════════════════════════════════
+
+// ═══════════════════════════════════
+// INIT
+// ═══════════════════════════════════
+function init(){
+  load();
+  updateHeader();
+
+  if(A.listings.length>0){
+    el('welcome').style.display='none';el('app').classList.add('show');
+    rebuildCityTabs();
+    populateIntelCityPills();
+    populateOppCityDropdown();
+    setTimeout(()=>initDefaultMap(),400);
+  }
+
+  setupDrop(el('wdrop'),el('wfile'),false);
+  setupDrop(el('mdrop'),el('mfile'),true);
+  el('load-modal').addEventListener('click',e=>{if(e.target===el('load-modal'))hideModal();});
+
+  // Auto-fill on city change (blur)
+  el('s-addr').addEventListener('blur',tryAutoFill);
+  el('s-city').addEventListener('blur',tryAutoFill);
+  el('s-city').addEventListener('blur',()=>{
+    const city=(v('s-city')||'').trim().toUpperCase();
+    if(city&&A.listings.some(l=>l.city===city)){
+      el('autofill-msg').style.display='none';
+    }
+  });
+}
+
+init();
+</script>
+</body>
+</html>

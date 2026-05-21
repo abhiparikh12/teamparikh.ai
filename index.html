@@ -262,6 +262,27 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--bl
 .empty-state h3 { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 400; color: var(--gold-light); margin-bottom: 10px; }
 .empty-state p { font-size: 12px; color: var(--muted); letter-spacing: 0.8px; max-width: 380px; text-align: center; line-height: 1.7; }
 
+/* ── VALUATION MODEL PAGE ── */
+.vm-gate-wrap {
+  flex: 1; display: flex; flex-direction: column; position: relative;
+  min-height: calc(100vh - 160px);
+}
+.vm-frame {
+  width: 100%; border: none; flex: 1;
+  min-height: calc(100vh - 160px);
+  display: none; background: #0C0F1A;
+}
+.vm-frame.visible { display: block; }
+.vm-gate {
+  position: absolute; inset: 0; z-index: 50;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(201,150,58,0.06) 0%, transparent 55%),
+    radial-gradient(ellipse at 70% 80%, rgba(201,150,58,0.04) 0%, transparent 55%),
+    var(--black);
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+}
+.vm-gate.hidden { display: none; }
+
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: var(--black); }
@@ -322,6 +343,16 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--bl
       <span class="lock-dot"></span>
     </button>
   </div>
+
+  <button class="nav-item" id="nav-valuation" onclick="showPage('valuation', this)">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="18" y1="20" x2="18" y2="10"/>
+      <line x1="12" y1="20" x2="12" y2="4"/>
+      <line x1="6"  y1="20" x2="6"  y2="14"/>
+      <line x1="2"  y1="20" x2="22" y2="20"/>
+    </svg>
+    Valuation Model
+  </button>
 
   <div class="sidebar-footer">
     Team-Parikh.com<br>
@@ -489,6 +520,57 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--bl
 
   </div>
 
+  <!-- ═══════════════ PAGE: VALUATION MODEL ═══════════════ -->
+  <div id="page-valuation" class="page">
+    <div class="page-header">
+      <div class="page-eyebrow">Internal Tool &middot; Team Parikh</div>
+      <h1>Valuation <em>Model</em></h1>
+      <p>Appraiser-grade comparative market analysis engine. Upload your MLS export to run time-adjusted valuations, dynamic comp scoring, reconciliation narratives, and opportunity scanning — all locally in the browser.</p>
+    </div>
+    <div class="gold-rule"></div>
+
+    <div class="vm-gate-wrap">
+
+      <!-- Password gate -->
+      <div class="vm-gate" id="vm-gate">
+        <div class="pw-box">
+          <div class="pw-lock">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <div class="pw-eyebrow">Restricted Internal Access</div>
+          <div class="pw-title">Valuation <em>Model</em></div>
+          <div class="pw-sub">This tool is for Team Parikh use only. Enter your access code to launch the analysis engine.</div>
+          <div class="pw-property">Team Parikh &middot; Valuation Intelligence</div>
+          <div class="pw-input-wrap">
+            <input class="pw-input" id="pw-input-valuation" type="password" maxlength="12"
+              placeholder="&middot; &middot; &middot; &middot;"
+              autocomplete="off"
+              onkeydown="if(event.key==='Enter') checkPW('valuation')">
+            <button class="pw-toggle" onclick="togglePWVis('valuation')" title="Show/hide">
+              <svg id="eye-valuation" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+          <button class="pw-btn" onclick="checkPW('valuation')">Launch Valuation Engine</button>
+          <div class="pw-error-msg" id="pw-error-valuation">Incorrect access code. Please try again.</div>
+          <div class="pw-hint">Enter your access code to continue</div>
+        </div>
+      </div>
+
+      <!-- Valuation Model iframe — loaded only after unlock -->
+      <iframe class="vm-frame" id="frame-valuation"
+        data-src="VIW_v2.html"
+        title="Team Parikh Valuation Model">
+      </iframe>
+
+    </div>
+  </div>
+
 </main>
 </div>
 
@@ -503,8 +585,9 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--bl
      The lock-icon / gate / iframe wiring is fully automatic. */
 
 const PROPERTY_CODES = {
-  houlton: '4978',
-  leland:  '844'
+  houlton:   '4978',
+  leland:    '844',
+  valuation: '3083'   // Team Parikh Valuation Model access code
 };
 
 // In-memory unlock state. Resets on page reload (intentional — no localStorage).
@@ -517,7 +600,15 @@ function showPage(pageId, btn) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + pageId).classList.add('active');
   btn.classList.add('active');
+  // Show buyer sub-nav only when on the buyer page
   document.getElementById('buyer-sub-nav').style.display = (pageId === 'buyer') ? 'block' : 'none';
+  // Auto-focus the valuation password input when switching to that page (if locked)
+  if (pageId === 'valuation' && !UNLOCKED['valuation']) {
+    setTimeout(() => {
+      const input = document.getElementById('pw-input-valuation');
+      if (input) input.focus();
+    }, 120);
+  }
 }
 
 /* ── PROPERTY SELECTION (sub-tab) ── */
@@ -555,10 +646,10 @@ function selectProperty(propId, btn) {
 
 /* ── PASSWORD CHECK ── */
 function checkPW(propId) {
-  const input = document.getElementById('pw-input-' + propId);
-  const error = document.getElementById('pw-error-' + propId);
-  const gate  = document.getElementById('gate-' + propId);
-  const frame = document.getElementById('frame-' + propId);
+  const input    = document.getElementById('pw-input-' + propId);
+  const error    = document.getElementById('pw-error-' + propId);
+  const gate     = document.getElementById('gate-' + propId) || document.getElementById('vm-gate');
+  const frame    = document.getElementById('frame-' + propId);
   const expected = PROPERTY_CODES[propId];
 
   if (input.value === expected) {
@@ -567,13 +658,23 @@ function checkPW(propId) {
     error.classList.remove('visible');
     input.classList.remove('error');
 
-    // Lazy-load the iframe ONLY after unlock (better security + faster initial page load)
-    if (!frame.src && frame.dataset.src) {
+    // Lazy-load the iframe ONLY after unlock (security + performance)
+    if (frame && !frame.src && frame.dataset.src) {
       frame.src = frame.dataset.src;
     }
+    // For the valuation model: show the iframe
+    if (propId === 'valuation' && frame) {
+      frame.classList.add('visible');
+    }
 
-    // Update lock-dot indicators
+    // Update lock-dot indicators (property advisories)
     document.querySelectorAll('[data-property="' + propId + '"]').forEach(t => t.classList.add('unlocked'));
+
+    // Mark valuation nav item as unlocked
+    if (propId === 'valuation') {
+      const navBtn = document.getElementById('nav-valuation');
+      if (navBtn) navBtn.style.color = 'var(--gold)';
+    }
   } else {
     input.classList.add('error');
     error.classList.add('visible');
