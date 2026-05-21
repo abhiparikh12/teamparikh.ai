@@ -12,7 +12,7 @@
   --bg:#0C0F1A;--sur:#141927;--sur2:#1C2235;--bdr:#28334F;
   --gold:#C9A84C;--gold2:#E8C96A;--blue:#3E8EF7;--grn:#38C68B;
   --org:#F5A23A;--red:#EE5E5E;--pur:#9F7AEA;--teal:#2BC0CB;
-  --txt:#DDE3F0;--txt2:#7A8BAE;--txt3:#3A4560;
+  --txt:#EDF2FF;--txt2:#A0AFCC;--txt3:#5C6E94;
   --ff:'Outfit',sans-serif;--fd:'Cormorant Garamond',serif;--fm:'JetBrains Mono',monospace;
   --r:7px;--r2:11px;
   --hdr:52px;--nav:44px;
@@ -25,7 +25,7 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
 #welcome{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:28px;padding:40px}
 .wl-logo{font-family:var(--fd);font-size:54px;font-weight:300;color:var(--gold);text-align:center;letter-spacing:1px}
 .wl-logo em{display:block;font-style:normal;font-size:13px;letter-spacing:5px;text-transform:uppercase;color:var(--txt2);margin-top:4px;font-family:var(--ff)}
-.wl-sub{color:var(--txt2);font-size:14px;text-align:center;max-width:480px;line-height:1.9}
+.wl-sub{color:#A8BAD8;font-size:14px;text-align:center;max-width:480px;line-height:1.9}
 .drop-hero{width:100%;max-width:520px;border:2px dashed var(--bdr);border-radius:16px;padding:48px 32px;text-align:center;cursor:pointer;transition:all .2s;background:var(--sur)}
 .drop-hero:hover,.drop-hero.over{border-color:var(--gold);background:rgba(201,168,76,.05)}
 .dh-icon{font-size:40px;margin-bottom:14px}
@@ -53,12 +53,17 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
 .btn-blue{background:var(--blue);color:#fff;font-weight:600}.btn-blue:hover{opacity:.85}
 
 /* ── TAB NAV ── */
-.tab-nav{height:var(--nav);background:var(--sur);border-bottom:1px solid var(--bdr);display:flex;align-items:flex-end;padding:0 14px;gap:2px;overflow-x:auto;flex-shrink:0}
+.tab-nav{background:var(--sur);border-bottom:1px solid var(--bdr);display:flex;
+  align-items:flex-end;padding:0 8px;gap:2px;flex-shrink:0;flex-wrap:wrap;
+  min-height:var(--nav);max-height:88px;overflow:hidden}
+.tab-nav.expanded{max-height:none}
 .tab-nav::-webkit-scrollbar{height:3px}
 .tn-btn{padding:8px 16px;font-family:var(--ff);font-size:12px;font-weight:500;color:var(--txt2);background:transparent;border:none;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:all .15s;border-radius:4px 4px 0 0}
 .tn-btn:hover{color:var(--txt);background:rgba(255,255,255,.04)}
 .tn-btn.active{color:var(--gold);border-bottom-color:var(--gold);background:rgba(201,168,76,.06)}
-.tn-city{font-size:11px}
+.tn-city{border-radius:3px 3px 0 0;background:rgba(255,255,255,.02)}
+.city-row-sep{width:100%;height:0;border-top:1px dashed rgba(40,51,79,.6);flex-shrink:0;margin:0 4px}
+.tn-city{font-size:10.5px;padding:6px 10px}
 
 /* ── TAB CONTENT ── */
 .tab-pane{display:none;flex:1;overflow:hidden}
@@ -101,7 +106,7 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
 
 /* ── FORMS ── */
 .fg{margin-bottom:9px}
-.fg label{display:block;font-size:10px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px}
+.fg label{display:block;font-size:10px;font-weight:700;color:#B8C6E0;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px}
 .fg input,.fg select{width:100%;background:var(--sur);border:1px solid var(--bdr);border-radius:5px;color:var(--txt);font-family:var(--ff);font-size:12px;padding:6px 9px;outline:none;transition:border-color .15s}
 .fg input:focus,.fg select:focus{border-color:var(--gold)}
 .fg input::placeholder{color:var(--txt3)}
@@ -131,7 +136,7 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
 .vm-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .vm-price{font-family:var(--fm);font-size:22px;font-weight:500;color:var(--txt)}
 .vm-range{font-size:11px;color:var(--txt2);margin-top:2px}
-.vm-detail{font-size:10px;color:var(--txt3);margin-top:3px;line-height:1.6}
+.vm-detail{font-size:10px;color:#7A8EAE;margin-top:3px;line-height:1.6}
 .consensus{background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.28);border-radius:var(--r);padding:14px;margin-top:4px}
 .cons-top{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}
 .cons-label{font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.8px}
@@ -382,6 +387,12 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
 .spread-wide{background:rgba(238,94,94,.12);color:var(--red);border:1px solid rgba(238,94,94,.3)}
 /* ── DATA HEALTH ── */
 .data-range-badge{font-size:10px;color:var(--txt3);font-family:var(--fm);padding:1px 8px;border:1px solid var(--bdr);border-radius:10px;white-space:nowrap;margin-left:4px}
+.lookback-badge{font-size:10px;font-family:var(--fm);padding:2px 9px;border-radius:10px;white-space:nowrap;margin-left:4px;border:1px solid;font-weight:600}
+.lb-6{background:rgba(56,198,139,.12);color:var(--grn);border-color:rgba(56,198,139,.3)}
+.lb-12{background:rgba(62,142,247,.1);color:var(--blue);border-color:rgba(62,142,247,.25)}
+.lb-18{background:rgba(245,162,58,.12);color:var(--org);border-color:rgba(245,162,58,.3)}
+.lb-24{background:rgba(238,94,94,.12);color:var(--red);border-color:rgba(238,94,94,.3)}
+.lb-all{background:rgba(159,122,234,.12);color:var(--pur);border-color:rgba(159,122,234,.3)}
 /* ── COMP QUALITY GRADE ── */
 .cq-pill{font-size:9px;font-weight:700;padding:1px 5px;border-radius:6px;letter-spacing:.3px;border:1px solid;margin-left:3px}
 .cq-a{background:rgba(56,198,139,.12);color:var(--grn);border-color:rgba(56,198,139,.3)}
@@ -420,6 +431,7 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
       <span class="status-chip chip-off" id="hdr-chip">No data loaded</span>
       <span id="hdr-detail" style="font-size:11px;color:var(--txt2)"></span>
       <span id="hdr-range" class="data-range-badge" style="display:none"></span>
+      <span id="hdr-lookback" class="lookback-badge" style="display:none"></span>
     </div>
     <div class="hdr-btns">
       <button class="btn btn-g" onclick="showModal()">📂 Load / Update</button>
@@ -491,7 +503,7 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
           </div>
 
           <button class="btn-run" onclick="runCMA()">⚡ Run CMA Analysis</button>
-          <div id="autofill-msg" style="font-size:11px;color:var(--grn);text-align:center;margin-top:6px;display:none">✓ Auto-filled from MLS data</div>
+          <div id="autofill-msg" style="font-size:11px;color:var(--grn);text-align:center;margin-top:6px;display:none;line-height:1.6"></div>
         </div>
 
         <div class="card">
@@ -765,6 +777,7 @@ const A = {
   adjUseInValuation: false, // when on, valuation uses adjusted comp prices
   adjAuditLog: [],          // [{ts, mlsNo, field, old, new}]
   intelScope: 'all',        // 'all' or city name
+  lookbackMonths: 6,         // active lookback window (set by cascade logic)
   opportunities: [],        // results of opportunity scanner
 };
 
@@ -1151,6 +1164,9 @@ function rebuildCityTabs(){
   const yOpts=years.map(y=>`<option value="${y}">${y}</option>`).join('');
   const yOptsAll=[Math.min(...years),Math.max(...years)].reduce((s,_,i,a)=>{let r='';for(let y=a[0];y<=a[1];y++)r+=`<option value="${y}">${y}</option>`;return r;},'');
 
+  // Insert a row separator before city tabs start
+  const sep=document.createElement('div');sep.className='city-row-sep';nav.appendChild(sep);
+
   cities.forEach(city=>{
     const btn=document.createElement('button');
     btn.className='tn-btn tn-city';btn.dataset.tab=city;
@@ -1492,15 +1508,53 @@ function clearGlobalDateRange(){
 function tryAutoFill(){
   const addr=(v('s-addr')||'').trim().toLowerCase();
   const city=(v('s-city')||'').trim().toUpperCase();
-  if(!addr||!city)return;
-  const match=A.listings.find(l=>l.address.toLowerCase()===addr&&l.city===city);
+  const afMsg=el('autofill-msg');
+  if(!addr){if(afMsg)afMsg.style.display='none';return;}
+
+  // Search without city requirement if city not entered yet
+  const matches=A.listings.filter(l=>{
+    const addrMatch=l.address.toLowerCase()===addr||l.address.toLowerCase().startsWith(addr.slice(0,-1));
+    const cityMatch=!city||l.city===city;
+    return addrMatch&&cityMatch;
+  });
+  if(!matches.length){if(afMsg)afMsg.style.display='none';return;}
+
+  // Prefer active listing over prior sale; among same status, prefer most recent
+  const actv=matches.filter(l=>l.status==='ACTV'||l.status==='PEND');
+  const sold=matches.filter(l=>l.status==='SLD').sort((a,b)=>(b.closeDate||0)-(a.closeDate||0));
+  const match=actv.length?actv[0]:sold[0];
   if(!match)return;
-  const set=(id,val)=>{const e=el(id);if(e&&val){e.value=val;e.classList.add('autofill-glow');setTimeout(()=>e.classList.remove('autofill-glow'),800);}};
-  set('s-sqft',match.sqft||'');set('s-br',match.br||'');set('s-bth',match.bth||'');
-  set('s-yr',match.yrBlt||'');set('s-lot',match.lotSqFt||'');set('s-hoa',match.hoaFee||'');
-  set('s-lp',match.lp||'');if(match.bt){el('s-bt').value=match.bt;}
-  el('autofill-msg').style.display='block';
-  toast('Subject found in MLS data — fields auto-filled ✓','ok');
+
+  const set=(id,val)=>{
+    const e=el(id);
+    if(e&&(val||val===0)){
+      e.value=val;
+      e.classList.add('autofill-glow');
+      setTimeout(()=>e.classList.remove('autofill-glow'),900);
+    }
+  };
+  set('s-sqft',match.sqft||'');
+  set('s-br',match.br||'');
+  set('s-bth',match.bth||'');
+  set('s-yr',match.yrBlt||'');
+  set('s-lot',match.lotSqFt||'');
+  set('s-hoa',match.hoaFee||'');
+  // Set list price from active LP or sold SP
+  const price=match.status==='SLD'?match.sp:match.lp;
+  set('s-lp',price||'');
+  if(match.bt&&el('s-bt'))el('s-bt').value=match.bt;
+  if(city&&el('s-city')&&!v('s-city'))el('s-city').value=toTitle(match.city);
+
+  // Show contextual status in autofill message
+  const isActive=match.status==='ACTV'||match.status==='PEND';
+  const statusLbl=isActive?'Active listing':'Prior sale';
+  const priceLbl=price?` · ${fmt(price)}`:'';
+  const dateLbl=match.closeDate?` · closed ${match.closeDate.toLocaleDateString('en-US',{month:'short',year:'numeric'})}`:'';
+  if(afMsg){
+    afMsg.style.display='block';
+    afMsg.innerHTML=`✓ Auto-filled from MLS — <strong style="color:var(--${isActive?'grn':'blue'})">${statusLbl}</strong>${priceLbl}${dateLbl}`;
+  }
+  toast(`${statusLbl} found — ${Object.keys({sqft:match.sqft,br:match.br,bth:match.bth,yr:match.yrBlt,lot:match.lotSqFt}).filter(k=>({sqft:match.sqft,br:match.br,bth:match.bth,yr:match.yrBlt,lot:match.lotSqFt})[k]).length} fields auto-filled ✓`,'ok');
 }
 
 // ═══════════════════════════════════
@@ -1574,32 +1628,59 @@ async function applyProximityFilter(candidates){
 // ═══════════════════════════════════
 function score(subj,comp){
   let s=100;
-  // SqFt — 30 pts (largest driver of value per appraisal standards)
-  if(subj.sqft&&comp.sqft){const d=Math.abs(comp.sqft-subj.sqft)/subj.sqft;s-=Math.min(30,d*100);}
-  // BR — 18 pts (functional utility)
-  if(subj.br&&comp.br){const d=Math.abs(comp.br-subj.br);s-=Math.min(18,d*9);}
-  // Bth — 12 pts
-  if(subj.bth&&comp.bth){const d=Math.abs(comp.bth-subj.bth);s-=Math.min(12,d*6);}
-  // YrBlt — 12 pts (condition/depreciation proxy)
-  if(subj.yrBlt&&comp.yrBlt){const d=Math.abs(comp.yrBlt-subj.yrBlt);s-=Math.min(12,d*0.7);}
-  // Property Type — 10 pts
-  if(subj.bt&&subj.bt!=='ANY'&&comp.bt&&comp.bt!==subj.bt)s-=10;
-  // Lot size — 8 pts (appraisers always compare site)
-  if(subj.lotSqFt&&comp.lotSqFt&&subj.lotSqFt>0&&comp.lotSqFt>0){
-    const d=Math.abs(comp.lotSqFt-subj.lotSqFt)/subj.lotSqFt;s-=Math.min(8,d*15);
+  // ── SqFt — 28 pts ─────────────────────────────────────────────────
+  // Near-identical sqft (within 3%) penalised barely; penalty ramps steeply beyond 10%
+  let sqftPen=0;
+  if(subj.sqft&&comp.sqft){
+    const d=Math.abs(comp.sqft-subj.sqft)/subj.sqft;
+    sqftPen=d<0.03?0:d<0.08?d*60:d<0.15?d*90:Math.min(28,d*110);
+    s-=sqftPen;
   }
-  // Recency bonus — fresher comps are more reliable (appraisers prefer <6 months)
+  // ── BR — 16 pts ───────────────────────────────────────────────────
+  if(subj.br&&comp.br){const d=Math.abs(comp.br-subj.br);s-=Math.min(16,d*10);}
+  // ── Bth — 12 pts ──────────────────────────────────────────────────
+  if(subj.bth&&comp.bth){const d=Math.abs(comp.bth-subj.bth);s-=Math.min(12,d*7);}
+  // ── YrBlt — 10 pts ────────────────────────────────────────────────
+  if(subj.yrBlt&&comp.yrBlt){const d=Math.abs(comp.yrBlt-subj.yrBlt);s-=Math.min(10,d*0.6);}
+  // ── Property Type — 10 pts ────────────────────────────────────────
+  if(subj.bt&&subj.bt!=='ANY'&&comp.bt&&comp.bt!==subj.bt)s-=10;
+  // ── Lot size — 8 pts ──────────────────────────────────────────────
+  if(subj.lotSqFt&&comp.lotSqFt&&subj.lotSqFt>0&&comp.lotSqFt>0){
+    const d=Math.abs(comp.lotSqFt-subj.lotSqFt)/subj.lotSqFt;
+    s-=d<0.05?0:Math.min(8,d*14);
+  }
+  // ── Same city — 5 pts ─────────────────────────────────────────────
+  if(comp.city===subj.city) s+=5;
+  // ── Garage mismatch — 3 pts ───────────────────────────────────────
+  if(subj.gar!==undefined&&comp.gar!==undefined&&subj.gar!==comp.gar) s-=3;
+
+  // ── RECENCY — scaled bonus/penalty ────────────────────────────────
+  // Recency is treated as a MULTIPLIER on the base score, not a flat bonus,
+  // so that a very similar comp that sold 2 months ago outranks a mediocre
+  // comp that sold last week.
+  let recencyMult=1.0;
   if(comp.closeDate){
     const daysSince=(TODAY.getTime()-comp.closeDate.getTime())/(864e5);
-    if(daysSince<=90) s+=8;
-    else if(daysSince<=180) s+=5;
-    else if(daysSince<=365) s+=2;
-    else if(daysSince>720) s-=5; // penalize stale comps > 2 years
+    if(daysSince<=60)  recencyMult=1.18;  // < 2 months — very fresh
+    else if(daysSince<=120) recencyMult=1.10;  // < 4 months
+    else if(daysSince<=180) recencyMult=1.05;  // < 6 months
+    else if(daysSince<=365) recencyMult=1.00;  // < 1 year — baseline
+    else if(daysSince<=545) recencyMult=0.95;  // 1–18 months — slight discount
+    else if(daysSince<=730) recencyMult=0.88;  // 18–24 months
+    else                   recencyMult=0.80;   // > 2 years — meaningfully stale
   }
-  // Same city bonus
-  if(comp.city===subj.city) s+=5;
-  // Garage match — small but appraisers note it
-  if(subj.gar!==undefined&&comp.gar!==undefined&&subj.gar!==comp.gar) s-=3;
+  s=Math.round(s*recencyMult);
+
+  // ── NEAR-IDENTICAL BONUS ──────────────────────────────────────────
+  // A comp that matches on sqft (±5%), BR, Bth AND sold in past 6 months
+  // gets a dominant bonus so modelB's weighted average pulls strongly toward it.
+  // This directly fixes the issue where a $2.1M identical sale was being diluted.
+  const sqftMatch=subj.sqft&&comp.sqft&&Math.abs(comp.sqft-subj.sqft)/subj.sqft<=0.05;
+  const brMatch=!subj.br||!comp.br||comp.br===subj.br;
+  const bthMatch=!subj.bth||!comp.bth||Math.abs(comp.bth-subj.bth)<=0.5;
+  const fresh=comp.closeDate&&(TODAY.getTime()-comp.closeDate.getTime())/(864e5)<=180;
+  if(sqftMatch&&brMatch&&bthMatch&&fresh) s=Math.min(100,s+12); // dominant near-identical bonus
+
   return Math.max(0,Math.min(100,Math.round(s)));
 }
 
@@ -1668,14 +1749,22 @@ function modelA(subj,sold){
 function modelB(subj,sold){
   const usable=sold.filter(c=>c.sp&&c.score>0&&!A.excluded.has(c.mlsNo));
   if(usable.length<2)return null;
-  // Weight by score AND recency — fresher, more-similar comps get more pull
+  // ── Exponential score weighting: score^2 so a 95-score comp gets ~3× the
+  // pull of a 55-score comp, not just 1.7×. Near-identical sales dominate.
   const wts=usable.map(c=>{
-    let w=c.score;
+    const sc=c.score;
+    // Use score² as base weight — this is the key fix for dilution
+    let w=(sc/100)*(sc/100)*10000;
+    // Additional recency multiplier on top (stacks with score²)
     if(c.closeDate){
       const daysSince=(TODAY.getTime()-c.closeDate.getTime())/(864e5);
-      if(daysSince<=90) w*=1.25;
-      else if(daysSince<=180) w*=1.10;
-      else if(daysSince>540) w*=0.75; // stale comp discount
+      if(daysSince<=60)  w*=1.40;  // < 2 months: very dominant
+      else if(daysSince<=120) w*=1.25;
+      else if(daysSince<=180) w*=1.12;  // < 6 months: elevated
+      else if(daysSince<=365) w*=1.00;
+      else if(daysSince<=545) w*=0.82;
+      else if(daysSince<=730) w*=0.65;
+      else                   w*=0.45;  // > 2 years: minimal influence
     }
     return Math.max(w,1);
   });
@@ -1829,6 +1918,42 @@ function calcAll(subj,comps){
 // ═══════════════════════════════════
 // MAIN CMA RUN
 // ═══════════════════════════════════
+// ══════════════════════════════════════
+// CASCADING LOOKBACK WINDOW
+// Starts at 6 months; expands automatically if fewer than MIN_COMPS sold comps found.
+// ══════════════════════════════════════
+const LOOKBACK_STEPS=[6,12,18,24,null]; // months; null = all data
+const MIN_COMPS=5; // minimum sold comps before expanding window
+
+function getLookbackCutoff(months){
+  if(months===null)return null;
+  const d=new Date(TODAY);d.setMonth(d.getMonth()-months);return d;
+}
+
+function filterWithLookback(candidates){
+  let soldCount=0,activeLookback=6,cutoff=null;
+  for(const months of LOOKBACK_STEPS){
+    cutoff=getLookbackCutoff(months);
+    const sold=candidates.filter(c=>c.status==='SLD'&&(!cutoff||!c.closeDate||c.closeDate>=cutoff));
+    soldCount=sold.length;
+    activeLookback=months;
+    if(soldCount>=MIN_COMPS)break;
+  }
+  A.lookbackMonths=activeLookback;
+  // Update lookback badge in header
+  const badge=el('hdr-lookback');
+  if(badge){
+    const lbl=activeLookback===null?'All Data':`${activeLookback}mo window`;
+    const cls=activeLookback===6?'lb-6':activeLookback===12?'lb-12':activeLookback===18?'lb-18':activeLookback===24?'lb-24':'lb-all';
+    badge.textContent='📅 '+lbl;
+    badge.className='lookback-badge '+cls;
+    badge.style.display='inline-block';
+    badge.title=activeLookback===6?'Sufficient comps found in 6-month window':`Expanded to ${lbl} — fewer than ${MIN_COMPS} sold comps in shorter window`;
+  }
+  if(!cutoff)return candidates;
+  return candidates.filter(c=>c.status!=='SLD'||!c.closeDate||c.closeDate>=cutoff);
+}
+
 function runCMA(){
   const addr=(v('s-addr')||'').trim();
   const city=(v('s-city')||'').trim().toUpperCase();
@@ -1899,7 +2024,9 @@ function runCMA(){
   // Score each candidate
   candidates.forEach(c=>c.score=score(A.subject,c));
   candidates.sort((a,b)=>b.score-a.score);
-  A.comps=candidates;
+  // Apply cascading lookback window — expand until MIN_COMPS found
+  const filteredByWindow=filterWithLookback(candidates);
+  A.comps=filteredByWindow;
 
   // Render immediately from city-scope results
   renderCompTable();
@@ -1994,7 +2121,8 @@ function renderValuation(r){
   const wExpl = A.adjUseInValuation && r.D
     ? `Method D (Appraiser Adjusted) is weighted at <strong>55%</strong>, Method C (Trend) at <strong>25%</strong>, Method A ($/SqFt) at <strong>20%</strong>. Adjustments applied per grid below.`
     : `Weights are <strong>dynamically assigned</strong> based on data quality — trend strength (R²), comp similarity scores, and PPSF variance all influence allocation. Toggle the adjustment grid to switch to appraiser-adjusted weighting.`;
-  expEl.innerHTML = `<div class="expl-card"><strong>How This Value Was Derived</strong>${wExpl} Time adjustment is applied to each comp's $/sqft using the market trend slope, bringing older sales to present-day equivalents before averaging.</div>`;
+  const lbLabel=A.lookbackMonths===null?'all available data':`the past ${A.lookbackMonths} months`;
+  expEl.innerHTML = `<div class="expl-card"><strong>How This Value Was Derived</strong>${`<span style='float:right;font-size:10px;color:var(--txt2)'>Using ${lbLabel} of sales</span>`}${wExpl} Time adjustment is applied to each comp's $/sqft using the market trend slope, bringing older sales to present-day equivalents before averaging.</div>`;
 }
 
 /**
@@ -2980,6 +3108,7 @@ async function init(){
 
   // Auto-fill on city change (blur)
   el('s-addr').addEventListener('blur',tryAutoFill);
+  el('s-addr').addEventListener('input',()=>setTimeout(tryAutoFill,300));
   el('s-city').addEventListener('blur',tryAutoFill);
   el('s-city').addEventListener('blur',()=>{
     const city=(v('s-city')||'').trim().toUpperCase();
