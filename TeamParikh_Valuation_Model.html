@@ -163,30 +163,68 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
   content:'';position:absolute;bottom:0;left:60px;right:60px;height:1px;
   background:linear-gradient(90deg, transparent 0%, rgba(201,168,76,.35) 50%, transparent 100%);
 }
-.export-stage .exp-foot-grid{display:flex;align-items:stretch;gap:24px}
-.export-stage .exp-foot-col{flex:1;min-width:0}
-.export-stage .exp-foot-divider{
-  width:1px;
-  background:linear-gradient(180deg, transparent 0%, rgba(201,168,76,.45) 35%, rgba(201,168,76,.45) 65%, transparent 100%);
-  flex-shrink:0;
+.export-stage .exp-foot-grid{display:flex;align-items:stretch;gap:14px}
+.export-stage .exp-foot-card{
+  flex:1;min-width:0;position:relative;
+  padding:16px 18px 14px;
+  background:linear-gradient(155deg, rgba(201,168,76,.10) 0%, rgba(15,18,26,.4) 60%, rgba(201,168,76,.08) 100%);
+  border:1px solid rgba(201,168,76,.45);
+  border-radius:3px;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
 }
-.export-stage .exp-ag-name{
+.export-stage .exp-foot-card::before{
+  content:'';position:absolute;inset:5px;
+  border:1px solid rgba(201,168,76,.22);border-radius:2px;pointer-events:none;
+}
+.export-stage .exp-cor{position:absolute;width:11px;height:11px;border:1px solid var(--gold);opacity:.85}
+.export-stage .exp-cor-tl{top:-1px;left:-1px;border-right:none;border-bottom:none}
+.export-stage .exp-cor-tr{top:-1px;right:-1px;border-left:none;border-bottom:none}
+.export-stage .exp-cor-bl{bottom:-1px;left:-1px;border-right:none;border-top:none}
+.export-stage .exp-cor-br{bottom:-1px;right:-1px;border-left:none;border-top:none}
+.export-stage .exp-foot-name{
   font-family:'Cormorant Garamond',serif;
-  font-size:20px;font-weight:600;color:#C9A84C;line-height:1;
-  margin-bottom:4px;letter-spacing:.4px;
+  font-size:22px;font-weight:500;color:#F1ECDD;letter-spacing:.5px;line-height:1;
+  white-space:nowrap;
 }
-.export-stage .exp-ag-role{
-  font-size:9px;letter-spacing:.22em;text-transform:uppercase;
-  color:rgba(201,168,76,.7);font-weight:500;margin-bottom:8px;
+.export-stage .exp-foot-name em{
+  color:var(--gold);font-style:italic;font-weight:500;margin-left:3px;
 }
-.export-stage .exp-ag-row{
-  font-size:12px;color:rgba(255,255,255,.88);line-height:1.6;
-  font-family:'Outfit',sans-serif;
+.export-stage .exp-foot-flourish{
+  width:42px;height:1px;margin:8px 0 7px;position:relative;
+  background:linear-gradient(90deg, transparent 0%, var(--gold) 50%, transparent 100%);
 }
-.export-stage .exp-foot-site{color:#C9A84C;font-weight:600;letter-spacing:.05em}
+.export-stage .exp-foot-flourish::before{
+  content:'◆';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  color:var(--gold);font-size:6px;background:#10131C;padding:0 5px;line-height:1;
+}
+.export-stage .exp-foot-dre{
+  font-size:9px;letter-spacing:.32em;text-transform:uppercase;
+  color:rgba(201,168,76,.7);font-weight:600;margin-bottom:6px;
+}
+.export-stage .exp-foot-dre span{
+  color:rgba(241,236,221,.7);font-family:'JetBrains Mono',monospace;letter-spacing:.08em;font-weight:500;
+}
+.export-stage .exp-foot-phone{
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px;color:#F1ECDD;font-weight:500;line-height:1.5;letter-spacing:.3px;
+}
+.export-stage .exp-foot-email{
+  font-size:10.5px;color:rgba(241,236,221,.75);line-height:1.5;letter-spacing:.15px;
+}
+.export-stage .exp-foot-card-brokerage{
+  background:linear-gradient(155deg, rgba(201,168,76,.18) 0%, rgba(15,18,26,.35) 60%, rgba(201,168,76,.14) 100%);
+  border-color:rgba(201,168,76,.6);
+}
+.export-stage .exp-foot-brorn{
+  color:var(--gold);font-size:16px;line-height:1;margin-bottom:4px;
+}
+.export-stage .exp-foot-site{
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px;color:var(--gold);letter-spacing:.3px;font-weight:600;
+}
 .export-stage .exp-foot-tag{
-  font-size:9.5px;letter-spacing:.28em;text-transform:uppercase;
-  color:rgba(201,168,76,.75);font-weight:600;margin-top:3px;
+  font-size:8px;letter-spacing:.45em;text-transform:uppercase;
+  color:rgba(201,168,76,.7);font-weight:600;margin-top:3px;
 }
 .export-stage .exp-foot-disc{
   margin-top:18px;
@@ -417,110 +455,188 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
 .hdr-status{flex:1;min-width:0;display:flex;align-items:center;gap:10px;overflow:hidden;flex-wrap:wrap}
 
 /* ══════════════════════════════════════════════════════════════ */
-/* LUXURY AGENT CARD — top right of hero band                     */
+/* LUXURY AGENT CARDS — three separate gold-bordered cards         */
+/* with breathing room. Elegant serif typography, decorative       */
+/* flourishes. Replaces the previous business-card-style block.    */
 /* ══════════════════════════════════════════════════════════════ */
-.hdr-luxe-card{
-  position:relative;
-  flex-shrink:0;
-  padding:14px 26px 11px;
-  background:
-    linear-gradient(135deg, rgba(201,168,76,.14) 0%, rgba(201,168,76,.04) 50%, rgba(201,168,76,.10) 100%),
-    radial-gradient(ellipse at top, rgba(201,168,76,.06), transparent 70%);
-  border:1px solid rgba(201,168,76,.35);
-  border-radius:6px;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.04),
-    0 2px 14px rgba(0,0,0,.4),
-    0 0 0 1px rgba(201,168,76,.08);
+.hdr-luxe-wrap{
+  display:flex;align-items:stretch;gap:14px;flex-shrink:0;
 }
-/* Decorative corner accents — refined art-deco feel */
-.luxe-card-corner{
-  position:absolute;
-  width:13px;
-  height:13px;
-  border:1px solid var(--gold);
-  opacity:.6;
-}
-.luxe-corner-tl{top:4px;left:4px;border-right:none;border-bottom:none}
-.luxe-corner-tr{top:4px;right:4px;border-left:none;border-bottom:none}
-.luxe-corner-bl{bottom:4px;left:4px;border-right:none;border-top:none}
-.luxe-corner-br{bottom:4px;right:4px;border-left:none;border-top:none}
 
-.luxe-agents{display:flex;align-items:stretch;gap:20px}
-.luxe-agent{font-size:9.5px;line-height:1.5;color:var(--txt2);min-width:0}
-.luxe-ag-name{
+.luxe-agent-card{
+  position:relative;
+  padding:14px 22px 12px;
+  background:
+    linear-gradient(155deg, rgba(201,168,76,.08) 0%, rgba(15,18,26,.4) 60%, rgba(201,168,76,.06) 100%);
+  border:1px solid rgba(201,168,76,.35);
+  border-radius:3px;
+  min-width:200px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  box-shadow:
+    inset 0 0 0 1px rgba(201,168,76,.06),
+    0 4px 16px rgba(0,0,0,.35);
+}
+/* Decorative double-border inset (refined hotel-stationery look) */
+.luxe-agent-card::before{
+  content:'';
+  position:absolute;
+  inset:4px;
+  border:1px solid rgba(201,168,76,.18);
+  border-radius:2px;
+  pointer-events:none;
+}
+.luxe-ac-corners{position:absolute;inset:0;pointer-events:none}
+.luxe-cor{position:absolute;width:8px;height:8px;border:1px solid var(--gold);opacity:.85}
+.luxe-cor-tl{top:-1px;left:-1px;border-right:none;border-bottom:none}
+.luxe-cor-tr{top:-1px;right:-1px;border-left:none;border-bottom:none}
+.luxe-cor-bl{bottom:-1px;left:-1px;border-right:none;border-top:none}
+.luxe-cor-br{bottom:-1px;right:-1px;border-left:none;border-top:none}
+
+.luxe-ac-name{
   font-family:var(--fd);
   font-size:17px;
-  font-weight:600;
-  color:var(--gold);
+  font-weight:500;
+  color:#F1ECDD;
   letter-spacing:.4px;
   line-height:1;
-  margin-bottom:4px;
   white-space:nowrap;
 }
-.luxe-ag-role{
+.luxe-ac-name em{
+  color:var(--gold);
+  font-style:italic;
+  font-weight:500;
+  margin-left:2px;
+}
+.luxe-ac-flourish{
+  width:36px;
+  height:1px;
+  background:linear-gradient(90deg, transparent 0%, var(--gold) 50%, transparent 100%);
+  margin:7px 0 6px;
+  position:relative;
+}
+.luxe-ac-flourish::before{
+  content:'◆';
+  position:absolute;
+  left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  color:var(--gold);
+  font-size:5px;
+  background:transparent;
+  padding:0 4px;
+  line-height:1;
+}
+.luxe-ac-dre{
   font-size:8px;
-  letter-spacing:.18em;
+  letter-spacing:.32em;
   text-transform:uppercase;
-  color:rgba(201,168,76,.75);
+  color:rgba(201,168,76,.7);
   font-family:var(--ff);
   font-weight:500;
   margin-bottom:5px;
 }
-.luxe-ag-row{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  font-size:10.5px;
-  margin-top:1px;
-  font-family:var(--ff);
-  white-space:nowrap;
+.luxe-ac-dre span{
+  color:rgba(241,236,221,.7);
+  font-family:var(--fm);
+  letter-spacing:.08em;
 }
-.luxe-ic{
-  color:rgba(201,168,76,.7);
-  font-size:10px;
-  width:11px;
-  display:inline-block;
-  text-align:center;
-}
-.luxe-ag-row a{
-  color:var(--txt);
+.luxe-ac-link{
+  display:block;
+  font-size:11px;
+  color:#F1ECDD;
   text-decoration:none;
-  letter-spacing:.15px;
-  transition:color .15s;
-}
-.luxe-ag-row a:hover{color:var(--gold)}
-.luxe-divider{
-  width:1px;
-  background:linear-gradient(180deg, transparent 0%, rgba(201,168,76,.5) 35%, rgba(201,168,76,.5) 65%, transparent 100%);
-  align-self:stretch;
-  flex-shrink:0;
-}
-.luxe-foot{
-  margin-top:9px;
-  padding-top:8px;
-  border-top:1px solid rgba(201,168,76,.2);
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:8px;
-  font-size:8.5px;
-  letter-spacing:.22em;
-  text-transform:uppercase;
-  color:rgba(201,168,76,.85);
+  line-height:1.65;
   font-family:var(--ff);
+  letter-spacing:.2px;
+  transition:color .2s;
+}
+.luxe-ac-link:hover{color:var(--gold)}
+.luxe-ac-phone{
+  font-family:var(--fm);
   font-weight:500;
+  color:#F1ECDD;
+  font-size:11px;
+  letter-spacing:.3px;
 }
-.luxe-foot-orn{color:rgba(201,168,76,.55);font-size:6px;letter-spacing:0}
-.luxe-foot-sep{color:rgba(201,168,76,.4);letter-spacing:0}
-.luxe-foot-txt{color:rgba(201,168,76,.85)}
-.luxe-foot-link{
-  color:var(--gold);
+.luxe-ac-email{
+  font-size:10px;
+  color:rgba(241,236,221,.7);
+  letter-spacing:.15px;
+}
+
+/* Brokerage card — slightly different to read as the brokerage anchor */
+.luxe-brokerage{
+  position:relative;
+  padding:14px 22px 12px;
+  background:
+    linear-gradient(155deg, rgba(201,168,76,.18) 0%, rgba(15,18,26,.4) 60%, rgba(201,168,76,.12) 100%);
+  border:1px solid rgba(201,168,76,.5);
+  border-radius:3px;
+  min-width:170px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
   text-decoration:none;
-  letter-spacing:.22em;
-  transition:color .15s;
+  box-shadow:
+    inset 0 0 0 1px rgba(201,168,76,.08),
+    0 4px 16px rgba(0,0,0,.35);
+  transition:border-color .2s, background .2s;
 }
-.luxe-foot-link:hover{color:#E3C267;text-decoration:underline}
+.luxe-brokerage:hover{
+  border-color:var(--gold);
+  background:
+    linear-gradient(155deg, rgba(201,168,76,.25) 0%, rgba(15,18,26,.35) 60%, rgba(201,168,76,.18) 100%);
+}
+.luxe-brokerage::before{
+  content:'';
+  position:absolute;
+  inset:4px;
+  border:1px solid rgba(201,168,76,.22);
+  border-radius:2px;
+  pointer-events:none;
+}
+.luxe-br-orn-l, .luxe-br-orn-r{
+  color:rgba(201,168,76,.7);
+  font-size:11px;
+  line-height:1;
+}
+.luxe-br-orn-l{margin-bottom:3px}
+.luxe-br-orn-r{margin-top:3px}
+.luxe-br-name{
+  font-family:var(--fd);
+  font-size:15px;
+  font-weight:500;
+  color:#F1ECDD;
+  letter-spacing:.45px;
+  line-height:1.1;
+  font-style:italic;
+}
+.luxe-br-line{
+  width:30px;
+  height:1px;
+  background:linear-gradient(90deg, transparent 0%, var(--gold) 50%, transparent 100%);
+  margin:5px 0 4px;
+}
+.luxe-br-site{
+  font-family:var(--fm);
+  font-size:11.5px;
+  color:var(--gold);
+  letter-spacing:.3px;
+  font-weight:500;
+  line-height:1.2;
+}
+.luxe-br-tag{
+  font-size:7.5px;
+  letter-spacing:.4em;
+  text-transform:uppercase;
+  color:rgba(201,168,76,.65);
+  font-weight:500;
+  margin-top:2px;
+}
 
 .status-chip{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:2px 10px;font-size:11px;font-family:var(--fm);white-space:nowrap;border:1px solid}
 .chip-ok{background:rgba(56,198,139,.1);color:var(--grn);border-color:rgba(56,198,139,.25)}
@@ -529,14 +645,22 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
 .hdr-btns{display:flex;gap:7px;flex-shrink:0;flex-wrap:wrap}
 
 /* Responsive — collapse to single-line hero on narrow screens */
-@media (max-width:1280px){
-  .hdr-hero{padding:22px 24px}
-  .hdr-title{font-size:42px}
-  .hdr-luxe-card{padding:12px 20px 10px}
-  .luxe-ag-name{font-size:15px}
+@media (max-width:1380px){
+  .hdr-hero{padding:24px 28px}
+  .hdr-title{font-size:46px}
+  .hdr-luxe-wrap{gap:10px}
+  .luxe-agent-card{padding:12px 16px 10px;min-width:0}
+  .luxe-brokerage{padding:12px 16px;min-width:0}
+  .luxe-ac-name{font-size:15px}
+  .luxe-ac-email{font-size:9.5px}
+  .luxe-br-name{font-size:13px}
 }
-@media (max-width:1100px){
-  .hdr-luxe-card{display:none}
+@media (max-width:1180px){
+  .hdr-title{font-size:38px}
+  .luxe-brokerage{display:none}
+}
+@media (max-width:1000px){
+  .hdr-luxe-wrap{display:none}
 }
 @media (max-width:900px){
   .hdr-title{font-size:32px;gap:10px}
@@ -1269,14 +1393,147 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
 .rp-meta strong{color:#1A1F2C;display:block}
 .rp-meta-date{font-family:'Cormorant Garamond',serif;font-size:12.5px;color:#806B30;margin-bottom:5px;font-style:italic;font-weight:500;line-height:1.3}
 
-/* Agent contact block under the letterhead */
-.rp-agents{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border:1px solid #D9CFB7;border-radius:5px;background:#F8F4EB;margin-bottom:14px;overflow:hidden}
-.rp-agent{padding:8px 12px;font-size:9.5px;line-height:1.45;color:#3A4258;border-right:1px solid #D9CFB7}
-.rp-agent:last-child{border-right:none}
-.rp-agent-search{background:#F2EDE2}
-.rp-ag-n{font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:600;color:#1A1F2C;letter-spacing:.2px;line-height:1.1;margin-bottom:2px}
-.rp-ag-d{font-size:8.5px;color:#806B30;letter-spacing:.1em;text-transform:uppercase;font-weight:600;font-family:'JetBrains Mono',monospace}
-.rp-ag-c{font-size:9.5px;color:#3A4258;margin-top:2px;font-family:'JetBrains Mono',monospace}
+/* Agent contact block under the letterhead — three elegant gold-bordered cards */
+.rp-agents{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:10px;
+  margin-bottom:16px;
+}
+.rp-agent-card{
+  position:relative;
+  padding:14px 16px 12px;
+  background:linear-gradient(155deg, #FBF9F4 0%, #F8F4EB 50%, #F2EDE2 100%);
+  border:1px solid #806B30;
+  border-radius:3px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  box-shadow:0 1px 4px rgba(128,107,48,.12);
+}
+/* Inner double-border, hotel-stationery feel */
+.rp-agent-card::before{
+  content:'';
+  position:absolute;
+  inset:4px;
+  border:1px solid rgba(128,107,48,.22);
+  border-radius:2px;
+  pointer-events:none;
+}
+.rp-cor{position:absolute;width:9px;height:9px;border:1px solid #806B30}
+.rp-cor-tl{top:-1px;left:-1px;border-right:none;border-bottom:none}
+.rp-cor-tr{top:-1px;right:-1px;border-left:none;border-bottom:none}
+.rp-cor-bl{bottom:-1px;left:-1px;border-right:none;border-top:none}
+.rp-cor-br{bottom:-1px;right:-1px;border-left:none;border-top:none}
+
+.rp-ag-name{
+  font-family:'Cormorant Garamond',serif;
+  font-size:18px;
+  font-weight:500;
+  color:#1A1F2C;
+  letter-spacing:.4px;
+  line-height:1;
+  white-space:nowrap;
+}
+.rp-ag-name em{
+  color:#806B30;
+  font-style:italic;
+  font-weight:500;
+  margin-left:2px;
+}
+.rp-ag-flourish{
+  width:32px;
+  height:1px;
+  background:linear-gradient(90deg, transparent 0%, #806B30 50%, transparent 100%);
+  margin:6px 0 5px;
+  position:relative;
+}
+.rp-ag-flourish::before{
+  content:'◆';
+  position:absolute;
+  left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  color:#806B30;
+  font-size:5px;
+  background:#FBF9F4;
+  padding:0 4px;
+  line-height:1;
+}
+.rp-ag-dre{
+  font-size:7.5px;
+  letter-spacing:.32em;
+  text-transform:uppercase;
+  color:#806B30;
+  font-family:'Outfit',sans-serif;
+  font-weight:600;
+  margin-bottom:4px;
+}
+.rp-ag-dre span{
+  color:#5F6577;
+  font-family:'JetBrains Mono',monospace;
+  letter-spacing:.08em;
+  font-weight:500;
+}
+.rp-ag-phone{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  color:#1A1F2C;
+  font-weight:500;
+  line-height:1.5;
+  letter-spacing:.3px;
+}
+.rp-ag-email{
+  font-size:9px;
+  color:#3A4258;
+  line-height:1.5;
+  font-family:'Outfit',sans-serif;
+  letter-spacing:.1px;
+}
+
+/* Brokerage card variation */
+.rp-agent-brokerage{
+  background:linear-gradient(155deg, #F2EDE2 0%, #E8DFCB 100%);
+  border-color:#806B30;
+}
+.rp-agent-brokerage::before{
+  border-color:rgba(128,107,48,.3);
+}
+.rp-br-orn{
+  color:#806B30;
+  font-size:13px;
+  line-height:1;
+  margin-bottom:3px;
+}
+.rp-br-name{
+  font-family:'Cormorant Garamond',serif;
+  font-size:16px;
+  font-weight:500;
+  color:#1A1F2C;
+  font-style:italic;
+  letter-spacing:.5px;
+  line-height:1;
+}
+.rp-br-name em{
+  color:#806B30;
+  margin-left:2px;
+}
+.rp-br-site{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11.5px;
+  color:#806B30;
+  letter-spacing:.3px;
+  font-weight:600;
+}
+.rp-br-tag{
+  font-size:7px;
+  letter-spacing:.45em;
+  text-transform:uppercase;
+  color:#806B30;
+  font-weight:600;
+  margin-top:3px;
+  opacity:.7;
+}
 
 /* Hero disclaimer */
 .rp-hero-disclaimer{margin-top:10px;padding:8px 14px;background:rgba(255,255,255,.6);border:1px dashed #D9CFB7;border-radius:4px;font-size:9px;color:#5F6577;line-height:1.55;font-style:italic;max-width:520px;margin-left:auto;margin-right:auto}
@@ -1405,15 +1662,21 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
   }
 
   /* Page size and physical margins (browser respects @page rules) */
+  /* Larger top/bottom margins prevent browser print headers/URLs from   */
+  /* overlapping content. Side margins comfortable for letter-sized PDF. */
   @page{
     size:letter;
-    margin:0.45in 0.4in;
+    margin:0.6in 0.55in 0.55in 0.55in;
   }
 
   /* Avoid orphan page breaks inside critical sections */
-  .rp-letterhead, .rp-agents, .rp-subject-card, .rp-hero, .rp-sec, .rp-foot{
+  .rp-letterhead, .rp-agents, .rp-agent-card, .rp-subject-card, .rp-hero, .rp-sec, .rp-foot{
     page-break-inside:avoid;
     break-inside:avoid;
+  }
+  /* Ensure the report-paper has internal padding to never touch edges */
+  .report-paper{
+    padding:0.1in 0 !important;
   }
 }
 </style>
@@ -1453,33 +1716,41 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
             <span class="hdr-title-sub">Valuation Model</span>
           </h1>
         </div>
-        <div class="hdr-luxe-card">
-          <div class="luxe-card-corner luxe-corner-tl"></div>
-          <div class="luxe-card-corner luxe-corner-tr"></div>
-          <div class="luxe-card-corner luxe-corner-bl"></div>
-          <div class="luxe-card-corner luxe-corner-br"></div>
-          <div class="luxe-agents">
-            <div class="luxe-agent">
-              <div class="luxe-ag-name">Abhishek Parikh</div>
-              <div class="luxe-ag-role">DRE# 02069777</div>
-              <div class="luxe-ag-row"><span class="luxe-ic">☏</span><a href="tel:9165297100">916.529.7100</a></div>
-              <div class="luxe-ag-row"><span class="luxe-ic">✉</span><a href="mailto:abhishek@team-parikh.com">abhishek@team-parikh.com</a></div>
+        <div class="hdr-luxe-wrap">
+          <div class="luxe-agent-card">
+            <div class="luxe-ac-corners">
+              <span class="luxe-cor luxe-cor-tl"></span>
+              <span class="luxe-cor luxe-cor-tr"></span>
+              <span class="luxe-cor luxe-cor-bl"></span>
+              <span class="luxe-cor luxe-cor-br"></span>
             </div>
-            <div class="luxe-divider"></div>
-            <div class="luxe-agent">
-              <div class="luxe-ag-name">Kavita Parikh</div>
-              <div class="luxe-ag-role">DRE# 02118709</div>
-              <div class="luxe-ag-row"><span class="luxe-ic">☏</span><a href="tel:4089140743">408.914.0743</a></div>
-              <div class="luxe-ag-row"><span class="luxe-ic">✉</span><a href="mailto:kavita@team-parikh.com">kavita@team-parikh.com</a></div>
+            <div class="luxe-ac-name">Abhishek <em>Parikh</em></div>
+            <div class="luxe-ac-flourish"></div>
+            <div class="luxe-ac-dre">DRE&nbsp;<span>02069777</span></div>
+            <a href="tel:9165297100" class="luxe-ac-link luxe-ac-phone">916.529.7100</a>
+            <a href="mailto:abhishek@team-parikh.com" class="luxe-ac-link luxe-ac-email">abhishek@team-parikh.com</a>
+          </div>
+          <div class="luxe-agent-card">
+            <div class="luxe-ac-corners">
+              <span class="luxe-cor luxe-cor-tl"></span>
+              <span class="luxe-cor luxe-cor-tr"></span>
+              <span class="luxe-cor luxe-cor-bl"></span>
+              <span class="luxe-cor luxe-cor-br"></span>
             </div>
+            <div class="luxe-ac-name">Kavita <em>Parikh</em></div>
+            <div class="luxe-ac-flourish"></div>
+            <div class="luxe-ac-dre">DRE&nbsp;<span>02118709</span></div>
+            <a href="tel:4089140743" class="luxe-ac-link luxe-ac-phone">408.914.0743</a>
+            <a href="mailto:kavita@team-parikh.com" class="luxe-ac-link luxe-ac-email">kavita@team-parikh.com</a>
           </div>
-          <div class="luxe-foot">
-            <span class="luxe-foot-orn">◆</span>
-            <span class="luxe-foot-txt">Keller Williams</span>
-            <span class="luxe-foot-sep">·</span>
-            <a href="https://team-parikh.com" target="_blank" rel="noopener" class="luxe-foot-link">team-parikh.com</a>
-            <span class="luxe-foot-orn">◆</span>
-          </div>
+          <a href="https://team-parikh.com" target="_blank" rel="noopener" class="luxe-brokerage">
+            <div class="luxe-br-orn-l">❦</div>
+            <div class="luxe-br-name">Keller Williams</div>
+            <div class="luxe-br-line"></div>
+            <div class="luxe-br-site">team-parikh.com</div>
+            <div class="luxe-br-tag">Search Homes</div>
+            <div class="luxe-br-orn-r">❦</div>
+          </a>
         </div>
       </div>
     </div>
@@ -5193,25 +5464,38 @@ function buildExportStage(card, title, scope, dateStr){
       <div class="exp-corner exp-corner-bl"></div>
       <div class="exp-corner exp-corner-br"></div>
       <div class="exp-foot-grid">
-        <div class="exp-foot-col">
-          <div class="exp-ag-name">Abhishek Parikh</div>
-          <div class="exp-ag-role">DRE# 02069777</div>
-          <div class="exp-ag-row">☏ 916.529.7100</div>
-          <div class="exp-ag-row">✉ abhishek@team-parikh.com</div>
+        <div class="exp-foot-card">
+          <span class="exp-cor exp-cor-tl"></span>
+          <span class="exp-cor exp-cor-tr"></span>
+          <span class="exp-cor exp-cor-bl"></span>
+          <span class="exp-cor exp-cor-br"></span>
+          <div class="exp-foot-name">Abhishek <em>Parikh</em></div>
+          <div class="exp-foot-flourish"></div>
+          <div class="exp-foot-dre">DRE <span>02069777</span></div>
+          <div class="exp-foot-phone">916.529.7100</div>
+          <div class="exp-foot-email">abhishek@team-parikh.com</div>
         </div>
-        <div class="exp-foot-divider"></div>
-        <div class="exp-foot-col">
-          <div class="exp-ag-name">Kavita Parikh</div>
-          <div class="exp-ag-role">DRE# 02118709</div>
-          <div class="exp-ag-row">☏ 408.914.0743</div>
-          <div class="exp-ag-row">✉ kavita@team-parikh.com</div>
+        <div class="exp-foot-card">
+          <span class="exp-cor exp-cor-tl"></span>
+          <span class="exp-cor exp-cor-tr"></span>
+          <span class="exp-cor exp-cor-bl"></span>
+          <span class="exp-cor exp-cor-br"></span>
+          <div class="exp-foot-name">Kavita <em>Parikh</em></div>
+          <div class="exp-foot-flourish"></div>
+          <div class="exp-foot-dre">DRE <span>02118709</span></div>
+          <div class="exp-foot-phone">408.914.0743</div>
+          <div class="exp-foot-email">kavita@team-parikh.com</div>
         </div>
-        <div class="exp-foot-divider"></div>
-        <div class="exp-foot-col exp-foot-brand">
-          <div class="exp-ag-name">Keller Williams</div>
-          <div class="exp-ag-role">Brokerage</div>
-          <div class="exp-ag-row exp-foot-site">team-parikh.com</div>
-          <div class="exp-ag-row exp-foot-tag">◆ Search Homes ◆</div>
+        <div class="exp-foot-card exp-foot-card-brokerage">
+          <span class="exp-cor exp-cor-tl"></span>
+          <span class="exp-cor exp-cor-tr"></span>
+          <span class="exp-cor exp-cor-bl"></span>
+          <span class="exp-cor exp-cor-br"></span>
+          <div class="exp-foot-brorn">❦</div>
+          <div class="exp-foot-name">Keller <em>Williams</em></div>
+          <div class="exp-foot-flourish"></div>
+          <div class="exp-foot-site">team-parikh.com</div>
+          <div class="exp-foot-tag">Search Homes</div>
         </div>
       </div>
       <div class="exp-foot-disc">Based on MLS data, not an appraisal. Market conditions change — consult your agent.</div>
@@ -5223,15 +5507,50 @@ function buildExportStage(card, title, scope, dateStr){
   clone.querySelectorAll('[id]').forEach(n=>{n.id='';});
   clone.classList.add('export-mode');
   clone.querySelectorAll('.mi-dl-btn,.mi-tip').forEach(n=>n.remove());
-  // Copy chart canvas bitmaps (cloneNode doesn't copy <canvas> content)
+
+  // ── FIX: Replace conic-gradient score ring with SVG ──
+  // html2canvas chokes on conic-gradient (createPattern error). SVG donut
+  // chart renders reliably and looks identical.
+  clone.querySelectorAll('.mkt-score-ring').forEach(ring=>{
+    const pct=parseFloat(ring.style.getPropertyValue('--pct'))||50;
+    const num=ring.querySelector('.mkt-score-num')?.textContent || '—';
+    const lbl=ring.querySelector('.mkt-score-lbl')?.textContent || 'Score';
+    const size=106, stroke=10, r=(size/2)-(stroke/2);
+    const C=2*Math.PI*r;
+    const dash=C*(pct/100);
+    const svg=`
+      <div class="mkt-score-ring-svg" style="position:relative;width:${size}px;height:${size}px;display:inline-flex;align-items:center;justify-content:center;">
+        <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="position:absolute;top:0;left:0;transform:rotate(-90deg);">
+          <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="#E8DFCB" stroke-width="${stroke}"/>
+          <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="#806B30" stroke-width="${stroke}"
+                  stroke-dasharray="${dash} ${C}" stroke-linecap="round"/>
+        </svg>
+        <div style="position:relative;text-align:center;z-index:1;">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:600;color:#1A1F2C;line-height:1;">${num}</div>
+          <div style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#806B30;margin-top:3px;">${lbl}</div>
+        </div>
+      </div>
+    `;
+    const wrapper=document.createElement('div');
+    wrapper.innerHTML=svg;
+    ring.replaceWith(wrapper.firstElementChild);
+  });
+
+  // Copy chart canvas bitmaps (cloneNode doesn't copy <canvas> content).
+  // FIX: Skip 0-sized canvases — they cause html2canvas createPattern errors.
   const origCanvases=card.querySelectorAll('canvas');
   const cloneCanvases=clone.querySelectorAll('canvas');
   origCanvases.forEach((oc,i)=>{
     const cc=cloneCanvases[i]; if(!cc) return;
+    if(!oc.width || !oc.height){
+      // Remove problematic empty canvases from clone — they crash html2canvas
+      cc.remove(); return;
+    }
     cc.width=oc.width; cc.height=oc.height;
     const cx=cc.getContext('2d');
     if(cx){try{cx.drawImage(oc,0,0);}catch(e){console.warn('canvas copy:',e);}}
   });
+
   stage.querySelector('.exp-card-wrap').appendChild(clone);
   return stage;
 }
@@ -5279,6 +5598,33 @@ async function captureCard(cardId, title){
       windowWidth:1080,
       height:stage.scrollHeight,
       windowHeight:stage.scrollHeight,
+      foreignObjectRendering:false,
+      onclone:(clonedDoc)=>{
+        // Final defensive pass on html2canvas's own internal clone:
+        // 1. Strip ANY remaining conic-gradient backgrounds (createPattern bug)
+        // 2. Remove any 0-sized canvas elements (createPattern source error)
+        try {
+          clonedDoc.querySelectorAll('*').forEach(node=>{
+            try {
+              const cs=clonedDoc.defaultView.getComputedStyle(node);
+              if(cs && cs.backgroundImage && cs.backgroundImage.indexOf('conic-gradient')!==-1){
+                node.style.backgroundImage='none';
+                node.style.background='rgba(201,168,76,0.12)';
+              }
+            } catch(e){}
+          });
+          clonedDoc.querySelectorAll('canvas').forEach(c=>{
+            if(!c.width || !c.height) c.parentNode && c.parentNode.removeChild(c);
+          });
+        } catch(e){
+          console.warn('onclone sanitize:',e);
+        }
+      },
+      ignoreElements:(el)=>{
+        // Skip 0-sized canvases that would crash createPattern
+        if(el.tagName==='CANVAS' && (!el.width || !el.height)) return true;
+        return false;
+      },
     });
     return {canvas, today};
   } finally {
@@ -6983,20 +7329,38 @@ function renderClientReport(){
     </div>
 
     <div class="rp-agents">
-      <div class="rp-agent">
-        <div class="rp-ag-n">Abhishek Parikh</div>
-        <div class="rp-ag-d">DRE# 02069777</div>
-        <div class="rp-ag-c">916.529.7100 · abhishek@team-parikh.com</div>
+      <div class="rp-agent-card">
+        <span class="rp-cor rp-cor-tl"></span>
+        <span class="rp-cor rp-cor-tr"></span>
+        <span class="rp-cor rp-cor-bl"></span>
+        <span class="rp-cor rp-cor-br"></span>
+        <div class="rp-ag-name">Abhishek <em>Parikh</em></div>
+        <div class="rp-ag-flourish"></div>
+        <div class="rp-ag-dre">DRE <span>02069777</span></div>
+        <div class="rp-ag-phone">916.529.7100</div>
+        <div class="rp-ag-email">abhishek@team-parikh.com</div>
       </div>
-      <div class="rp-agent">
-        <div class="rp-ag-n">Kavita Parikh</div>
-        <div class="rp-ag-d">DRE# 02118709</div>
-        <div class="rp-ag-c">408.914.0743 · kavita@team-parikh.com</div>
+      <div class="rp-agent-card">
+        <span class="rp-cor rp-cor-tl"></span>
+        <span class="rp-cor rp-cor-tr"></span>
+        <span class="rp-cor rp-cor-bl"></span>
+        <span class="rp-cor rp-cor-br"></span>
+        <div class="rp-ag-name">Kavita <em>Parikh</em></div>
+        <div class="rp-ag-flourish"></div>
+        <div class="rp-ag-dre">DRE <span>02118709</span></div>
+        <div class="rp-ag-phone">408.914.0743</div>
+        <div class="rp-ag-email">kavita@team-parikh.com</div>
       </div>
-      <div class="rp-agent rp-agent-search">
-        <div class="rp-ag-n">Search Homes</div>
-        <div class="rp-ag-d">team-parikh.com</div>
-        <div class="rp-ag-c">Brokerage · Keller Williams</div>
+      <div class="rp-agent-card rp-agent-brokerage">
+        <span class="rp-cor rp-cor-tl"></span>
+        <span class="rp-cor rp-cor-tr"></span>
+        <span class="rp-cor rp-cor-bl"></span>
+        <span class="rp-cor rp-cor-br"></span>
+        <div class="rp-br-orn">❦</div>
+        <div class="rp-br-name">Keller <em>Williams</em></div>
+        <div class="rp-ag-flourish"></div>
+        <div class="rp-br-site">team-parikh.com</div>
+        <div class="rp-br-tag">Search Homes</div>
       </div>
     </div>
 
