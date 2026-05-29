@@ -2616,16 +2616,38 @@ async function fetchFromSupabase(timeoutMs){
 
 // Upsert to Supabase in batches of 500 (merge on mls_no)
 async function upsertToSupabase(listings){
+  // The DB table is keyed on mls_no, and an on_conflict=mls_no upsert CANNOT
+  // contain two rows with the same mls_no in one request (Postgres: "ON
+  // CONFLICT DO UPDATE command cannot affect row a second time" → 500). Our
+  // in-memory list may legitimately hold several records sharing an mls_no
+  // (e.g. a sold record and a later active relist). For the cloud copy we keep
+  // one row per mls_no — preferring the most recently active/closed, with a
+  // price — so the write is valid.
+  const rank=(l)=>{
+    let s=0;
+    if(l.status==='ACTV'||l.status==='PEND') s+=3; // current market state first
+    if(l.sp||l.lp) s+=2;                            // has a price
+    const t=(l.closeDate?l.closeDate.getTime():0)||(l.listDate?l.listDate.getTime():0);
+    return s*1e13 + t;                              // tie-break on recency
+  };
+  const byMls=new Map();
+  for(const l of listings){
+    if(!l.mlsNo) continue;
+    const cur=byMls.get(l.mlsNo);
+    if(!cur || rank(l)>rank(cur)) byMls.set(l.mlsNo, l);
+  }
+  const deduped=Array.from(byMls.values());
+
   const BATCH=500;
-  for(let i=0;i<listings.length;i+=BATCH){
-    const batch=listings.slice(i,i+BATCH).map(toRow);
+  for(let i=0;i<deduped.length;i+=BATCH){
+    const batch=deduped.slice(i,i+BATCH).map(toRow);
     const resp=await fetch(
       `${SB_URL}/rest/v1/listings?on_conflict=mls_no`,
       {method:'POST',
        headers:{...SB_HDR,'Prefer':'resolution=merge-duplicates,return=minimal'},
        body:JSON.stringify(batch)}
     );
-    if(!resp.ok){const t=await resp.text();throw new Error(t);}
+    if(!resp.ok){const t=await resp.text();throw new Error(`(${resp.status}) ${t.slice(0,300)}`);}
   }
 }
 
