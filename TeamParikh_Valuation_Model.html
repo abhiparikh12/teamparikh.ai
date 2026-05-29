@@ -33,6 +33,44 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
 .dh-s{color:var(--txt2);font-size:13px;line-height:1.7}
 .wl-note{color:var(--txt3);font-size:11px}
 
+/* ── LIABILITY DISCLOSURE GATE ── */
+#disclosure-gate{
+  position:fixed;inset:0;z-index:10000;
+  background:linear-gradient(155deg,#0B0E16 0%,#141A27 60%,#0B0E16 100%);
+  display:flex;align-items:center;justify-content:center;padding:24px;
+}
+#disclosure-gate.dg-hidden{display:none}
+.dg-card{
+  position:relative;max-width:540px;width:100%;
+  background:#15192480;border:1px solid rgba(201,168,76,.35);
+  border-radius:8px;padding:44px 44px 36px;text-align:center;
+  box-shadow:0 30px 80px rgba(0,0,0,.6);
+}
+.dg-corner{position:absolute;width:16px;height:16px;border:1px solid rgba(201,168,76,.6)}
+.dg-tl{top:10px;left:10px;border-right:none;border-bottom:none}
+.dg-tr{top:10px;right:10px;border-left:none;border-bottom:none}
+.dg-bl{bottom:10px;left:10px;border-right:none;border-top:none}
+.dg-br{bottom:10px;right:10px;border-left:none;border-top:none}
+.dg-eyebrow{font-size:10px;letter-spacing:.42em;text-transform:uppercase;color:#C9A84C;font-weight:600;margin-bottom:14px}
+.dg-brand{font-family:var(--fd);font-size:40px;font-weight:500;color:#F4EFE3;line-height:1;letter-spacing:.5px}
+.dg-brand em{font-style:italic;color:#C9A84C;font-weight:500}
+.dg-tag{font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:rgba(201,168,76,.7);font-weight:600;margin-top:7px}
+.dg-rule{width:50px;height:2px;background:#C9A84C;margin:20px auto 22px;border-radius:2px}
+.dg-body{text-align:left;color:#C3CCDD;font-size:13px;line-height:1.7}
+.dg-body p{margin-bottom:12px}
+.dg-body strong{color:#E8C96A;font-weight:600}
+.dg-check{display:flex;align-items:flex-start;gap:10px;text-align:left;margin:18px 0 20px;font-size:12.5px;color:#E2E7F0;line-height:1.5;cursor:pointer}
+.dg-check input{margin-top:2px;width:16px;height:16px;accent-color:#C9A84C;flex-shrink:0;cursor:pointer}
+.dg-btn{
+  width:100%;padding:13px;border:none;border-radius:6px;cursor:pointer;
+  background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#1A1F2C;
+  font-family:var(--ff);font-size:14px;font-weight:600;letter-spacing:.05em;
+  transition:opacity .2s,transform .1s;
+}
+.dg-btn:disabled{opacity:.4;cursor:not-allowed}
+.dg-btn:not(:disabled):hover{transform:translateY(-1px)}
+.dg-btn:not(:disabled):active{transform:translateY(0)}
+
 /* ── APP SHELL ── */
 #app{display:none;flex-direction:column;height:100vh;overflow:hidden}
 #app.show{display:flex}
@@ -49,7 +87,7 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
   top:0;left:0;
   width:1080px;
   z-index:1;       /* below the backdrop (which is 99998+) */
-  background:#FBF9F4;
+  background:#FBF8F1;
   font-family:'Outfit',sans-serif;
   color:#1A1F2C;
   box-sizing:border-box;
@@ -97,227 +135,232 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
 }
 @keyframes exb-spin{to{transform:rotate(360deg)}}
 
-/* HERO HEADER */
+/* HERO HEADER — all-light luxury, matches client report */
 .export-stage .exp-header{
   position:relative;
-  padding:54px 60px 36px;
-  background:
-    radial-gradient(ellipse 700px 200px at 30% 60%, rgba(201,168,76,.18), transparent 70%),
-    radial-gradient(ellipse 500px 180px at 80% 40%, rgba(201,168,76,.08), transparent 70%),
-    linear-gradient(135deg, #0F121A 0%, #1A1F2C 50%, #0F121A 100%);
-  color:#FBF9F4;
+  padding:58px 64px 38px;
+  background:#FBF8F1;
+  color:#1A1F2C;
   overflow:hidden;
+  border-bottom:2px solid #1A1F2C;
 }
 .export-stage .exp-header::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:3px;
-  background:linear-gradient(90deg, transparent 0%, rgba(201,168,76,.6) 30%, #C9A84C 50%, rgba(201,168,76,.6) 70%, transparent 100%);
+  content:'';position:absolute;top:0;left:0;right:0;height:4px;
+  background:#C9A84C;
 }
 .export-stage .exp-header::after{
-  content:'';position:absolute;bottom:0;left:60px;right:60px;height:1px;
-  background:linear-gradient(90deg, transparent 0%, rgba(201,168,76,.4) 50%, transparent 100%);
+  content:'';position:absolute;bottom:-2px;left:64px;right:64px;height:0;
 }
 .export-stage .exp-eyebrow{
-  font-size:11px;font-weight:600;letter-spacing:.42em;
-  color:rgba(201,168,76,.9);text-transform:uppercase;margin-bottom:18px;
+  font-size:11px;font-weight:600;letter-spacing:.46em;
+  color:#8A7333;text-transform:uppercase;margin-bottom:18px;
 }
 .export-stage .exp-title{
   font-family:'Cormorant Garamond',serif;
-  font-weight:400;font-size:60px;line-height:1;margin:0;letter-spacing:.5px;
-  display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+  font-weight:400;font-size:66px;line-height:.95;margin:0;letter-spacing:.5px;
+  display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;
 }
-.export-stage .exp-tit-name{color:#F1ECDD;font-weight:500}
-.export-stage .exp-title em{color:#C9A84C;font-style:italic;font-weight:500}
+.export-stage .exp-tit-name{color:#1A1F2C;font-weight:600}
+.export-stage .exp-title em{color:#8A7333;font-style:italic;font-weight:500}
+.export-stage .exp-rule{
+  width:64px;height:2px;background:#C9A84C;margin:22px 0 0;border-radius:2px;
+}
 .export-stage .exp-meta{
-  display:flex;align-items:center;gap:14px;margin-top:22px;flex-wrap:wrap;
+  display:flex;align-items:center;gap:16px;margin-top:24px;flex-wrap:wrap;
 }
 .export-stage .exp-meta-pill{
-  font-size:11px;letter-spacing:.18em;text-transform:uppercase;
-  color:rgba(255,255,255,.85);font-weight:500;
-  padding:6px 14px;border:1px solid rgba(201,168,76,.35);border-radius:22px;
-  background:rgba(201,168,76,.06);
+  font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:#3A4258;font-weight:500;
+  padding:7px 16px;border:1px solid #D8CBAA;border-radius:22px;
+  background:#F6F1E6;
 }
-.export-stage .exp-meta-pill strong{color:#C9A84C;font-weight:600}
-.export-stage .exp-meta-sep{color:rgba(201,168,76,.6);font-size:8px}
+.export-stage .exp-meta-pill strong{color:#8A7333;font-weight:600}
+.export-stage .exp-meta-sep{color:#C9A84C;font-size:8px}
 
-/* CARD WRAP — cream paper area */
+/* CARD WRAP — ivory paper area */
 .export-stage .exp-card-wrap{
-  padding:46px 56px;
-  background:linear-gradient(180deg, #FBF9F4 0%, #F8F4EB 100%);
+  padding:48px 56px;
+  background:#FBF8F1;
 }
 
-/* FOOTER */
+/* FOOTER — light, with subtle top border */
 .export-stage .exp-footer{
   position:relative;
-  padding:30px 60px 36px;
-  background:
-    radial-gradient(ellipse 600px 180px at 50% 50%, rgba(201,168,76,.10), transparent 70%),
-    linear-gradient(135deg, #0F121A 0%, #1A1F2C 50%, #0F121A 100%);
-  color:#FBF9F4;
+  padding:36px 64px 42px;
+  background:#FBF8F1;
+  color:#1A1F2C;
   overflow:hidden;
+  border-top:2px solid #1A1F2C;
 }
 .export-stage .exp-footer::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:3px;
-  background:linear-gradient(90deg, transparent 0%, rgba(201,168,76,.6) 30%, #C9A84C 50%, rgba(201,168,76,.6) 70%, transparent 100%);
+  content:'';position:absolute;top:-2px;left:0;right:0;height:0;
 }
 .export-stage .exp-footer::after{
-  content:'';position:absolute;bottom:0;left:60px;right:60px;height:1px;
-  background:linear-gradient(90deg, transparent 0%, rgba(201,168,76,.35) 50%, transparent 100%);
+  content:'';position:absolute;bottom:0;left:0;right:0;height:4px;
+  background:#C9A84C;
 }
-.export-stage .exp-foot-grid{display:flex;align-items:stretch;gap:14px}
+.export-stage .exp-foot-grid{display:flex;align-items:stretch;gap:22px;justify-content:center;max-width:720px;margin:0 auto}
 .export-stage .exp-foot-card{
   flex:1;min-width:0;position:relative;
-  padding:16px 18px 14px;
-  background:linear-gradient(155deg, rgba(201,168,76,.10) 0%, rgba(15,18,26,.4) 60%, rgba(201,168,76,.08) 100%);
-  border:1px solid rgba(201,168,76,.45);
-  border-radius:3px;
+  padding:24px 22px 18px;
+  background:linear-gradient(155deg,#FBF9F4 0%,#F6F1E6 100%);
+  border:1px solid #8A7333;
+  border-radius:4px;
   display:flex;flex-direction:column;align-items:center;text-align:center;
 }
 .export-stage .exp-foot-card::before{
-  content:'';position:absolute;inset:5px;
-  border:1px solid rgba(201,168,76,.22);border-radius:2px;pointer-events:none;
+  content:'';position:absolute;inset:6px;
+  border:1px solid rgba(138,115,51,.28);border-radius:2px;pointer-events:none;
 }
-.export-stage .exp-cor{position:absolute;width:11px;height:11px;border:1px solid var(--gold);opacity:.85}
+.export-stage .exp-cor{position:absolute;width:12px;height:12px;border:1px solid #8A7333;opacity:.8}
 .export-stage .exp-cor-tl{top:-1px;left:-1px;border-right:none;border-bottom:none}
 .export-stage .exp-cor-tr{top:-1px;right:-1px;border-left:none;border-bottom:none}
 .export-stage .exp-cor-bl{bottom:-1px;left:-1px;border-right:none;border-top:none}
 .export-stage .exp-cor-br{bottom:-1px;right:-1px;border-left:none;border-top:none}
 .export-stage .exp-foot-name{
   font-family:'Cormorant Garamond',serif;
-  font-size:22px;font-weight:500;color:#F1ECDD;letter-spacing:.5px;line-height:1;
+  font-size:26px;font-weight:500;color:#1A1F2C;letter-spacing:.5px;line-height:1;
   white-space:nowrap;
 }
 .export-stage .exp-foot-name em{
-  color:var(--gold);font-style:italic;font-weight:500;margin-left:3px;
+  color:#8A7333;font-style:italic;font-weight:500;margin-left:4px;
 }
 .export-stage .exp-foot-flourish{
-  width:42px;height:1px;margin:8px 0 7px;position:relative;
-  background:linear-gradient(90deg, transparent 0%, var(--gold) 50%, transparent 100%);
+  width:46px;height:1px;margin:11px 0 10px;position:relative;
+  background:#C9A84C;
 }
 .export-stage .exp-foot-flourish::before{
   content:'◆';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-  color:var(--gold);font-size:6px;background:#10131C;padding:0 5px;line-height:1;
+  color:#C9A84C;font-size:6px;background:#F8F4EB;padding:0 6px;line-height:1;
 }
 .export-stage .exp-foot-dre{
   font-size:9px;letter-spacing:.32em;text-transform:uppercase;
-  color:rgba(201,168,76,.7);font-weight:600;margin-bottom:6px;
+  color:#8A7333;font-weight:600;margin-bottom:8px;
 }
 .export-stage .exp-foot-dre span{
-  color:rgba(241,236,221,.7);font-family:'JetBrains Mono',monospace;letter-spacing:.08em;font-weight:500;
+  color:#3A4258;font-family:'JetBrains Mono',monospace;letter-spacing:.08em;font-weight:500;
 }
 .export-stage .exp-foot-phone{
   font-family:'JetBrains Mono',monospace;
-  font-size:13px;color:#F1ECDD;font-weight:500;line-height:1.5;letter-spacing:.3px;
+  font-size:14px;color:#1A1F2C;font-weight:500;line-height:1.55;letter-spacing:.3px;
 }
 .export-stage .exp-foot-email{
-  font-size:10.5px;color:rgba(241,236,221,.75);line-height:1.5;letter-spacing:.15px;
+  font-size:11px;color:#3A4258;line-height:1.55;letter-spacing:.15px;
 }
-.export-stage .exp-foot-card-brokerage{
-  background:linear-gradient(155deg, rgba(201,168,76,.18) 0%, rgba(15,18,26,.35) 60%, rgba(201,168,76,.14) 100%);
-  border-color:rgba(201,168,76,.6);
-}
-.export-stage .exp-foot-brorn{
-  color:var(--gold);font-size:16px;line-height:1;margin-bottom:4px;
-}
-.export-stage .exp-foot-site{
-  font-family:'JetBrains Mono',monospace;
-  font-size:13px;color:var(--gold);letter-spacing:.3px;font-weight:600;
-}
-.export-stage .exp-foot-tag{
-  font-size:8px;letter-spacing:.45em;text-transform:uppercase;
-  color:rgba(201,168,76,.7);font-weight:600;margin-top:3px;
+.export-stage .exp-foot-broker{
+  margin-top:11px;padding-top:9px;border-top:1px solid rgba(138,115,51,.22);
+  width:100%;
+  font-size:8.5px;letter-spacing:.24em;text-transform:uppercase;
+  color:#8A7333;font-weight:600;
 }
 .export-stage .exp-foot-disc{
-  margin-top:18px;
-  padding-top:14px;
-  border-top:1px dashed rgba(201,168,76,.2);
-  font-size:9.5px;color:rgba(255,255,255,.5);
-  text-align:center;font-style:italic;line-height:1.6;
+  margin-top:24px;
+  padding-top:16px;
+  border-top:1px solid #D8CBAA;
+  font-size:9.5px;color:#5F6577;
+  text-align:center;font-style:italic;line-height:1.7;max-width:760px;margin-left:auto;margin-right:auto;
 }
 
-/* Decorative corner brackets — same art-deco feel as luxe card */
+/* Decorative corner brackets — art-deco frame, dark on light */
 .export-stage .exp-corner{
-  position:absolute;width:18px;height:18px;
-  border:1px solid rgba(201,168,76,.6);
+  position:absolute;width:20px;height:20px;
+  border:1px solid rgba(138,115,51,.55);
 }
-.export-stage .exp-corner-tl{top:18px;left:24px;border-right:none;border-bottom:none}
-.export-stage .exp-corner-tr{top:18px;right:24px;border-left:none;border-bottom:none}
-.export-stage .exp-corner-bl{bottom:18px;left:24px;border-right:none;border-top:none}
-.export-stage .exp-corner-br{bottom:18px;right:24px;border-left:none;border-top:none}
+.export-stage .exp-corner-tl{top:20px;left:26px;border-right:none;border-bottom:none}
+.export-stage .exp-corner-tr{top:20px;right:26px;border-left:none;border-bottom:none}
+.export-stage .exp-corner-bl{bottom:20px;left:26px;border-right:none;border-top:none}
+.export-stage .exp-corner-br{bottom:20px;right:26px;border-left:none;border-top:none}
 
-/* ── EXPORT MODE — re-skin the captured card to cream/gold ── */
+/* ── EXPORT MODE — re-skin the captured card to ivory/gold ── */
 /* Overrides CSS variables so child elements inherit light theme */
 .export-mode{
-  --bg:#FBF9F4 !important;
-  --sur:#F8F4EB !important;
-  --sur2:#F2EDE2 !important;
+  --bg:#FBF8F1 !important;
+  --sur:#F6F1E6 !important;
+  --sur2:#F0E9D9 !important;
   --txt:#1A1F2C !important;
   --txt2:#3A4258 !important;
-  --txt3:#806B30 !important;
-  --bdr:#D9CFB7 !important;
-  --gold:#806B30 !important;
-  background:#FBF9F4 !important;
-  border:1px solid #D9CFB7 !important;
-  box-shadow:0 2px 14px rgba(26,31,44,.06) !important;
-  padding:24px !important;
-  border-radius:8px !important;
+  --txt3:#8A7333 !important;
+  --bdr:#E0D6BF !important;
+  --gold:#8A7333 !important;
+  background:#FFFDF8 !important;
+  border:1px solid #D8CBAA !important;
+  box-shadow:0 4px 22px rgba(26,31,44,.07) !important;
+  padding:30px 32px !important;
+  border-radius:6px !important;
+  position:relative !important;
+}
+/* Gold top accent on the card (replaces the jarring blue strip) */
+.export-mode::before{
+  content:'' !important;position:absolute !important;top:0;left:0;right:0;height:3px !important;
+  background:#C9A84C !important;border-radius:6px 6px 0 0 !important;
 }
 .export-mode .mi-title{
   font-family:'Cormorant Garamond',serif !important;
-  font-size:22px !important;
+  font-size:24px !important;
   color:#1A1F2C !important;
   font-weight:600 !important;
   letter-spacing:.3px !important;
-  margin-bottom:16px !important;
-  padding-bottom:10px !important;
-  border-bottom:1px solid #D9CFB7 !important;
+  margin-bottom:18px !important;
+  padding-bottom:12px !important;
+  border-bottom:1px solid #E0D6BF !important;
 }
 .export-mode .mi-stat{
-  background:#FBF9F4 !important;
-  border:1px solid #D9CFB7 !important;
-  padding:12px 14px !important;
+  background:#FBF8F1 !important;
+  border:1px solid #E0D6BF !important;
+  border-radius:5px !important;
+  padding:14px 16px !important;
 }
 .export-mode .mi-stat-lbl{
-  color:#806B30 !important;
+  color:#8A7333 !important;
   font-size:9px !important;
-  letter-spacing:.12em !important;
+  letter-spacing:.14em !important;
   font-weight:700 !important;
 }
 .export-mode .mi-stat-val{
   font-family:'JetBrains Mono',monospace !important;
   color:#1A1F2C !important;
-  font-size:22px !important;
+  font-size:23px !important;
   font-weight:500 !important;
 }
 .export-mode .mi-stat-val.up{color:#1F6B47 !important}
 .export-mode .mi-stat-val.down{color:#9A3530 !important}
 .export-mode .mi-stat-sub{color:#5F6577 !important;font-size:10px !important}
 .export-mode .mi-bar-track{background:#F2EDE2 !important;border:1px solid #D9CFB7 !important}
-.export-mode .mi-bar-fill.over{background:linear-gradient(90deg,rgba(154,53,48,.5),#9A3530) !important}
-.export-mode .mi-bar-fill.fair{background:linear-gradient(90deg,rgba(31,107,71,.5),#1F6B47) !important}
-.export-mode .mi-bar-fill.warn{background:linear-gradient(90deg,rgba(165,107,25,.5),#A56B19) !important}
-.export-mode .mi-bar-fill.under{background:linear-gradient(90deg,rgba(58,111,168,.5),#3A6FA8) !important}
+.export-mode .mi-bar-fill.over{background:#9A3530 !important;background-image:none !important}
+.export-mode .mi-bar-fill.fair{background:#1F6B47 !important;background-image:none !important}
+.export-mode .mi-bar-fill.warn{background:#A56B19 !important;background-image:none !important}
+.export-mode .mi-bar-fill.under{background:#3A6FA8 !important;background-image:none !important}
 .export-mode .mi-bar-lbl{color:#3A4258 !important;font-size:11px !important}
 .export-mode .mi-bar-num{color:#1A1F2C !important;font-family:'JetBrains Mono',monospace !important}
 
 /* Re-skin the market conditions hero card for cream theme */
 .export-mode.mkt-hero-card,
 .export-mode .mkt-hero-card{
-  background:linear-gradient(135deg, #FBF9F4 0%, #F2EDE2 100%) !important;
+  background:#FBF9F4 !important;background-image:none !important;
   border:1px solid #D9CFB7 !important;
 }
+/* Neutralize the hero accent strip (::before) gradient during export — it's a
+   thin element whose 0/low height makes html2canvas build a 0-sized gradient
+   pattern and crash. Solid gold strip looks the same. */
+.export-mode .mkt-hero-card.mkt-hero-card::before,
+.export-mode.mkt-hero-card.mkt-hero-card::before{background:#C9A84C !important;background-image:none !important}
 .export-mode .mkt-hero-eyebrow{color:#806B30 !important}
 .export-mode .mkt-hero-label{color:#1A1F2C !important}
 .export-mode .mkt-hero-narr{color:#3A4258 !important}
 .export-mode .mkt-hero-dir{background:rgba(201,168,76,.08) !important;border-color:#D9CFB7 !important}
-.export-mode .mkt-score-ring{background:conic-gradient(#806B30 calc(var(--pct)*1%),#E8DFCB 0) !important}
-.export-mode .mkt-score-ring::after{background:#FBF9F4 !important}
+/* NOTE: the conic-gradient ring is replaced by an inline SVG donut at capture
+   time (see buildExportStage). We deliberately do NOT declare a conic-gradient
+   here because html2canvas 1.4.1 throws a createPattern error on conic-gradient
+   even when the element is later removed. SVG renders identically and safely. */
+.export-mode .mkt-score-ring{background:#EBE3D0 !important}
+.export-mode .mkt-score-ring::after{background:#FFFDF8 !important}
 .export-mode .mkt-score-num{color:#1A1F2C !important}
-.export-mode .mkt-score-lbl{color:#806B30 !important}
-.export-mode .mkt-comp{background:#F8F4EB !important;border-color:#D9CFB7 !important}
-.export-mode .mkt-comp-lbl{color:#806B30 !important}
+.export-mode .mkt-score-lbl{color:#8A7333 !important}
+.export-mode .mkt-comp{background:#FBF8F1 !important;border-color:#E0D6BF !important}
+.export-mode .mkt-comp-lbl{color:#8A7333 !important}
 .export-mode .mkt-comp-val{color:#1A1F2C !important}
-.export-mode .mkt-comp-bar{background:#E8DFCB !important}
-.export-mode .mkt-comp-bar-fill{background:linear-gradient(90deg,#806B30,#C9A84C) !important}
+.export-mode .mkt-comp-bar{background:#EBE3D0 !important}
+.export-mode .mkt-comp-bar-fill{background:#C9A84C !important;background-image:none !important}
 .export-mode .mkt-components{border-top-color:#D9CFB7 !important}
 
 /* Hide interactive elements in export */
@@ -371,22 +414,41 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
 /* MARKET INTEL — Marketing Toolbar (top of tab)                  */
 /* ══════════════════════════════════════════════════════════════ */
 .mi-marketing-bar{
-  display:flex;align-items:center;justify-content:space-between;gap:18px;
-  padding:14px 22px;margin-bottom:14px;
+  display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;
+  padding:16px 22px;margin-bottom:14px;min-height:64px;
   background:linear-gradient(135deg, rgba(201,168,76,.10) 0%, rgba(201,168,76,.03) 50%, rgba(201,168,76,.08) 100%);
   border:1px solid rgba(201,168,76,.3);
   border-radius:10px;
-  position:relative;overflow:hidden;
+  position:relative;
 }
 .mi-marketing-bar::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:10px 10px 0 0;
   background:linear-gradient(90deg, transparent 0%, rgba(201,168,76,.6) 50%, transparent 100%);
 }
-.mi-mb-left{display:flex;flex-direction:column;gap:3px}
+.mi-mb-left{display:flex;flex-direction:column;gap:4px;flex:1 1 320px;min-width:0}
 .mi-mb-eyebrow{
-  font-family:var(--fd);font-size:16px;font-weight:600;color:var(--gold);letter-spacing:.3px;
+  font-family:var(--fd);font-size:16px;font-weight:600;color:var(--gold);letter-spacing:.3px;line-height:1.2;
 }
-.mi-mb-sub{font-size:11px;color:var(--txt2);letter-spacing:.05em;line-height:1.4}
+.mi-mb-sub{font-size:11px;color:var(--txt2);letter-spacing:.04em;line-height:1.45;white-space:normal}
+.mi-marketing-bar .btn-gold{flex:0 0 auto;white-space:nowrap}
+.mi-type-bar{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:10px 16px;margin-bottom:14px;
+  background:var(--sur);border:1px solid var(--bdr);border-radius:9px;
+}
+.mi-type-lbl{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--txt3);font-weight:700;flex:0 0 auto}
+.mi-type-pills{display:flex;gap:7px;flex-wrap:wrap}
+.mi-type-pill{
+  padding:6px 14px;border:1px solid var(--bdr);border-radius:20px;
+  background:transparent;color:var(--txt2);font-size:12px;font-weight:500;
+  font-family:var(--ff);cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.mi-type-pill:hover{border-color:var(--gold);color:var(--gold)}
+.mi-type-pill.active{
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  border-color:var(--gold);color:#1A1F2C;font-weight:600;
+}
+.mi-type-count{font-size:11px;color:var(--txt3);margin-left:auto;font-family:var(--fm);flex:0 0 auto}
 .hdr-wrap{flex-shrink:0;display:flex;flex-direction:column}
 
 /* HERO BAND — dramatic, dark, luxurious */
@@ -805,6 +867,17 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
 
 /* ── COMP TABLE ── */
 .tbl-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+#distant-prompt{background:rgba(62,142,247,.06);border:1px solid rgba(62,142,247,.3);border-radius:8px;padding:12px 14px}
+.dp-head{font-size:12px;color:var(--txt2);line-height:1.6;margin-bottom:10px}
+.dp-head strong{color:var(--blue)}
+.dp-list{max-height:220px;overflow:auto;display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+.dp-row{display:grid;grid-template-columns:auto 56px 1fr;gap:8px;align-items:center;padding:5px 7px;border:1px solid var(--bdr);border-radius:5px;cursor:pointer;font-size:11px;background:var(--sur)}
+.dp-row:hover{border-color:var(--blue)}
+.dp-row input{accent-color:var(--blue);width:15px;height:15px}
+.dp-dist{font-family:var(--fm);color:var(--org);font-weight:700;font-size:11px}
+.dp-addr{color:var(--txt);font-weight:600}
+.dp-meta{grid-column:3;color:var(--txt3);font-size:10px}
+.dp-actions{display:flex;gap:8px}
 .tbl-label{font-size:12px;color:var(--txt2);font-family:var(--fm)}
 .tbl-btns{display:flex;gap:6px}
 .tbl-wrap{overflow-x:auto;max-height:320px;overflow-y:auto}
@@ -1573,20 +1646,22 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
 .rp-method-w{font-size:9px;color:#5F6577;margin-top:3px;font-family:'JetBrains Mono',monospace}
 .rp-method-detail{font-size:9.5px;color:#3A4258;margin-top:4px;line-height:1.5}
 
-.rp-comp-table{width:100%;border-collapse:collapse;font-size:9.5px}
+.rp-comp-table{width:100%;border-collapse:collapse;font-size:9.5px;table-layout:fixed}
 .rp-comp-table th{background:#1A1F2C;color:#FBF9F4;font-weight:500;padding:7px 6px;text-align:left;font-size:8.5px;letter-spacing:.06em;text-transform:uppercase}
-.rp-comp-table td{padding:6px;border-bottom:1px solid #E4DCC4;color:#1A1F2C}
+.rp-comp-table td{padding:6px;border-bottom:1px solid #E4DCC4;color:#1A1F2C;overflow-wrap:break-word}
+.rp-comp-table th:first-child,.rp-comp-table td:first-child{width:30%}
 .rp-comp-table tr:nth-child(even) td{background:#F8F4EB}
-.rp-comp-table .num{text-align:right;font-family:'JetBrains Mono',monospace}
+.rp-comp-table .num{text-align:right;font-family:'JetBrains Mono',monospace;white-space:nowrap}
 .rp-comp-table .grade{font-family:'JetBrains Mono',monospace;font-weight:700}
 .rp-comp-table .grade.A{color:#1F6B47}
 .rp-comp-table .grade.B{color:#3A6FA8}
 .rp-comp-table .grade.C{color:#A56B19}
 .rp-comp-table .grade.D{color:#9A3530}
 
-.rp-adj-table{width:100%;border-collapse:collapse;font-size:9px}
-.rp-adj-table th, .rp-adj-table td{padding:5px 5px;border:1px solid #D9CFB7;text-align:right;font-family:'JetBrains Mono',monospace}
-.rp-adj-table th{background:#F2EDE2;font-weight:600;color:#1A1F2C;font-family:'Outfit',sans-serif;font-size:8.5px;letter-spacing:.05em;text-transform:uppercase}
+.rp-adj-table{width:100%;border-collapse:collapse;font-size:9px;table-layout:fixed}
+.rp-adj-table th, .rp-adj-table td{padding:5px 4px;border:1px solid #D9CFB7;text-align:right;font-family:'JetBrains Mono',monospace;overflow-wrap:break-word;word-break:break-word}
+.rp-adj-table th:first-child,.rp-adj-table td.lbl{width:22%}
+.rp-adj-table th{background:#F2EDE2;font-weight:600;color:#1A1F2C;font-family:'Outfit',sans-serif;font-size:8px;letter-spacing:.03em;text-transform:uppercase}
 .rp-adj-table td.lbl{text-align:left;font-family:'Outfit',sans-serif;font-weight:500}
 .rp-adj-table .pos{color:#1F6B47}
 .rp-adj-table .neg{color:#9A3530}
@@ -1666,7 +1741,7 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
   /* overlapping content. Side margins comfortable for letter-sized PDF. */
   @page{
     size:letter;
-    margin:0.6in 0.55in 0.55in 0.55in;
+    margin:0.5in 0.5in 0.5in 0.5in;
   }
 
   /* Avoid orphan page breaks inside critical sections */
@@ -1674,19 +1749,60 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
     page-break-inside:avoid;
     break-inside:avoid;
   }
-  /* Ensure the report-paper has internal padding to never touch edges */
+  /* Internal horizontal padding so content never bleeds into the         */
+  /* @page margin / page edge. This is the fix for text running off the   */
+  /* right margin in the saved PDF.                                       */
   .report-paper{
-    padding:0.1in 0 !important;
+    padding:0.1in 0.18in !important;
+  }
+  /* Hard guarantee: nothing inside the report exceeds the paper width.    */
+  .report-paper, .report-paper *{
+    max-width:100%!important;
+  }
+  .report-paper *{
+    overflow-wrap:break-word;
+    word-break:normal;
+  }
+  /* Tables must respect the container and wrap, not push past the edge.   */
+  .rp-comp-table, .rp-adj-table{
+    width:100%!important;
+    table-layout:fixed!important;
+    border-collapse:collapse!important;
+  }
+  .rp-comp-table th, .rp-comp-table td,
+  .rp-adj-table th, .rp-adj-table td{
+    overflow:hidden!important;
+    overflow-wrap:break-word!important;
+    word-break:break-word!important;
   }
 }
 </style>
 </head>
 <body>
 
+<!-- LIABILITY DISCLOSURE — shown on every entry, must be acknowledged -->
+<div id="disclosure-gate">
+  <div class="dg-card">
+    <div class="dg-corner dg-tl"></div><div class="dg-corner dg-tr"></div>
+    <div class="dg-corner dg-bl"></div><div class="dg-corner dg-br"></div>
+    <div class="dg-eyebrow">Important Notice</div>
+    <div class="dg-brand">Team <em>Parikh</em></div>
+    <div class="dg-tag">Keller Williams Tri-Valley</div>
+    <div class="dg-rule"></div>
+    <div class="dg-body">
+      <p>The figures, scores, and estimates produced by this tool are generated by an <strong>automated mathematical model</strong> applied to comparable MLS sales data.</p>
+      <p>They are <strong>not an appraisal</strong>, <strong>not a formal opinion of value</strong>, and <strong>not a guarantee of any sale, list, or purchase price</strong>. An appraisal can only be performed by a licensed appraiser, and actual market value depends on property condition, market timing, buyer pool, financing, negotiation, and other factors this model does not capture.</p>
+      <p>Nothing here should be relied upon for lending, tax, legal, or investment decisions. Independent professional advice should always be obtained.</p>
+    </div>
+    <label class="dg-check"><input type="checkbox" id="dg-agree" onchange="dgToggle()"> I understand these figures are model estimates, not an appraisal or opinion of value.</label>
+    <button class="dg-btn" id="dg-btn" disabled onclick="acknowledgeDisclosure()">Enter</button>
+  </div>
+</div>
+
 <!-- WELCOME -->
 <div id="welcome">
   <div class="wl-logo">Team Parikh <em>Valuation Model</em></div>
-  <p class="wl-sub">Appraiser-grade valuations with time-adjusted comps, dynamic method weighting, reconciliation narratives, market diagnostics, and mispricing detection.</p>
+  <p class="wl-sub">Automated statistical valuations with time-adjusted comps, dynamic method weighting, reconciliation narratives, market diagnostics, and mispricing detection.</p>
   <div id="wl-loading" style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:40px 0">
     <div style="width:44px;height:44px;border:2px solid rgba(201,168,76,.2);border-top-color:#C9A84C;border-radius:50%;animation:spin .9s linear infinite"></div>
     <div id="wl-load-msg" style="font-size:14px;color:rgba(221,229,240,.6);letter-spacing:.5px">Connecting to database...</div>
@@ -1841,14 +1957,14 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
             <div class="fg"><label>Unit #</label><input id="s-unit" type="text" placeholder="—"></div>
           </div>
           <div class="fg">
-            <label>Property Type</label>
-            <select id="s-bt">
-              <option value="">— Any Type —</option>
-              <option value="DE">Detached (Single Family)</option>
-              <option value="CO">Condo</option>
-              <option value="TH">Townhome</option>
-            </select>
+            <label>Property Type <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--txt3);font-size:10px">(tick all that apply)</span></label>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;padding:2px 0">
+              <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="s-bt-de" checked style="accent-color:var(--gold)"> SFR</label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="s-bt-co" checked style="accent-color:var(--gold)"> Condo</label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="s-bt-th" checked style="accent-color:var(--gold)"> Townhome</label>
+            </div>
           </div>
+          <input type="hidden" id="s-bt">
           <div class="fr">
             <div class="fg"><label>Sq Ft</label><input id="s-sqft" type="number" placeholder="1,500"></div>
             <div class="fg"><label>Year Built</label><input id="s-yr" type="number" placeholder="2000"></div>
@@ -1868,6 +1984,14 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
 
           <button class="btn-run" onclick="runCMA()">⚡ Run CMA Analysis</button>
           <div id="autofill-msg" style="font-size:11px;color:var(--grn);text-align:center;margin-top:6px;display:none;line-height:1.6"></div>
+          <div style="border-top:1px solid var(--bdr);margin-top:11px;padding-top:10px">
+            <label style="font-size:10px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:6px">Data Inspector <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--txt3)">— is an address in the data?</span></label>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <input id="dbg-addr" type="text" placeholder="e.g. Pawnee or Comanche Way" style="width:100%;box-sizing:border-box;background:var(--sur);border:1px solid var(--bdr);border-radius:5px;color:var(--txt);font-family:var(--ff);font-size:12px;padding:7px 9px;outline:none" onkeydown="if(event.key==='Enter')inspectAddress()">
+              <button class="btn btn-g" style="font-size:11px;padding:6px 12px;width:100%" onclick="inspectAddress()">Look up in loaded data</button>
+            </div>
+            <div id="dbg-result" style="display:none;margin-top:8px;font-size:11px;line-height:1.6;max-height:240px;overflow:auto;background:var(--sur);border:1px solid var(--bdr);border-radius:6px;padding:9px 11px"></div>
+          </div>
         </div>
 
         <div class="card">
@@ -1888,12 +2012,10 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
             </div>
             <div id="prox-extra" style="display:none;margin-top:8px">
               <div class="radius-row" id="radius-pills">
-                <button class="pill" onclick="setRadius(0.25,this)">0.25 mi</button>
-                <button class="pill active" onclick="setRadius(0.5,this)">0.5 mi</button>
-                <button class="pill" onclick="setRadius(0.75,this)">0.75 mi</button>
-                <button class="pill" onclick="setRadius(1.0,this)">1.0 mi</button>
+                <button class="pill active" onclick="setRadius(0.25,this)">0.25 mi</button>
+                <button class="pill" onclick="setRadius(0.5,this)">0.5 mi</button>
               </div>
-              <div style="font-size:10px;color:var(--txt3);margin-top:5px;line-height:1.6">Requires internet + HTTPS. Works on your live site URL. May not work when opening the file directly from your computer.<br><strong style="color:var(--org)">Note: CMA valuation never depends on this — it is map-only.</strong></div>
+              <div style="font-size:10px;color:var(--txt3);margin-top:5px;line-height:1.6">Uses true mile distances (geocoded). <strong style="color:var(--grn)">Vicinity sales come first</strong> — stale local comps are brought to present value using this city &amp; building-type's appreciation trend, before reaching past the radius. Comps beyond <strong>0.5 mi are excluded</strong> and offered as a tick-list to add manually.</div>
             </div>
           </div>
         </div>
@@ -1904,8 +2026,8 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
             <label>Status</label>
             <div style="display:flex;gap:8px;flex-wrap:wrap">
               <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="f-sld" checked style="accent-color:var(--gold)"> Sold</label>
-              <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="f-actv" style="accent-color:var(--gold)"> Active</label>
-              <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="f-pend" style="accent-color:var(--gold)"> Pending</label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="f-actv" checked style="accent-color:var(--gold)"> Active</label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="f-pend" checked style="accent-color:var(--gold)"> Pending</label>
             </div>
           </div>
           <div class="fg">
@@ -1951,7 +2073,7 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
         <!-- Adjustment Engine (Appraiser Layer) -->
         <div class="card" id="adj-card">
           <div class="adj-toolbar">
-            <div class="card-title" style="margin-bottom:0">Adjustment Grid <span class="ct-chip" id="adj-badge">Appraiser Layer · Gross Adj %</span></div>
+            <div class="card-title" style="margin-bottom:0">Adjustment Grid <span class="ct-chip" id="adj-badge">Adjustment Model · Gross Adj %</span></div>
             <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
               <div class="adj-tog-row" id="adj-tog" onclick="toggleAdjustmentMode()" title="When on, valuation uses adjusted comp prices">
                 <div class="tog-track" id="adj-track"><div class="tog-thumb"></div></div>
@@ -1961,7 +2083,7 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
               <button class="btn btn-g" style="font-size:11px;padding:4px 10px" onclick="clearAdjustments()">↺ Reset</button>
             </div>
           </div>
-          <div class="adj-help" id="adj-help">Each cell is editable. Auto-suggest fills appraiser defaults: <strong>Time</strong> uses Method C trend slope · <strong>Size</strong> uses median $/sqft × ½ marginal rate · <strong>Lot</strong> at $5/sqft · <strong>BR</strong> at $7K/unit · <strong>Bath</strong> at $10K/full ($5K half). <strong>Condition / Location / Amenities</strong> are manual. Net Adjustment %&nbsp;>&nbsp;25% triggers a comp-quality flag (appraiser red flag).</div>
+          <div class="adj-help" id="adj-help">Each cell is editable. Auto-suggest fills model defaults: <strong>Time</strong> uses Method C trend slope · <strong>Size</strong> uses median $/sqft × ½ marginal rate · <strong>Lot</strong> at $5/sqft · <strong>BR</strong> at $7K/unit · <strong>Bath</strong> at $10K/full ($5K half). <strong>Condition / Location / Amenities</strong> are manual. Net Adjustment %&nbsp;>&nbsp;25% triggers a comp-quality flag (model red flag).</div>
           <div id="adj-area"><div class="adj-empty">Run CMA to populate the adjustment grid with your top sold comps.<br>Subject's missing fields (Sq Ft, Year Built, Lot, Beds, Baths) are needed for auto-suggestions.</div></div>
         </div>
 
@@ -1974,6 +2096,8 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
               <button class="btn btn-g" style="font-size:11px;padding:4px 10px" onclick="excludeAll()">Exclude All</button>
             </div>
           </div>
+          <div id="comp-diag" style="display:none;margin:0 0 10px;padding:9px 12px;background:rgba(245,162,58,.08);border:1px solid rgba(245,162,58,.3);border-radius:6px;font-size:11px;color:var(--txt2);line-height:1.6"></div>
+          <div id="distant-prompt" style="display:none;margin:0 0 12px"></div>
           <div class="tbl-wrap">
             <table class="ctable" id="comp-table">
               <thead><tr>
@@ -2027,6 +2151,16 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
           <span class="mi-mb-sub">Export any card as a branded Instagram-ready PNG · 1080×variable · Cream/gold luxury template</span>
         </div>
         <button class="btn btn-gold" onclick="openMultiExport()">📸 Multi-Export Carousel →</button>
+      </div>
+      <div class="mi-type-bar" id="mi-type-bar" style="display:none">
+        <span class="mi-type-lbl">Property Type</span>
+        <div class="mi-type-pills" id="mi-type-pills">
+          <button class="mi-type-pill active" data-type="all" onclick="setIntelType('all',this)">All Types</button>
+          <button class="mi-type-pill" data-type="DE" onclick="setIntelType('DE',this)">Single Family</button>
+          <button class="mi-type-pill" data-type="CO" onclick="setIntelType('CO',this)">Condo</button>
+          <button class="mi-type-pill" data-type="TH" onclick="setIntelType('TH',this)">Townhome</button>
+        </div>
+        <span class="mi-type-count" id="mi-type-count"></span>
       </div>
       <div id="mi-content"><div class="mi-empty">Load MLS data to view market intelligence.<br>Trends, pricing accuracy, and liquidity diagnostics appear here.</div></div>
     </div>
@@ -2323,7 +2457,7 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
     <div class="rt-title">Client Report Preview</div>
     <div class="rt-controls">
       <label class="rt-input-lbl">Prepared for: <input type="text" id="rt-client" placeholder="Client name" oninput="updateClientReportFields()"></label>
-      <label class="rt-input-lbl">Prepared by: <input type="text" id="rt-preparer" value="Team Parikh Realtors" oninput="updateClientReportFields()"></label>
+      <label class="rt-input-lbl">Prepared by: <input type="text" id="rt-preparer" value="Team Parikh" oninput="updateClientReportFields()"></label>
       <button class="btn btn-g" onclick="closeClientReport()">✕ Close</button>
       <button class="btn btn-gold" onclick="printClientReport()">🖨 Print / Save PDF</button>
     </div>
@@ -2381,8 +2515,10 @@ const A = {
   excluded: new Set(),
   scope: 'same',
   globalDateRange: {start: null, end: null},
+  distantComps: [],         // comps beyond 0.5mi awaiting user opt-in
+  approvedDistant: [],      // mlsNos the user chose to include despite distance
   proximityEnabled: false,
-  proximityRadius: 0.5,
+  proximityRadius: 0.25,
   map: null,
   mapMarkers: [],
   radiusCircle: null,
@@ -2393,6 +2529,7 @@ const A = {
   adjUseInValuation: false, // when on, valuation uses adjusted comp prices
   adjAuditLog: [],          // [{ts, mlsNo, field, old, new}]
   intelScope: 'all',        // 'all' or city name
+  intelType: 'all',         // 'all' | 'DE' (SFR) | 'CO' (Condo) | 'TH' (Townhome)
   lookbackMonths: 6,         // active lookback window (set by cascade logic)
   opportunities: [],        // results of opportunity scanner
   // ── v2.0: Tuning, Backtesting, Client Report ──
@@ -2441,7 +2578,7 @@ function toRow(l){
 // Supabase row → JS listing (camelCase, string→Date)
 function fromRow(r){
   return{
-    mlsNo:r.mls_no, status:r.status, dom:r.dom||0, cdom:r.cdom||0,
+    mlsNo:r.mls_no, status:normalizeStatus(r.status), dom:r.dom||0, cdom:r.cdom||0,
     address:r.address, unit:r.unit||'', city:r.city, county:r.county||'',
     lp:r.lp, sp:r.sp, bt:r.bt, sqft:r.sqft||0,
     br:r.br||0, bth:r.bth||0, gar:r.gar||false, garSp:r.gar_sp||0,
@@ -2666,6 +2803,55 @@ function withAsOfDate(asOf,fn){
 
 function haversine(la1,lo1,la2,lo2){const R=3958.8,r=Math.PI/180,dl=(la2-la1)*r,dn=(lo2-lo1)*r,a=Math.sin(dl/2)**2+Math.cos(la1*r)*Math.cos(la2*r)*Math.sin(dn/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
 
+// ── ADDRESS-BASED PROXIMITY (works offline, no geocoding) ──────────────
+// With only street Address + City available, the street name is the strongest
+// neighborhood signal we have: listings on the same street (or the same named
+// tract street) are almost always in the same immediate area. We normalize the
+// street, drop the leading house number, and strip common suffixes so
+// "4609 Ithaca Way" and "4625 Ithaca Way" share the same street key.
+const STREET_SUFFIXES=new Set(['st','street','ave','avenue','rd','road','dr','drive','ln','lane','ct','court','cir','circle','way','pl','place','blvd','boulevard','ter','terrace','loop','trl','trail','pkwy','parkway','sq','square','walk','row','path','run','xing','crossing','grn','green','cmn','common','commons']);
+function streetKey(address){
+  if(!address) return '';
+  // lower-case, strip punctuation, collapse spaces
+  let a=address.toLowerCase().replace(/[#.,]/g,' ').replace(/\s+/g,' ').trim();
+  let parts=a.split(' ');
+  // drop a leading house number (and an optional unit-ish token)
+  if(parts.length && /^\d+[a-z]?$/.test(parts[0])) parts.shift();
+  // drop a leading direction (N/S/E/W) — keep it as part of key for accuracy actually
+  // strip a trailing street suffix so "ithaca way" -> "ithaca"
+  if(parts.length>1 && STREET_SUFFIXES.has(parts[parts.length-1])) parts.pop();
+  return parts.join(' ').trim();
+}
+function houseNumber(address){
+  if(!address) return null;
+  const m=address.trim().match(/^(\d+)/);
+  return m?parseInt(m[1],10):null;
+}
+// Proximity affinity 0..1 between two addresses, offline.
+// 1.0 = same street & very close house numbers; tapers down by street/number.
+function addressAffinity(subjAddr, compAddr){
+  const sk=streetKey(subjAddr), ck=streetKey(compAddr);
+  if(!sk||!ck) return 0;
+  if(sk===ck){
+    // same street — refine by house-number closeness
+    const sn=houseNumber(subjAddr), cn=houseNumber(compAddr);
+    if(sn!=null && cn!=null){
+      const diff=Math.abs(sn-cn);
+      if(diff<=50) return 1.0;
+      if(diff<=200) return 0.92;
+      if(diff<=600) return 0.85;
+      return 0.78; // same street, far numbers
+    }
+    return 0.9;
+  }
+  // Different streets: light affinity if they share a distinctive token
+  // (e.g. tract names like "Ironwood", "Siena") — helps same-subdivision streets.
+  const st=new Set(sk.split(' ').filter(w=>w.length>=4));
+  const ct=ck.split(' ').filter(w=>w.length>=4);
+  if(ct.some(w=>st.has(w))) return 0.4;
+  return 0;
+}
+
 // ═══════════════════════════════════
 // STORAGE
 // ═══════════════════════════════════
@@ -2807,6 +2993,25 @@ function estimateCloseDate(row,explicitClose,listDate,dom){
   return{date:null,method:'UNKNOWN',est:true};
 }
 
+// Map the many MLS status codes to three canonical buckets the tool uses.
+// Anything unrecognized but clearly on-market (NEW, PCH price change, BOM back
+// on market, EXT extended, etc.) is treated as ACTIVE so live comps appear.
+function normalizeStatus(s){
+  s=(s||'').trim().toUpperCase();
+  if(!s) return '';
+  // Sold / closed
+  if(['SLD','SOLD','S','CLOSED','CLO','C'].includes(s)) return 'SLD';
+  // Pending / contingent / in-contract
+  if(['PEND','P','PENDING','CONT','CTG','PSB','PS','UC','UCB','CS','SC','ACT/CONT','ACTIVE UNDER CONTRACT','AC'].includes(s)) return 'PEND';
+  // Active / on-market variants (new, price change, back on market, extended,
+  // re-activated, coming soon, etc.)
+  if(['ACTV','ACT','ACTIVE','A','NEW','PCH','PC','BOM','EXT','RACT','REACTIVATED','CS-COMING','COMING SOON','COMINGSOON','CMG','PRICE CHANGE','PRICECHANGE','RAC','AVAIL','AVAILABLE'].includes(s)) return 'ACTV';
+  // Withdrawn / expired / cancelled / off-market — not useful as comps
+  if(['WDN','WITHDRAWN','EXP','EXPIRED','CAN','CANC','CANCELLED','CANCELED','HOLD','TEMP','DEL','DELETE','OFF'].includes(s)) return s; // keep raw so they're excluded by status checkboxes
+  // Unknown but present → assume on-market active (better to show than hide)
+  return 'ACTV';
+}
+
 function parseRow(row){
   const listPPSF=parsePrice(row['List$/SqFt']);  // e.g. "$409" → 409
   const salePPSF=parsePrice(row['Sale/SqFt']);   // e.g. "$458" → 458
@@ -2820,9 +3025,10 @@ function parseRow(row){
   const explicitClose=parseDate(row['Close Date'])||parseDate(row['Closing Date'])||parseDate(row['_est_close_date']);
   const listDate=parseDate(row['LD'])||parseDate(row['List Date'])||parseDate(row['Listed Date']);
   const dom=parseInt(row['DOM'])||parseInt(row['Days On Market'])||0;
-  const status=(row['Status']||'').trim().toUpperCase();
+  const rawStatus=(row['Status']||'').trim().toUpperCase();
+  const status=normalizeStatus(rawStatus);
   // Only estimate for sold/pending — not active listings
-  const needsEst=['SLD','SOLD','WC','PEND','CS','SOM'].includes(status);
+  const needsEst=status==='SLD'||status==='PEND';
   const est=needsEst?estimateCloseDate(row,explicitClose,listDate,dom)
                     :{date:explicitClose,method:explicitClose?'M1':'NONE',est:false};
   return{
@@ -2857,12 +3063,20 @@ function parseRow(row){
 
 function mergeCSV(text){
   const rows=Papa.parse(text,{header:true,skipEmptyLines:true,trimHeaders:true}).data.map(parseRow).filter(r=>r.mlsNo&&r.address);
-  const map=new Map(A.listings.map(l=>[l.mlsNo,l]));
+  // Composite key so two genuinely different listings that happen to share an
+  // MLS number (e.g. a sold record and a later active relist, or duplicate
+  // exports) are NOT collapsed into one. Keying by mlsNo alone silently
+  // dropped active comps that shared a number with a sold record.
+  const keyOf=(l)=>`${l.mlsNo}|${l.status||''}|${l.closeDate?l.closeDate.getTime():''}|${l.sp||''}|${(l.address||'').toLowerCase()}|${l.unit||''}`;
+  const map=new Map(A.listings.map(l=>[keyOf(l),l]));
   let added=0,updated=0;
   rows.forEach(r=>{
-    if(!r.mlsNo||(!r.lp&&!r.sp&&!r.listPPSF))return;
-    if(map.has(r.mlsNo)){const old=map.get(r.mlsNo);r.lat=old.lat;r.lng=old.lng;map.set(r.mlsNo,r);updated++;}
-    else{map.set(r.mlsNo,r);added++;}
+    // Keep any listing with a price signal in ANY field (actives have lp;
+    // solds have sp). Don't discard a valid active just because sp is blank.
+    if(!r.mlsNo||(!r.lp&&!r.sp&&!r.listPPSF&&!r.ppsf))return;
+    const k=keyOf(r);
+    if(map.has(k)){const old=map.get(k);r.lat=old.lat;r.lng=old.lng;map.set(k,r);updated++;}
+    else{map.set(k,r);added++;}
   });
   A.listings=Array.from(map.values());
 
@@ -3294,6 +3508,9 @@ function tryAutoFill(){
   const price=match.status==='SLD'?match.sp:match.lp;
   set('s-lp',price||'');
   if(match.bt&&el('s-bt'))el('s-bt').value=match.bt;
+  // Note: we intentionally do NOT auto-untick type checkboxes on autofill —
+  // condo/townhome are tagged loosely, so all types stay enabled by default and
+  // the user can narrow manually if they want.
   if(city&&el('s-city')&&!v('s-city'))el('s-city').value=toTitle(match.city);
 
   // Show contextual status in autofill message
@@ -3320,9 +3537,9 @@ function setScope(s,btn){
 function toggleProximity(){
   A.proximityEnabled=!A.proximityEnabled;
   el('prox-track').classList.toggle('on',A.proximityEnabled);
-  el('prox-lbl').textContent=A.proximityEnabled?'On — radius filter active':'Off — city scope only';
+  el('prox-lbl').textContent=A.proximityEnabled?'On — radius + present-value adjust':'Off — city scope only';
   el('prox-extra').style.display=A.proximityEnabled?'block':'none';
-  if(A.proximityEnabled) toast('Proximity on — geocoding runs when you click Run CMA','inf');
+  if(A.proximityEnabled) toast('Proximity on — vicinity sales used first, time-adjusted to today; distant comps offered for opt-in.','inf');
 }
 
 function setRadius(r,btn){
@@ -3332,46 +3549,180 @@ function setRadius(r,btn){
 }
 
 // ═══════════════════════════════════
-// PROXIMITY FILTER (geocode + radius)
+// PROXIMITY ENGINE — true mile radius tiering + present-value adjustment
 // ═══════════════════════════════════
+// Live site is always online, so we geocode for real distances. Comps are
+// tiered: ≤0.25 mi (primary), 0.25–0.5 mi (secondary, used when primary is
+// thin), >0.5 mi (excluded by default, offered to the user as a tick-list).
+// Stale local comps are kept and time-adjusted to present value using the
+// city+building-type appreciation rate, so vicinity always wins over distance.
+async function geocodeOne(addr, city){
+  const key=`${addr}, ${city}, CA`.toLowerCase();
+  if(A.geoCache[key]) return A.geoCache[key];
+  try{
+    const url=`https://nominatim.openstreetmap.org/search?`+new URLSearchParams({q:`${addr}, ${city}, California, USA`,format:'json',limit:'1',countrycodes:'us'});
+    const r=await fetch(url,{headers:{'Accept':'application/json'}});
+    const d=await r.json();
+    if(d&&d.length){const o={lat:parseFloat(d[0].lat),lng:parseFloat(d[0].lon)};A.geoCache[key]=o;return o;}
+  }catch(e){}
+  return null;
+}
+
 async function applyProximityFilter(candidates){
   const subj=A.subject;
   if(!subj)return;
-  // Geocode subject if not already done
+  const radius=A.proximityRadius||0.5;       // user's primary radius (0.25/0.5)
+  const HARD_MAX=0.5;                          // never auto-include beyond this
+  const MIN_PRIMARY=4;                         // want at least this many inside primary
+
+  // Address affinity as an instant first signal + geocode fallback hint.
+  candidates.forEach(c=>{ c.addrAff=addressAffinity(subj.address||subj.addr, c.address); });
+
+  toast('Locating subject & comps for radius filter…','inf');
+
+  // 1) Geocode the subject.
   if(!subj.lat||!subj.lng){
-    toast('Geocoding subject address for radius filter…','inf');
-    try{
-      const url=`https://nominatim.openstreetmap.org/search?`+new URLSearchParams({q:`${subj.addr}, ${subj.city}, California, USA`,format:'json',limit:'1',countrycodes:'us'});
-      const r=await fetch(url);const d=await r.json();
-      if(d.length){subj.lat=parseFloat(d[0].lat);subj.lng=parseFloat(d[0].lon);}
-      else{toast('Could not geocode address — proximity filter skipped. CMA results above are accurate.','warn');return;}
-    }catch(e){toast('Proximity geocoding unavailable — CMA valuation is unaffected. Turn off Proximity Filter to dismiss.','warn');el('prox-track').classList.remove('on');A.proximityEnabled=false;el('prox-lbl').textContent='Off — city scope only';el('prox-extra').style.display='none';return;}
+    const g=await geocodeOne(subj.addr, subj.city);
+    if(g){subj.lat=g.lat;subj.lng=g.lng;}
   }
-  // Geocode candidates that aren't cached
-  const radius=A.proximityRadius;
-  let geocoded=0;
+  if(!subj.lat||!subj.lng){
+    // Could not locate subject — fall back to address-affinity ranking only,
+    // never silently drop comps.
+    A.comps=candidates;
+    A.comps.forEach(c=>{c.score=Math.min(100,c.score+(c.addrAff||0)*15);});
+    A.comps.sort((a,b)=>b.score-a.score);
+    A.distantComps=[];
+    toast('Could not locate the subject address — showing all matched comps ranked by street proximity.','warn');
+    return;
+  }
+
+  // 2) Geocode candidates (cap the live lookups per run; cached ones are free).
+  let budget=40;
   for(const c of candidates){
+    if(c.lat&&c.lng){c.distance=haversine(subj.lat,subj.lng,c.lat,c.lng);continue;}
     const key=`${c.address}, ${c.city}, CA`.toLowerCase();
     if(A.geoCache[key]){c.lat=A.geoCache[key].lat;c.lng=A.geoCache[key].lng;}
-    else{
-      try{
-        const url=`https://nominatim.openstreetmap.org/search?`+new URLSearchParams({q:`${c.address}, ${c.city}, California, USA`,format:'json',limit:'1',countrycodes:'us'});
-        const r=await fetch(url);const d=await r.json();
-        if(d.length){c.lat=parseFloat(d[0].lat);c.lng=parseFloat(d[0].lon);A.geoCache[key]={lat:c.lat,lng:c.lng};geocoded++;}
-      }catch(e){}
-      await new Promise(r=>setTimeout(r,1100)); // Nominatim rate limit
+    else if(budget>0){
+      const g=await geocodeOne(c.address,c.city);
+      if(g){c.lat=g.lat;c.lng=g.lng;}
+      budget--;
+      await new Promise(rr=>setTimeout(rr,1050)); // Nominatim rate limit
     }
     if(c.lat&&c.lng) c.distance=haversine(subj.lat,subj.lng,c.lat,c.lng);
   }
-  if(geocoded>0)saveGeo();
-  // Apply radius filter — keep comps within radius OR those without coords (can't discard unknown)
-  A.comps=candidates.filter(c=>!c.lat||c.distance==null||c.distance<=radius);
-  // Re-score with distance component
-  A.comps.forEach(c=>{
-    if(c.distance!=null) c.score=Math.min(100,c.score+(1-Math.min(1,c.distance/radius))*15);
+  saveGeo();
+
+  // 3) Tier by true distance.
+  const located=candidates.filter(c=>c.distance!=null);
+  const unlocated=candidates.filter(c=>c.distance==null); // keep, can't measure
+  const primary=located.filter(c=>c.distance<=radius);
+  const secondary=located.filter(c=>c.distance>radius && c.distance<=HARD_MAX);
+  const distant=located.filter(c=>c.distance>HARD_MAX);
+
+  // 4) Build the working comp set: primary first; pull in secondary only if
+  //    primary is thin. Unlocated comps are kept (we can't prove they're far),
+  //    but ranked below located in-radius comps.
+  let working=primary.slice();
+  if(working.length<MIN_PRIMARY) working=working.concat(secondary);
+  // Always include any user-approved distant comps from a prior prompt.
+  const approved=new Set(A.approvedDistant||[]);
+  const approvedDistant=distant.filter(c=>approved.has(c.mlsNo));
+  working=working.concat(approvedDistant);
+  // Keep unlocated comps so geocoding gaps don't hide valid neighbors.
+  working=working.concat(unlocated);
+
+  // 5) Present-value adjust stale comps (sold) to today using city+type trend.
+  working.forEach(c=>{
+    c.pvApplied=false;
+    if(c.status==='SLD' && c.sp && c.closeDate){
+      const pv=toPresentValue(c.sp, c.closeDate, c.city, c.bt);
+      if(pv.years>0.25){ // only adjust comps older than ~3 months
+        c.spOriginal=c.sp;
+        c.spPV=Math.round(pv.value);
+        c.pvPct=pv.pct;
+        c.pvRate=pv.rate;
+        c.pvSrc=pv.src;
+        c.pvYears=pv.years;
+        c.pvApplied=true;
+      }
+    }
   });
-  A.comps.sort((a,b)=>b.score-a.score);
-  toast(`Proximity filter applied — ${A.comps.length} comps within ${radius} mi`,'ok');
+
+  A.comps=working;
+  // Stash distant (unapproved) comps for the opt-in prompt.
+  A.distantComps=distant.filter(c=>!approved.has(c.mlsNo))
+    .sort((a,b)=>a.distance-b.distance);
+
+  // 6) Re-score: in-radius proximity dominates; distance decays the score.
+  A.comps.forEach(c=>{
+    let boost=0;
+    if(c.distance!=null){
+      // 0 mi → +18, fading to 0 at HARD_MAX
+      boost=Math.max(0,(1-Math.min(1,c.distance/HARD_MAX))*18);
+    } else {
+      boost=(c.addrAff||0)*12; // unlocated: lean on street affinity
+    }
+    c.score=Math.min(100,c.score+boost);
+  });
+  A.comps.sort((a,b)=>{
+    // Primary sort: located-in-radius before unlocated before nothing.
+    const ad=a.distance==null?9:a.distance, bd=b.distance==null?9:b.distance;
+    if((ad<=HARD_MAX)!==(bd<=HARD_MAX)) return (ad<=HARD_MAX)?-1:1;
+    return b.score-a.score;
+  });
+
+  const nPrim=primary.length, nSec=secondary.length, nDist=A.distantComps.length;
+  toast(`Proximity: ${nPrim} within ${radius} mi`+(working.length>nPrim?`, +${working.length-nPrim-unlocated.length} nearby`:'')+(nDist?` · ${nDist} beyond ${HARD_MAX} mi available`:'')+'.','ok');
+
+  // 7) If comps beyond 0.5 mi exist, offer them as a tick-list.
+  if(nDist>0) renderDistantPrompt();
+}
+
+// ── DISTANT-COMP OPT-IN PROMPT ────────────────────────────────────────
+function renderDistantPrompt(){
+  const box=el('distant-prompt');
+  if(!box) return;
+  const list=A.distantComps||[];
+  if(!list.length){box.style.display='none';return;}
+  const btName={DE:'SFR',CO:'Condo',TH:'Townhome'};
+  const rows=list.slice(0,30).map(c=>{
+    const price=c.status==='SLD'?fmt(c.sp):fmt(c.lp);
+    const dt=c.closeDate?c.closeDate.toLocaleDateString('en-US',{month:'numeric',year:'2-digit'}):'active';
+    return `<label class="dp-row">
+      <input type="checkbox" value="${c.mlsNo}" data-mls="${c.mlsNo}">
+      <span class="dp-dist">${c.distance.toFixed(2)} mi</span>
+      <span class="dp-addr">${c.address}${c.unit?' #'+c.unit:''}, ${toTitle(c.city)}</span>
+      <span class="dp-meta">${c.status} · ${btName[c.bt]||c.bt||'?'} · ${c.sqft||'?'} sf · ${price} · ${dt}</span>
+    </label>`;
+  }).join('');
+  box.innerHTML=`
+    <div class="dp-head">
+      <strong>${list.length} comp${list.length>1?'s':''} beyond 0.5 mi were excluded.</strong>
+      Vicinity sales (time-adjusted to today) are used first. Tick any distant comps you want to add, then Apply.
+    </div>
+    <div class="dp-list">${rows}</div>
+    <div class="dp-actions">
+      <button class="btn btn-gold" style="font-size:12px;padding:7px 16px" onclick="applyDistantSelections()">Apply selected</button>
+      <button class="btn btn-g" style="font-size:12px;padding:7px 14px" onclick="el('distant-prompt').style.display='none'">Dismiss</button>
+    </div>`;
+  box.style.display='block';
+}
+
+function applyDistantSelections(){
+  const box=el('distant-prompt');
+  const picked=[...box.querySelectorAll('input[type=checkbox]:checked')].map(cb=>cb.dataset.mls);
+  if(!picked.length){toast('No distant comps selected.','inf');box.style.display='none';return;}
+  A.approvedDistant=[...new Set([...(A.approvedDistant||[]),...picked])];
+  box.style.display='none';
+  toast(`Added ${picked.length} distant comp(s) — re-running with present-value adjustment…`,'ok');
+  // Re-run proximity with the approved set, then refresh outputs.
+  const cands=A.comps.concat(A.distantComps); // current + the distant pool
+  applyProximityFilter(cands).then(()=>{
+    renderCompTable();
+    const r=calcAll(A.subject,A.comps);
+    renderValuation(r);renderReport(r);renderAdjustmentGrid();
+    tryGeocodeMap();
+  });
 }
 
 // ═══════════════════════════════════
@@ -3402,6 +3753,13 @@ function score(subj,comp){
   }
   // ── Same city — 5 pts ─────────────────────────────────────────────
   if(comp.city===subj.city) s+=5;
+  // ── ADDRESS PROXIMITY — up to +12 pts (offline neighborhood signal) ──
+  // Same street / nearby house numbers strongly indicate same neighborhood.
+  // This is the only reliable proximity signal when no coords are available.
+  if(subj.address && comp.address){
+    const aff=addressAffinity(subj.address, comp.address);
+    if(aff>0) s+=Math.round(aff*12);
+  }
   // ── Garage mismatch — 3 pts ───────────────────────────────────────
   if(subj.gar!==undefined&&comp.gar!==undefined&&subj.gar!==comp.gar) s-=3;
 
@@ -3451,6 +3809,56 @@ function compGrade(sc){
  * Compute trend slope ($/sqft/day) from dated sold comps.
  * Returns null if insufficient data or flat/noise-level trend.
  */
+// ── CITY + BUILDING-TYPE APPRECIATION ENGINE ──────────────────────────
+// Derives an annual %/yr price appreciation rate from the loaded dataset for a
+// given city + building type, used to bring stale comps to present value.
+// Falls back: city+type → city → same type citywide → all data → 3%/yr.
+// Cached per (city|type) so repeated calls are cheap.
+const A_APPR_CACHE={};
+function getAppreciationRate(city, bt){
+  const key=`${(city||'').toUpperCase()}|${bt||''}`;
+  if(A_APPR_CACHE[key]!=null) return A_APPR_CACHE[key];
+
+  const fitRate=(rows)=>{
+    // Regress ln(ppsf) on time(years) → slope = continuous annual growth.
+    const d=rows.filter(c=>c.closeDate&&c.ppsf>0&&c.sqft>0);
+    if(d.length<8) return null;
+    const t0=Math.min(...d.map(c=>c.closeDate.getTime()));
+    const xs=d.map(c=>(c.closeDate.getTime()-t0)/(365.25*864e5)); // years
+    const ys=d.map(c=>Math.log(c.ppsf));
+    const reg=S.linReg(xs,ys);
+    if(!reg) return null;
+    // Convert continuous slope to annual %; clamp to sane bounds.
+    let rate=Math.exp(reg.slope)-1;
+    if(!isFinite(rate)) return null;
+    rate=Math.max(-0.15, Math.min(0.25, rate)); // -15%..+25%/yr guardrails
+    return {rate, n:d.length, r2:reg.r2};
+  };
+
+  const sld=A.listings.filter(l=>l.status==='SLD');
+  let res=null, src='';
+  // 1) city + type
+  res=fitRate(sld.filter(l=>l.city===city && l.bt===bt)); if(res) src='city+type';
+  // 2) city (any type)
+  if(!res){res=fitRate(sld.filter(l=>l.city===city)); if(res) src='city';}
+  // 3) type citywide (all cities, same type)
+  if(!res){res=fitRate(sld.filter(l=>l.bt===bt)); if(res) src='type';}
+  // 4) all sold data
+  if(!res){res=fitRate(sld); if(res) src='all';}
+  const out = res ? {rate:res.rate, n:res.n, r2:res.r2, src} : {rate:0.03, n:0, r2:0, src:'default'};
+  A_APPR_CACHE[key]=out;
+  return out;
+}
+// Adjust a comp's sale price (or ppsf) to present-day value using the city+type
+// appreciation rate. Returns the adjusted dollar value and the % applied.
+function toPresentValue(amount, closeDate, city, bt){
+  if(!amount||!closeDate) return {value:amount, pct:0, rate:0, src:'none'};
+  const ap=getAppreciationRate(city, bt);
+  const years=(TODAY.getTime()-closeDate.getTime())/(365.25*864e5);
+  const factor=Math.pow(1+ap.rate, years);
+  return {value:amount*factor, pct:(factor-1)*100, rate:ap.rate, src:ap.src, years};
+}
+
 function getTrendSlope(sold){
   const dated=sold.filter(c=>c.closeDate&&c.ppsf&&c.sqft&&!A.excluded.has(c.mlsNo));
   if(dated.length<5)return null;
@@ -3467,15 +3875,17 @@ function modelA(subj,sold){
   if(priced.length<2)return null;
 
   // ── Time-adjust each comp's PPSF to present day ──────────────────────
-  // Core appraiser technique: comps from 18 months ago need market-time adjustment.
-  // We use the linear trend slope to bring each comp's PPSF to "today's dollars".
-  const trend=getTrendSlope(priced);
-  let timeAdjusted=false;
+  // If the proximity engine already computed a present-value price (spPV) from
+  // the city+type appreciation trend, use it directly. Otherwise fall back to
+  // the in-set linear trend slope.
+  const anyPV=priced.some(c=>c.pvApplied);
+  const trend=anyPV?null:getTrendSlope(priced);
+  let timeAdjusted=anyPV;
   const raw=priced.map(c=>{
-    let ppsf=c.sp/c.sqft;
+    let ppsf=(c.pvApplied&&c.spPV?c.spPV:c.sp)/c.sqft;
     if(trend&&c.closeDate){
       const daysSince=(TODAY.getTime()-c.closeDate.getTime())/(864e5);
-      ppsf+=trend.slope*daysSince; // e.g. +$0.15/sqft/day × 365 days = +$55/sqft
+      ppsf+=trend.slope*daysSince;
       timeAdjusted=true;
     }
     return Math.max(ppsf,50); // floor at $50/sqft
@@ -3504,24 +3914,30 @@ function modelB(subj,sold){
   // pull of a 55-score comp, not just 1.7×. Near-identical sales dominate.
   const wts=usable.map(c=>{
     const sc=c.score;
-    // Use score² as base weight — this is the key fix for dilution
+    // Use score² as base weight — near-identical sales dominate.
     let w=(sc/100)*(sc/100)*10000;
-    // Additional recency multiplier on top (stacks with score²)
+    // Recency multiplier. When a present-value adjustment has been applied, the
+    // price is already in today's dollars, so we only lightly favour fresher
+    // sales (data-quality preference), instead of heavily discounting them.
     if(c.closeDate){
       const daysSince=(TODAY.getTime()-c.closeDate.getTime())/(864e5);
-      if(daysSince<=60)  w*=1.40;  // < 2 months: very dominant
-      else if(daysSince<=120) w*=1.25;
-      else if(daysSince<=180) w*=1.12;  // < 6 months: elevated
-      else if(daysSince<=365) w*=1.00;
-      else if(daysSince<=545) w*=0.82;
-      else if(daysSince<=730) w*=0.65;
-      else                   w*=0.45;  // > 2 years: minimal influence
+      if(c.pvApplied){
+        if(daysSince<=180) w*=1.10; else if(daysSince<=545) w*=1.00; else w*=0.90;
+      } else {
+        if(daysSince<=60)  w*=1.40;
+        else if(daysSince<=120) w*=1.25;
+        else if(daysSince<=180) w*=1.12;
+        else if(daysSince<=365) w*=1.00;
+        else if(daysSince<=545) w*=0.82;
+        else if(daysSince<=730) w*=0.65;
+        else                   w*=0.45;
+      }
     }
     return Math.max(w,1);
   });
   const tw=wts.reduce((s,x)=>s+x,0);
   if(!tw)return null;
-  const est=Math.round(usable.reduce((s,c,i)=>s+c.sp*wts[i],0)/tw);
+  const est=Math.round(usable.reduce((s,c,i)=>s+(c.pvApplied&&c.spPV?c.spPV:c.sp)*wts[i],0)/tw);
   const sc=usable.map(c=>c.score);
   return{est,n:usable.length,avgSc:Math.round(S.mean(sc)),minSc:Math.min(...sc),maxSc:Math.max(...sc)};
 }
@@ -3569,7 +3985,7 @@ function modelAdj(subj,sold){
   if(!A.adjUseInValuation) return null;
   const usable=sold.filter(c=>c.sp&&c.score>0&&!A.excluded.has(c.mlsNo));
   if(usable.length<2)return null;
-  const adjPrices=usable.map(c=>{const a=A.adjustments[c.mlsNo];const sum=a?(a.time+a.size+a.lot+a.br+a.bth+a.cond+a.loc+a.amen):0;return c.sp+sum;});
+  const adjPrices=usable.map(c=>{const a=A.adjustments[c.mlsNo];const sum=a?(a.time+a.size+a.lot+a.br+a.bth+a.cond+a.loc+a.amen):0;const base=(c.pvApplied&&c.spPV?c.spPV:c.sp);return base+sum;});
   const wts=usable.map(c=>c.score);
   const tw=wts.reduce((s,x)=>s+x,0);if(!tw)return null;
   const est=Math.round(adjPrices.reduce((s,p,i)=>s+p*wts[i],0)/tw);
@@ -3628,7 +4044,7 @@ function calcAll(subj,comps){
   // When adjustment mode is ON, weight the appraiser-adjusted model heavily
   if(A.adjUseInValuation && D_){
     if(A_)ests.push({v:A_.mid,w:.20,label:'A',name:'Method A ($/SqFt, Time-Adj.)'});
-    if(D_)ests.push({v:D_.est,w:.55,label:'D',name:'Method D (Appraiser Adjusted)'});
+    if(D_)ests.push({v:D_.est,w:.55,label:'D',name:'Method D (Comp-Adjusted Model)'});
     if(C_)ests.push({v:C_.est,w:.25,label:'C',name:'Method C (Trend + Market)'});
     weightSource='adjustment-grid';
   } else if(A.weightMode==='manual'){
@@ -3700,6 +4116,13 @@ function getLookbackCutoff(months){
 }
 
 function filterWithLookback(candidates){
+  // Determine how far back we need to look to have a reasonable SOLD sample.
+  // This is used for the header badge and trend context only — it is NOT a
+  // hard delete. Previously this discarded every sold comp older than the
+  // window, which silently removed perfect same-neighborhood comps that
+  // happened to sell a little earlier than the newest citywide sales. We now
+  // KEEP all comps and let the recency multiplier in score() rank fresher
+  // sales higher without throwing away the best matches.
   let soldCount=0,activeLookback=6,cutoff=null;
   for(const months of LOOKBACK_STEPS){
     cutoff=getLookbackCutoff(months);
@@ -3712,15 +4135,91 @@ function filterWithLookback(candidates){
   // Update lookback badge in header
   const badge=el('hdr-lookback');
   if(badge){
-    const lbl=activeLookback===null?'All Data':`${activeLookback}mo window`;
+    const lbl=activeLookback===null?'All Data':`${activeLookback}mo focus`;
     const cls=activeLookback===6?'lb-6':activeLookback===12?'lb-12':activeLookback===18?'lb-18':activeLookback===24?'lb-24':'lb-all';
     badge.textContent='📅 '+lbl;
     badge.className='lookback-badge '+cls;
     badge.style.display='inline-block';
-    badge.title=activeLookback===6?'Sufficient comps found in 6-month window':`Expanded to ${lbl} — fewer than ${MIN_COMPS} sold comps in shorter window`;
+    badge.title=`Most sold comps fall within ~${activeLookback||'all'} months. Older same-neighborhood sales are still kept and ranked by similarity.`;
   }
-  if(!cutoff)return candidates;
-  return candidates.filter(c=>c.status!=='SLD'||!c.closeDate||c.closeDate>=cutoff);
+  // Return ALL candidates — do not delete older solds.
+  return candidates;
+}
+
+// ── DATA INSPECTOR — show exactly what's loaded for a search term ──────
+function inspectAddress(){
+  const term=(v('dbg-addr')||'').trim().toLowerCase();
+  const box=el('dbg-result');
+  if(!box) return;
+  if(!term){box.style.display='none';return;}
+  if(!A.listings.length){box.style.display='block';box.innerHTML='<span style="color:var(--org)">No data loaded yet — click Load / Update first.</span>';return;}
+  const hits=A.listings.filter(l=>(l.address||'').toLowerCase().includes(term)||(l.city||'').toLowerCase().includes(term));
+  box.style.display='block';
+  if(!hits.length){
+    box.innerHTML=`<span style="color:var(--red)"><strong>Not found.</strong></span> No loaded listing contains "${term}". This address is <strong>not in your current dataset</strong>, so no filter change can surface it — it must be added to the MLS export you load.`;
+    return;
+  }
+
+  // Read the CURRENT filter settings exactly as runCMA would, so we can show
+  // why each match would or wouldn't be picked up as a comp.
+  const subjCity=(v('s-city')||'').trim().toUpperCase();
+  const btTypes=[];
+  if(el('s-bt-de')&&el('s-bt-de').checked) btTypes.push('DE');
+  if(el('s-bt-co')&&el('s-bt-co').checked) btTypes.push('CO');
+  if(el('s-bt-th')&&el('s-bt-th').checked) btTypes.push('TH');
+  const statuses=[];
+  if(el('f-sld').checked)statuses.push('SLD');if(el('f-actv').checked)statuses.push('ACTV');if(el('f-pend').checked)statuses.push('PEND');
+  const fSfMin=parseFloat(v('f-sf-min'))||0,fSfMax=parseFloat(v('f-sf-max'))||Infinity;
+  const fBrMin=parseFloat(v('f-br-min'))||0,fBrMax=parseFloat(v('f-br-max'))||Infinity;
+  const fBthMin=parseFloat(v('f-bth-min'))||0,fBthMax=parseFloat(v('f-bth-max'))||Infinity;
+  const fYrMin=parseFloat(v('f-yr-min'))||0,fYrMax=parseFloat(v('f-yr-max'))||9999;
+  const cityChosen = A.scope==='all' ? null : subjCity;
+
+  function whyRejected(l){
+    if(cityChosen && l.city!==cityChosen) return `different city (${toTitle(l.city)} vs ${toTitle(cityChosen)})`;
+    if(!statuses.length) return 'no status checkboxes ticked';
+    if(!statuses.includes(l.status)) return `status ${l.status} not ticked`;
+    if(btTypes.length && btTypes.length<3 && l.bt && !btTypes.includes(l.bt)) return `type ${l.bt} not ticked`;
+    if(fSfMin&&l.sqft&&l.sqft<fSfMin) return `sqft ${l.sqft} < min ${fSfMin}`;
+    if(fSfMax<Infinity&&l.sqft&&l.sqft>fSfMax) return `sqft ${l.sqft} > max ${fSfMax}`;
+    if(fBrMin&&l.br&&l.br<fBrMin) return `${l.br}BR < min ${fBrMin}`;
+    if(fBrMax<Infinity&&l.br&&l.br>fBrMax) return `${l.br}BR > max ${fBrMax}`;
+    if(fBthMin&&l.bth&&l.bth<fBthMin) return `${l.bth}BA < min ${fBthMin}`;
+    if(fBthMax<Infinity&&l.bth&&l.bth>fBthMax) return `${l.bth}BA > max ${fBthMax}`;
+    if(fYrMin&&l.yrBlt&&l.yrBlt<fYrMin) return `built ${l.yrBlt} < min ${fYrMin}`;
+    if(fYrMax<9999&&l.yrBlt&&l.yrBlt>fYrMax) return `built ${l.yrBlt} > max ${fYrMax}`;
+    const gdr=A.globalDateRange||{};
+    if(gdr.start&&l.status==='SLD'&&l.closeDate&&l.closeDate<gdr.start) return `sold ${l.closeDate.toLocaleDateString()} before date-bar start`;
+    if(gdr.end&&l.status==='SLD'&&l.closeDate&&l.closeDate>gdr.end) return `sold after date-bar end`;
+    return null; // passes
+  }
+
+  const btName={DE:'SFR',CO:'Condo',TH:'Townhome'};
+  const rows=hits.slice(0,25).map(l=>{
+    const st=l.status||'?';
+    const dt=l.closeDate?l.closeDate.toLocaleDateString('en-US',{month:'numeric',day:'numeric',year:'2-digit'}):'—';
+    const rej=whyRejected(l);
+    const hasRun = A.comps && A.comps.length>0;
+    const inComps = hasRun && A.comps.some(c=>c.mlsNo===l.mlsNo && c.status===l.status && (c.closeDate?c.closeDate.getTime():0)===(l.closeDate?l.closeDate.getTime():0));
+    let verdict;
+    if(rej){
+      verdict=`<span style="color:var(--red)">✗ would be filtered out — ${rej}</span>`;
+    } else if(!hasRun){
+      verdict=`<span style="color:var(--gold)">✓ passes filters — run the CMA to load it into comps</span>`;
+    } else if(inComps){
+      verdict=`<span style="color:var(--grn)">✓ passes filters &amp; IS in current comps</span>`;
+    } else {
+      verdict=`<span style="color:var(--org)">⚠ passes filters but NOT in last run — re-run CMA for this subject (mlsNo ${l.mlsNo||'blank'})</span>`;
+    }
+    return `<div style="padding:6px 0;border-bottom:1px solid var(--bdr)">
+      <strong style="color:var(--txt)">${l.address||'—'}${l.unit?' #'+l.unit:''}</strong>, ${toTitle(l.city||'')}<br>
+      <span style="color:var(--txt3)">${st} · ${btName[l.bt]||l.bt||'type?'} · ${l.sqft||'?'} sqft · ${l.br||'?'}BR/${l.bth||'?'}BA · ${l.yrBlt||'?'} · close ${dt}</span><br>
+      ${verdict}
+    </div>`;
+  }).join('');
+  const subjSf=parseFloat(v('s-sqft'))||0;
+  const bandNote = (fSfMin||fSfMax<Infinity) ? `<div style="color:var(--txt3);margin-bottom:5px">Current SqFt band: <strong>${fSfMin||0}–${fSfMax<Infinity?fSfMax:'∞'}</strong>${subjSf?` (subject ${subjSf} sqft)`:''}. Clear the SqFt Min/Max fields on the left to widen.</div>` : '';
+  box.innerHTML=`<div style="color:var(--grn);margin-bottom:5px"><strong>${hits.length} match${hits.length>1?'es':''}</strong> in loaded data${hits.length>25?' (showing first 25)':''}:</div>${bandNote}${rows}`;
 }
 
 function runCMA(){
@@ -3737,12 +4236,24 @@ function runCMA(){
   const lot=parseFloat(v('s-lot'))||0;
   const hoa=parseFloat(v('s-hoa'))||0;
   const lp=parseFloat(v('s-lp'))||0;
-  const bt=v('s-bt')||'';
+  // Property type filter — multi-select. People tag condo/townhome loosely,
+  // so allow ticking several. btTypes = the set to keep.
+  const btTypes=[];
+  if(el('s-bt-de')&&el('s-bt-de').checked) btTypes.push('DE');
+  if(el('s-bt-co')&&el('s-bt-co').checked) btTypes.push('CO');
+  if(el('s-bt-th')&&el('s-bt-th').checked) btTypes.push('TH');
+  // Subject's own type (for scoring/report): the single ticked type, or '' if
+  // 0 or 2+ are ticked (treat as type-agnostic so no scoring penalty applies).
+  const bt = btTypes.length===1 ? btTypes[0] : '';
+  if(el('s-bt')) el('s-bt').value=bt;
 
   A.subject={addr,city,sqft,br,bth,yrBlt,lotSqFt:lot,hoaFee:hoa,lp,bt,address:addr};
 
-  // Auto-set sqft range if blank
-  if(sqft&&!v('f-sf-min')){el('f-sf-min').value=Math.round(sqft*0.75);el('f-sf-max').value=Math.round(sqft*1.3);}
+  // NOTE: we deliberately do NOT auto-set a SqFt band. A hard band silently
+  // drops valid same-neighborhood comps that differ in size (a common cause of
+  // "my neighbor didn't show up"). The similarity score already weights SqFt
+  // heavily (28 pts), so size still drives ranking — it just no longer deletes
+  // comps outright. The user can still type a manual Min/Max band if they want.
 
   // Determine cities in scope
   let cities=[city];
@@ -3769,7 +4280,7 @@ function runCMA(){
   let candidates=A.listings.filter(l=>{
     if(!statuses.includes(l.status))return false;
     if(cities&&!cities.includes(l.city))return false;
-    if(bt&&bt!=='ANY'&&l.bt&&l.bt!==bt)return false;
+    if(btTypes.length && btTypes.length<3 && l.bt && !btTypes.includes(l.bt))return false;
     if(fSfMin&&l.sqft&&l.sqft<fSfMin)return false;
     if(fSfMax<Infinity&&l.sqft&&l.sqft>fSfMax)return false;
     if(fBrMin&&l.br&&l.br<fBrMin)return false;
@@ -3793,6 +4304,24 @@ function runCMA(){
   // Score each candidate
   candidates.forEach(c=>c.score=score(A.subject,c));
   candidates.sort((a,b)=>b.score-a.score);
+
+  // ── DIAGNOSTIC: explain why same-city listings were excluded ──────────
+  // Helps answer "why didn't my neighbor show up?" without guessing.
+  try{
+    const cityList=A.listings.filter(l=>l.city===city && !(l.address.toLowerCase()===addr.toLowerCase()));
+    let exStatus=0,exSqft=0,exBr=0,exBth=0,exYr=0,exType=0,exDom=0;
+    cityList.forEach(l=>{
+      if(!statuses.includes(l.status)){exStatus++;return;}
+      if(btTypes.length && btTypes.length<3 && l.bt && !btTypes.includes(l.bt)){exType++;return;}
+      if((fSfMin&&l.sqft&&l.sqft<fSfMin)||(fSfMax<Infinity&&l.sqft&&l.sqft>fSfMax)){exSqft++;return;}
+      if((fBrMin&&l.br&&l.br<fBrMin)||(fBrMax<Infinity&&l.br&&l.br>fBrMax)){exBr++;return;}
+      if((fBthMin&&l.bth&&l.bth<fBthMin)||(fBthMax<Infinity&&l.bth&&l.bth>fBthMax)){exBth++;return;}
+      if((fYrMin&&l.yrBlt&&l.yrBlt<fYrMin)||(fYrMax<9999&&l.yrBlt&&l.yrBlt>fYrMax)){exYr++;return;}
+      if(l.dom>fDom){exDom++;return;}
+    });
+    A.compDiag={cityTotal:cityList.length,kept:candidates.length,exStatus,exType,exSqft,exBr,exBth,exYr,exDom,
+      sfMin:fSfMin||null,sfMax:fSfMax<Infinity?fSfMax:null,btSel:(btTypes.length&&btTypes.length<3)?btTypes.join(','):null};
+  }catch(e){A.compDiag=null;}
   // Apply cascading lookback window — expand until MIN_COMPS found
   const filteredByWindow=filterWithLookback(candidates);
   A.comps=filteredByWindow;
@@ -3811,6 +4340,7 @@ function runCMA(){
 
   // Async: geocode subject + apply radius (non-blocking) then map
   if(A.proximityEnabled){
+    A.approvedDistant=[]; // fresh run — clear prior distant approvals
     applyProximityFilter(candidates).then(()=>{
       renderCompTable();
       const r2=calcAll(A.subject,A.comps);
@@ -3886,7 +4416,7 @@ function renderValuation(r){
   // Methods grid — when adjustment mode is on, show Method D in place of B
   const methodB=A.adjUseInValuation&&r.D
     ? `<div class="val-method-card" style="border-color:rgba(201,168,76,.4);background:rgba(201,168,76,.04)">
-        <div class="vm-tag"><div class="vm-dot" style="background:var(--gold)"></div>Method D — Appraiser Adjusted ★</div>
+        <div class="vm-tag"><div class="vm-dot" style="background:var(--gold)"></div>Method D — Comp-Adjusted Model ★</div>
         <div class="vm-price">${fmtK(r.D.est)}</div>
         <div class="vm-range">Range: ${fmtK(r.D.lo)} – ${fmtK(r.D.hi)}</div>
         <div class="vm-detail">Weighted by similarity · gross adj ${r.D.avgGross}% · ${r.D.n} comps</div>
@@ -3919,7 +4449,7 @@ function renderValuation(r){
     </div>
     <div class="consensus">
       <div class="cons-top">
-        <span class="cons-label">${A.adjUseInValuation?'Appraiser Value Opinion':'Most Probable Value'}</span>
+        <span class="cons-label">${A.adjUseInValuation?'Model Estimate':'Most Probable Value'}</span>
       </div>
       <div class="cons-price">${fmt(r.consensus)}</div>
       ${(()=>{
@@ -3940,7 +4470,7 @@ function renderValuation(r){
         <span class="conf-txt ${cfTxt}">${r.conf} Confidence</span>
       </div>
       <div style="font-size:10px;color:var(--txt3);margin-top:5px">${r.soldN} sold comps · ${r.actvN} active · method spread ${r.spreadPct?.toFixed(1)||0}%</div>
-      <div class="cons-disclaimer">This is an automated valuation estimate based on comparable sales data, <strong>not an appraisal</strong>. Actual market value may vary based on property condition, market timing, buyer pool, and factors not captured in this model.</div>
+      <div class="cons-disclaimer">This figure is produced by an <strong>automated mathematical model</strong> applied to comparable MLS sales data. It is <strong>not an appraisal, not a formal opinion of value, and not a guarantee of sale price</strong>. Actual market value depends on property condition, market timing, buyer pool, and other factors the model does not capture.</div>
     </div>
   </div>
 
@@ -3950,8 +4480,8 @@ function renderValuation(r){
   const expEl=el('val-explain');
   expEl.style.display='block';
   const wExpl = A.adjUseInValuation && r.D
-    ? `Method D (Appraiser Adjusted) is weighted at <strong>55%</strong>, Method C (Trend) at <strong>25%</strong>, Method A ($/SqFt) at <strong>20%</strong>. Adjustments applied per grid below.`
-    : `Weights are <strong>dynamically assigned</strong> based on data quality — trend strength (R²), comp similarity scores, and PPSF variance all influence allocation. Toggle the adjustment grid to switch to appraiser-adjusted weighting.`;
+    ? `Method D (Comp-Adjusted Model) is weighted at <strong>55%</strong>, Method C (Trend) at <strong>25%</strong>, Method A ($/SqFt) at <strong>20%</strong>. Adjustments applied per grid below.`
+    : `Weights are <strong>dynamically assigned</strong> based on data quality — trend strength (R²), comp similarity scores, and PPSF variance all influence allocation. Toggle the adjustment grid to switch to comp-adjusted model weighting.`;
   const lbLabel=A.lookbackMonths===null?'all available data':`the past ${A.lookbackMonths} months`;
   expEl.innerHTML = `<div class="expl-card"><strong>How This Value Was Derived</strong>${`<span style='float:right;font-size:10px;color:var(--txt2)'>Using ${lbLabel} of sales</span>`}${wExpl} Time adjustment is applied to each comp's $/sqft using the market trend slope, bringing older sales to present-day equivalents before averaging.</div>`;
 }
@@ -3998,7 +4528,7 @@ function buildReconciliationCard(r){
     :`Confidence is <strong>LOW</strong> — limited sold comps (${r.soldN}) or high pricing variance. Treat this estimate as a starting range only; expand comp scope or add data.`;
 
   return `<div class="recon-card">
-    <div class="recon-title">⚖ Appraiser Reconciliation <span class="recon-spread ${spreadCls}">${spreadLbl}</span></div>
+    <div class="recon-title">⚖ Model Reconciliation <span class="recon-spread ${spreadCls}">${spreadLbl}</span></div>
     ${rows}
     <div class="recon-divider"></div>
     <div class="recon-note">${reconcNote} ${confNarrative}</div>
@@ -4010,6 +4540,23 @@ function buildReconciliationCard(r){
 // ═══════════════════════════════════
 function renderCompTable(){
   const comps=A.comps;
+  // Diagnostic banner — shows why same-city listings were excluded
+  const dg=el('comp-diag');
+  if(dg && A.compDiag){
+    const d=A.compDiag;
+    const bits=[];
+    if(d.exType) bits.push(`${d.exType} wrong property type${d.btSel?` (showing only ${d.btSel.split(',').map(t=>({DE:'SFR',CO:'Condo',TH:'Townhome'}[t]||t)).join(' + ')})`:''}`);
+    if(d.exSqft) bits.push(`${d.exSqft} outside SqFt band${d.sfMin||d.sfMax?` (${d.sfMin||0}\u2013${d.sfMax||'\u221e'})`:''}`);
+    if(d.exBr) bits.push(`${d.exBr} outside Bed range`);
+    if(d.exBth) bits.push(`${d.exBth} outside Bath range`);
+    if(d.exYr) bits.push(`${d.exYr} outside Year range`);
+    if(d.exDom) bits.push(`${d.exDom} over DOM limit`);
+    if(d.exStatus) bits.push(`${d.exStatus} excluded by status checkboxes`);
+    if(bits.length){
+      dg.innerHTML=`<strong style="color:var(--org)">${d.kept} of ${d.cityTotal} ${toTitle(A.subject.city)} listings matched.</strong> Excluded: ${bits.join(' \u00b7 ')}. If a neighbor is missing, widen the relevant filter on the left and re-run.`;
+      dg.style.display='block';
+    } else { dg.style.display='none'; }
+  } else if(dg){ dg.style.display='none'; }
   el('tbl-count').textContent=comps.length?`— ${comps.length} properties`:'';
   if(!comps.length){el('comp-tbody').innerHTML='<tr><td colspan="19" class="empty-r">No comparables match current filters</td></tr>';return;}
   const sc=A.sortCol,sd=A.sortDir;
@@ -4032,14 +4579,20 @@ function renderCompTable(){
     const spCls=c.sp&&c.lp?(c.sp>c.lp*1.005?'good':c.sp<c.lp*.97?'bad':''):'';
     const btL=c.bt==='DE'?'SFR':c.bt==='CO'?'Condo':c.bt==='TH'?'TH':c.bt;
     const sameCityCls=c.city!==A.subject?.city?'style="color:var(--org)"':'';
+    const distTag=c.distance!=null?`<span style="font-size:9px;color:${c.distance<=0.25?'var(--grn)':c.distance<=0.5?'var(--gold)':'var(--org)'};font-family:var(--fm)"> ${c.distance.toFixed(2)}mi</span>`:'';
+    const spCell = c.status==='SLD'
+      ? (c.pvApplied&&c.spPV
+          ? `<span title="Sold ${fmt(c.spOriginal)} on ${fmtDate(c.closeDate)} · +${c.pvPct.toFixed(1)}% to present (${(c.pvRate*100).toFixed(1)}%/yr, ${c.pvSrc})">${fmt(c.spPV)}<span style="font-size:8px;color:var(--grn);display:block;line-height:1">PV ↑${c.pvPct.toFixed(0)}%</span></span>`
+          : fmt(c.sp))
+      : '—';
     return`<tr class="${ex?'excl':''}" id="row-${c.mlsNo}">
       <td><input type="checkbox" class="row-cb" ${ex?'':'checked'} onchange="toggleComp('${c.mlsNo}',this.checked)"></td>
-      <td title="${c.address}" style="max-width:150px;overflow:hidden;text-overflow:ellipsis">${c.address}${c.unit?' #'+c.unit:''}</td>
+      <td title="${c.address}" style="max-width:160px;overflow:hidden;text-overflow:ellipsis">${c.address}${c.unit?' #'+c.unit:''}${distTag}</td>
       <td ${sameCityCls}>${toTitle(c.city)}</td>
       <td><span class="st-pill st-${c.status}">${c.status}</span></td>
       <td style="color:var(--txt2);font-size:11px">${btL}</td>
       <td style="font-family:var(--fm);font-size:11px;color:var(--txt2)">${fmtDate(c.closeDate)}</td>
-      <td class="num">${c.status==='SLD'?fmt(c.sp):'—'}</td>
+      <td class="num">${spCell}</td>
       <td class="num" style="color:var(--txt2)">${fmt(c.lp)}</td>
       <td class="num ${spCls}">${spLp}</td>
       <td class="num">${c.ppsf?'$'+Math.round(c.ppsf):'—'}</td>
@@ -4456,7 +5009,7 @@ function renderAdjustmentGrid(){
       <div class="adj-sum-card">
         <div class="adj-sum-lbl">Comps Over 25% Gross</div>
         <div class="adj-sum-val ${aboveThresh?'down':''}">${aboveThresh}</div>
-        <div class="adj-sum-sub">appraiser red-flag count</div>
+        <div class="adj-sum-sub">model red-flag count</div>
       </div>
     </div>`;
 }
@@ -4467,6 +5020,14 @@ function renderAdjustmentGrid(){
 
 function setIntelScope(scope, btn){
   A.intelScope = scope;
+  renderMarketIntel();
+}
+
+function setIntelType(type, btn){
+  A.intelType = type;
+  document.querySelectorAll('#mi-type-pills .mi-type-pill').forEach(p=>{
+    p.classList.toggle('active', p.dataset.type===type);
+  });
   renderMarketIntel();
 }
 
@@ -4530,6 +5091,8 @@ function renderMarketIntel(){
   // Show/hide the marketing-export toolbar based on data availability
   const mbar = el('mi-marketing-bar');
   if(mbar) mbar.style.display = A.listings.length ? 'flex' : 'none';
+  const tbar = el('mi-type-bar');
+  if(tbar) tbar.style.display = A.listings.length ? 'flex' : 'none';
   if(!A.listings.length){
     el('mi-content').innerHTML = `<div class="mi-empty">Load MLS data to view market intelligence.<br>Trends, pricing accuracy, and liquidity diagnostics appear here.</div>`;
     populateIntelCityPills();
@@ -4537,7 +5100,19 @@ function renderMarketIntel(){
   }
   populateIntelCityPills();
 
-  const inScope = A.intelScope==='all' ? A.listings : A.listings.filter(l=>l.city===A.intelScope);
+  const cityScoped = A.intelScope==='all' ? A.listings : A.listings.filter(l=>l.city===A.intelScope);
+  const inScope = A.intelType==='all' ? cityScoped : cityScoped.filter(l=>l.bt===A.intelType);
+  // Update property-type count label
+  const tcount = el('mi-type-count');
+  if(tcount){
+    const typeName = A.intelType==='all' ? 'all property types'
+      : A.intelType==='DE' ? 'single-family'
+      : A.intelType==='CO' ? 'condos' : 'townhomes';
+    tcount.textContent = `${inScope.length} listing${inScope.length===1?'':'s'} · ${typeName}`;
+  }
+  const _cityLbl = A.intelScope==='all' ? 'All Cities' : toTitle(A.intelScope);
+  const _typeLbl = A.intelType==='all' ? '' : ({DE:'Single Family',CO:'Condo',TH:'Townhome'}[A.intelType]||'');
+  const scopeLabel = _typeLbl ? `${_cityLbl} · ${_typeLbl}` : _cityLbl;
   const gdr = A.globalDateRange;
 
   // ── DATE FILTER ──────────────────────────────────────────────────────────
@@ -4948,7 +5523,7 @@ function renderMarketIntel(){
       <button class="mi-dl-btn mkt-hero-dl-btn" onclick="downloadMICard('mi-market-hero','Current Market Conditions')">⬇ PNG</button>
       <div class="mkt-hero-row">
         <div class="mkt-hero-main">
-          <div class="mkt-hero-eyebrow">Current Market Conditions <span style="opacity:.7;font-weight:400">· last 90 days · ${A.intelScope==='all'?'All Cities':toTitle(A.intelScope)}</span></div>
+          <div class="mkt-hero-eyebrow">Current Market Conditions <span style="opacity:.7;font-weight:400">· last 90 days · ${scopeLabel}</span></div>
           <div class="mkt-hero-label">${marketLabel}</div>
           <div class="mkt-hero-narr">${marketNarrative}</div>
           <div class="mkt-hero-dir mkt-dir-${direction}">
@@ -5117,7 +5692,7 @@ function renderMarketIntel(){
       <div class="mi-card">
         <div class="mi-title">Geography</div>
         <div class="mi-stat-grid">
-          <div class="mi-stat"><div class="mi-stat-lbl">Scope</div><div class="mi-stat-val" style="font-size:14px;font-family:var(--ff)">${A.intelScope==='all'?'All Cities':toTitle(A.intelScope)}</div><div class="mi-stat-sub">${[...new Set(filtered.map(l=>l.city))].length} cities in scope</div></div>
+          <div class="mi-stat"><div class="mi-stat-lbl">Scope</div><div class="mi-stat-val" style="font-size:14px;font-family:var(--ff)">${scopeLabel}</div><div class="mi-stat-sub">${[...new Set(filtered.map(l=>l.city))].length} cities in scope</div></div>
           <div class="mi-stat"><div class="mi-stat-lbl">Counties</div><div class="mi-stat-val" style="font-size:14px">${[...new Set(filtered.map(l=>l.county).filter(Boolean))].length}</div><div class="mi-stat-sub">${[...new Set(filtered.map(l=>l.county).filter(Boolean))].slice(0,2).join(', ')||'—'}</div></div>
           <div class="mi-stat"><div class="mi-stat-lbl">SFR / Condo / TH</div><div class="mi-stat-val" style="font-size:13px;font-family:var(--fm)">${filtered.filter(l=>l.bt==='DE').length} / ${filtered.filter(l=>l.bt==='CO').length} / ${filtered.filter(l=>l.bt==='TH').length}</div><div class="mi-stat-sub">by property type</div></div>
           <div class="mi-stat"><div class="mi-stat-lbl">Total Records</div><div class="mi-stat-val">${filtered.length}</div><div class="mi-stat-sub">in current filter</div></div>
@@ -5392,7 +5967,8 @@ function updateAffordability(){
   const rows=el('mi-afford-rows');
   if(!inp||!rows)return;
   const rate=parseFloat(inp.value)||6.75;
-  const inScope2=A.intelScope==='all'?A.listings:A.listings.filter(l=>l.city===A.intelScope);
+  const cityScoped2=A.intelScope==='all'?A.listings:A.listings.filter(l=>l.city===A.intelScope);
+  const inScope2=A.intelType==='all'?cityScoped2:cityScoped2.filter(l=>l.bt===A.intelType);
   const medSP=S.median(inScope2.filter(l=>l.status==='SLD'&&l.sp>0).map(l=>l.sp));
   rows.innerHTML=renderAffordability(medSP,rate);
 }
@@ -5450,7 +6026,8 @@ function buildExportStage(card, title, scope, dateStr){
       <div class="exp-corner exp-corner-tl"></div>
       <div class="exp-corner exp-corner-tr"></div>
       <div class="exp-eyebrow">Market Intelligence Report</div>
-      <h1 class="exp-title"><span class="exp-tit-name">Team Parikh</span><em>Realtors</em></h1>
+      <h1 class="exp-title"><span class="exp-tit-name">Team</span><em>Parikh</em></h1>
+      <div class="exp-rule"></div>
       <div class="exp-meta">
         <span class="exp-meta-pill"><strong>${title}</strong></span>
         <span class="exp-meta-sep">◆</span>
@@ -5474,6 +6051,7 @@ function buildExportStage(card, title, scope, dateStr){
           <div class="exp-foot-dre">DRE <span>02069777</span></div>
           <div class="exp-foot-phone">916.529.7100</div>
           <div class="exp-foot-email">abhishek@team-parikh.com</div>
+          <div class="exp-foot-broker">Keller Williams Tri-Valley</div>
         </div>
         <div class="exp-foot-card">
           <span class="exp-cor exp-cor-tl"></span>
@@ -5485,20 +6063,10 @@ function buildExportStage(card, title, scope, dateStr){
           <div class="exp-foot-dre">DRE <span>02118709</span></div>
           <div class="exp-foot-phone">408.914.0743</div>
           <div class="exp-foot-email">kavita@team-parikh.com</div>
-        </div>
-        <div class="exp-foot-card exp-foot-card-brokerage">
-          <span class="exp-cor exp-cor-tl"></span>
-          <span class="exp-cor exp-cor-tr"></span>
-          <span class="exp-cor exp-cor-bl"></span>
-          <span class="exp-cor exp-cor-br"></span>
-          <div class="exp-foot-brorn">❦</div>
-          <div class="exp-foot-name">Keller <em>Williams</em></div>
-          <div class="exp-foot-flourish"></div>
-          <div class="exp-foot-site">team-parikh.com</div>
-          <div class="exp-foot-tag">Search Homes</div>
+          <div class="exp-foot-broker">Keller Williams Tri-Valley</div>
         </div>
       </div>
-      <div class="exp-foot-disc">Based on MLS data, not an appraisal. Market conditions change — consult your agent.</div>
+      <div class="exp-foot-disc">Figures derived from MLS data using an automated statistical model — not an appraisal or a formal opinion of value. Market conditions change; consult your agent.</div>
     </div>
   `;
   // Clone the card and clean it up
@@ -5521,13 +6089,13 @@ function buildExportStage(card, title, scope, dateStr){
     const svg=`
       <div class="mkt-score-ring-svg" style="position:relative;width:${size}px;height:${size}px;display:inline-flex;align-items:center;justify-content:center;">
         <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="position:absolute;top:0;left:0;transform:rotate(-90deg);">
-          <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="#E8DFCB" stroke-width="${stroke}"/>
-          <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="#806B30" stroke-width="${stroke}"
+          <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="#EBE3D0" stroke-width="${stroke}"/>
+          <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="#C9A84C" stroke-width="${stroke}"
                   stroke-dasharray="${dash} ${C}" stroke-linecap="round"/>
         </svg>
         <div style="position:relative;text-align:center;z-index:1;">
           <div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:600;color:#1A1F2C;line-height:1;">${num}</div>
-          <div style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#806B30;margin-top:3px;">${lbl}</div>
+          <div style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#8A7333;margin-top:3px;">${lbl}</div>
         </div>
       </div>
     `;
@@ -5542,17 +6110,77 @@ function buildExportStage(card, title, scope, dateStr){
   const cloneCanvases=clone.querySelectorAll('canvas');
   origCanvases.forEach((oc,i)=>{
     const cc=cloneCanvases[i]; if(!cc) return;
-    if(!oc.width || !oc.height){
-      // Remove problematic empty canvases from clone — they crash html2canvas
-      cc.remove(); return;
+    // ── ROOT-CAUSE FIX for the createPattern crash ──────────────────────
+    // html2canvas rasterizes every <canvas> it sees into an internal pattern.
+    // A Chart.js canvas whose rendered size collapses in the clone (or any
+    // 0-sized canvas) makes that pattern 0×0 and createPattern throws,
+    // aborting the WHOLE capture. So we never let a live <canvas> reach
+    // html2canvas: we convert each chart to a static <img> snapshot taken
+    // from the ORIGINAL on-screen canvas (which is correctly sized), and
+    // drop any canvas we can't snapshot.
+    if(oc.width && oc.height){
+      try{
+        const dataUrl=oc.toDataURL('image/png');
+        const img=document.createElement('img');
+        img.src=dataUrl;
+        // Preserve the on-screen display size so layout matches
+        const r=oc.getBoundingClientRect();
+        img.style.width=(r.width||oc.width/2)+'px';
+        img.style.height=(r.height||oc.height/2)+'px';
+        img.style.display='block';
+        cc.replaceWith(img);
+        return;
+      }catch(e){ /* tainted/again 0-size — fall through to removal */ }
     }
-    cc.width=oc.width; cc.height=oc.height;
-    const cx=cc.getContext('2d');
-    if(cx){try{cx.drawImage(oc,0,0);}catch(e){console.warn('canvas copy:',e);}}
+    cc.remove();
   });
 
   stage.querySelector('.exp-card-wrap').appendChild(clone);
+
+  // NOTE: gradient flattening + zero-dimension guard run in captureCard,
+  // AFTER the stage is attached to the document — getComputedStyle and
+  // getBoundingClientRect only return real values for attached elements.
   return stage;
+}
+
+// Replace gradient backgrounds with a representative solid colour and ensure
+// no element is 0-sized. Operates on the detached capture stage only — the
+// live UI is untouched.
+function flattenForCapture(root){
+  // The createPattern crash happens ONLY when a gradient is painted onto an
+  // element whose width or height is ~0 (thin accent strips, collapsed bars,
+  // hairlines). Large-area gradients render fine. So we flatten gradients
+  // *only* on thin/zero-sized elements, preserving the rich large-area
+  // gradients that give the flyer its depth.
+  const THIN=6; // px threshold for "thin" in either axis
+  root.querySelectorAll('*').forEach(node=>{
+    try{
+      const cs=window.getComputedStyle(node);
+      const bg=cs.backgroundImage||'';
+      const hasGrad=bg.indexOf('gradient')!==-1;
+      const r=node.getBoundingClientRect();
+      const thin = r.width<=THIN || r.height<=THIN;
+      if(hasGrad && thin){
+        // Pick a representative solid for the thin element.
+        const cls=node.className&&node.className.toString?node.className.toString():'';
+        let solid='#C9A84C';
+        if(/mi-bar-fill/.test(cls)){
+          if(/\bover\b/.test(cls)) solid='#9A3530';
+          else if(/\bfair\b/.test(cls)) solid='#1F6B47';
+          else if(/\bwarn\b/.test(cls)) solid='#A56B19';
+          else if(/\bunder\b/.test(cls)) solid='#3A6FA8';
+          else solid='#C9A84C';
+        } else if(/mkt-comp-bar-fill/.test(cls)) solid='#C9A84C';
+        node.style.setProperty('background-image','none','important');
+        node.style.setProperty('background',solid,'important');
+      }
+      // Zero-dimension guard — never let any painted element be exactly 0.
+      if((r.width===0||r.height===0) && (hasGrad || (cs.backgroundColor&&cs.backgroundColor!=='rgba(0, 0, 0, 0)'))){
+        if(r.width===0) node.style.setProperty('min-width','1px','important');
+        if(r.height===0) node.style.setProperty('min-height','1px','important');
+      }
+    }catch(e){ /* per-node safety */ }
+  });
 }
 
 // Show a centered "Rendering..." backdrop while the stage is captured.
@@ -5577,7 +6205,9 @@ function setBackdropHint(bd, text){
 async function captureCard(cardId, title){
   const card=el(cardId);
   if(!card) throw new Error(`Card not found: ${cardId}`);
-  const scope=A.intelScope==='all'?'All Cities':toTitle(A.intelScope);
+  const cityLbl=A.intelScope==='all'?'All Cities':toTitle(A.intelScope);
+  const typeLbl=A.intelType==='all'?'':({DE:'Single Family',CO:'Condo',TH:'Townhome'}[A.intelType]||'');
+  const scope=typeLbl?`${cityLbl} · ${typeLbl}`:cityLbl;
   const today=new Date();
   const dateStr=today.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
   const stage=buildExportStage(card,title,scope,dateStr);
@@ -5587,6 +6217,10 @@ async function captureCard(cardId, title){
   if(document.fonts && document.fonts.ready){
     try{ await document.fonts.ready; }catch(e){}
   }
+  // Flatten gradients + guard zero-sized elements now that the stage is
+  // attached (getComputedStyle / getBoundingClientRect need a live element).
+  flattenForCapture(stage);
+  await new Promise(r=>requestAnimationFrame(r));
   try{
     const canvas=await html2canvas(stage,{
       backgroundColor:'#FBF9F4',
@@ -5601,17 +6235,105 @@ async function captureCard(cardId, title){
       foreignObjectRendering:false,
       onclone:(clonedDoc)=>{
         // Final defensive pass on html2canvas's own internal clone:
-        // 1. Strip ANY remaining conic-gradient backgrounds (createPattern bug)
-        // 2. Remove any 0-sized canvas elements (createPattern source error)
+        // 0. KILL EVERY BACKGROUND-IMAGE in the clone. html2canvas renders
+        //    each gradient into a temporary canvas sized to the element's
+        //    background box; if that box is 0 in any dimension the temp canvas
+        //    is 0×0 and createPattern throws, aborting the whole capture.
+        //    Inline !important beats any stylesheet rule (even high-specificity
+        //    .export-mode rules with their own !important), so this is the one
+        //    approach that is guaranteed to win. Each gradient is swapped for a
+        //    representative solid colour so the image still looks right.
+        try{
+          const win0 = clonedDoc.defaultView || window;
+          const pickSolid=(node, cs)=>{
+            const cls=(node.className&&node.className.toString)?node.className.toString():'';
+            if(/mi-bar-fill/.test(cls)){
+              if(/\bover\b/.test(cls)) return '#9A3530';
+              if(/\bfair\b/.test(cls)) return '#1F6B47';
+              if(/\bwarn\b/.test(cls)) return '#A56B19';
+              if(/\bunder\b/.test(cls)) return '#3A6FA8';
+              return '#C9A84C';
+            }
+            if(/bar-fill|mkt-comp-bar-fill/.test(cls)) return '#C9A84C';
+            if(/flourish/.test(cls)) return '#C9A84C';
+            if(/exp-header|exp-footer/.test(cls)) return '#141823';
+            if(/exp-card-wrap/.test(cls)) return '#FBF9F4';
+            if(/exp-foot-card-brokerage/.test(cls)) return 'rgba(201,168,76,0.16)';
+            if(/exp-foot-card|exp-meta-pill/.test(cls)) return 'rgba(201,168,76,0.10)';
+            if(/flourish/.test(cls)) return '#C9A84C';
+            // Fall back to the element's own background colour if it has one,
+            // otherwise transparent so we don't paint a wrong block.
+            const bc = cs && cs.backgroundColor;
+            if(bc && bc!=='rgba(0, 0, 0, 0)' && bc!=='transparent') return bc;
+            return 'transparent';
+          };
+          const all = clonedDoc.querySelectorAll('*');
+          all.forEach(node=>{
+            try{
+              const cs = win0.getComputedStyle ? win0.getComputedStyle(node) : null;
+              const bgi = cs ? cs.backgroundImage : (node.style.backgroundImage||'');
+              const r = node.getBoundingClientRect ? node.getBoundingClientRect() : {width:100,height:100};
+              const thin = (r.width<=6 || r.height<=6);
+              // Only flatten gradients on THIN elements (the createPattern crash
+              // condition). Large-area gradients render fine and are kept for depth.
+              if(bgi && bgi!=='none' && bgi.indexOf('gradient')!==-1 && thin){
+                node.style.setProperty('background-image','none','important');
+                node.style.setProperty('background', pickSolid(node, cs), 'important');
+              }
+              // Zero-dimension guard so no remaining painted box is 0-sized.
+              if(r.width===0) node.style.setProperty('min-width','1px','important');
+              if(r.height===0) node.style.setProperty('min-height','1px','important');
+            }catch(e){ /* per-node */ }
+          });
+        }catch(e){ console.warn('onclone bg-image kill:',e); }
+        // 0b. PSEUDO-ELEMENTS: ::before/::after gradients (the 1-3px header/
+        //     footer accent strips and the flourish diamonds) are not in the
+        //     DOM and are the backgrounds that crash on EVERY card. Remove them
+        //     with content:none. Selectors repeat the class to out-specify the
+        //     originals (.export-stage .exp-header::before == 2 classes), and
+        //     !important covers the rest.
+        try{
+          const ps=clonedDoc.createElement('style');
+          ps.textContent=`
+            .export-stage .exp-header.exp-header::before,
+            .export-stage .exp-footer.exp-footer::before{
+              background:#C9A84C!important;background-image:none!important;
+            }
+            .export-stage .exp-header.exp-header::after,
+            .export-stage .exp-footer.exp-footer::after{
+              background:rgba(201,168,76,.3)!important;background-image:none!important;
+            }
+            .export-stage .mkt-hero-card.mkt-hero-card::before{
+              background:#C9A84C!important;background-image:none!important;
+            }
+            .export-stage .exp-foot-flourish.exp-foot-flourish::before,
+            .export-stage .rp-ag-flourish.rp-ag-flourish::before{
+              content:none!important;background:none!important;background-image:none!important;
+            }
+            .export-stage .exp-foot-flourish.exp-foot-flourish,
+            .export-stage .rp-ag-flourish.rp-ag-flourish{
+              background:#C9A84C!important;background-image:none!important;
+            }
+          `;
+          (clonedDoc.head||clonedDoc.body||clonedDoc.documentElement).appendChild(ps);
+        }catch(e){ console.warn('onclone pseudo kill:',e); }
         try {
+          const win = clonedDoc.defaultView || window;
           clonedDoc.querySelectorAll('*').forEach(node=>{
             try {
-              const cs=clonedDoc.defaultView.getComputedStyle(node);
+              // Check inline style first (cheap, no throw)
+              const inlineBg = node.style && (node.style.backgroundImage || node.style.background) || '';
+              if(inlineBg.indexOf('conic-gradient')!==-1){
+                node.style.backgroundImage='none';
+                node.style.background='rgba(201,168,76,0.12)';
+              }
+              // Then computed style (can be null in detached docs)
+              const cs = win.getComputedStyle ? win.getComputedStyle(node) : null;
               if(cs && cs.backgroundImage && cs.backgroundImage.indexOf('conic-gradient')!==-1){
                 node.style.backgroundImage='none';
                 node.style.background='rgba(201,168,76,0.12)';
               }
-            } catch(e){}
+            } catch(e){ /* per-node failures must not abort the whole capture */ }
           });
           clonedDoc.querySelectorAll('canvas').forEach(c=>{
             if(!c.width || !c.height) c.parentNode && c.parentNode.removeChild(c);
@@ -5621,8 +6343,10 @@ async function captureCard(cardId, title){
         }
       },
       ignoreElements:(el)=>{
-        // Skip 0-sized canvases that would crash createPattern
-        if(el.tagName==='CANVAS' && (!el.width || !el.height)) return true;
+        // Charts are converted to <img> before capture, so any <canvas> left
+        // in the export stage is unintended — skip them all to be safe (a
+        // 0-sized one would crash createPattern).
+        if(el.tagName==='CANVAS') return true;
         return false;
       },
     });
@@ -5630,6 +6354,34 @@ async function captureCard(cardId, title){
   } finally {
     if(document.body.contains(stage)) document.body.removeChild(stage);
   }
+}
+
+// Robust PNG save: try Blob first; if the canvas is tainted (cross-origin
+// image) toBlob yields null/throws, so fall back to a data URL. Returns a
+// promise so multi-export can await each save in sequence.
+function saveCanvasPng(canvas, fname){
+  return new Promise((resolve,reject)=>{
+    const triggerDownload=(href, revoke)=>{
+      const a=document.createElement('a');
+      a.download=fname; a.href=href;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      if(revoke) setTimeout(()=>URL.revokeObjectURL(href),1500);
+    };
+    const fallbackDataUrl=()=>{
+      try{
+        const url=canvas.toDataURL('image/png');
+        triggerDownload(url,false); resolve();
+      }catch(e){ reject(new Error('Image could not be saved (canvas may contain a cross-origin image)')); }
+    };
+    try{
+      if(typeof canvas.toBlob==='function'){
+        canvas.toBlob(blob=>{
+          if(!blob){ fallbackDataUrl(); return; }
+          triggerDownload(URL.createObjectURL(blob),true); resolve();
+        },'image/png');
+      } else { fallbackDataUrl(); }
+    }catch(e){ fallbackDataUrl(); }
+  });
 }
 
 async function downloadMICard(cardId, title){
@@ -5649,18 +6401,9 @@ async function downloadMICard(cardId, title){
     setBackdropHint(bd,'Building branded template…');
     const {canvas, today}=await captureCard(cardId,title);
     setBackdropHint(bd,'Saving PNG…');
-    canvas.toBlob(blob=>{
-      const url=URL.createObjectURL(blob);
-      const fname=`TeamParikh_${title.replace(/[^\w]+/g,'_')}_${today.toISOString().split('T')[0]}.png`;
-      const a=document.createElement('a');
-      a.download=fname;
-      a.href=url;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setTimeout(()=>URL.revokeObjectURL(url),1500);
-      toast(`Exported · ${title}`,'ok');
-    },'image/png');
+    const fname=`TeamParikh_${title.replace(/[^\w]+/g,'_')}_${today.toISOString().split('T')[0]}.png`;
+    saveCanvasPng(canvas, fname);
+    toast(`Exported · ${title}`,'ok');
   }catch(err){
     console.error('Export error:',err);
     toast(`Export failed: ${err.message||'unknown'}`,'err');
@@ -5765,21 +6508,12 @@ async function runMultiExport(){
     setBackdropHint(bd,`Card ${i+1} of ${selected.length} · ${it.label}`);
     try{
       const {canvas, today}=await captureCard(it.id,it.label);
-      // Save
-      await new Promise(res=>{
-        canvas.toBlob(blob=>{
-          const url=URL.createObjectURL(blob);
-          const slideN=String(i+1).padStart(2,'0');
-          const fname=`TeamParikh_Carousel_${today.toISOString().split('T')[0]}_${slideN}_${it.label.replace(/[^\w]+/g,'_')}.png`;
-          const a=document.createElement('a');
-          a.download=fname; a.href=url;
-          document.body.appendChild(a); a.click(); document.body.removeChild(a);
-          setTimeout(()=>URL.revokeObjectURL(url),1500);
-          success++;
-          // Small delay between downloads so browser doesn't choke
-          setTimeout(res,400);
-        },'image/png');
-      });
+      const slideN=String(i+1).padStart(2,'0');
+      const fname=`TeamParikh_Carousel_${today.toISOString().split('T')[0]}_${slideN}_${it.label.replace(/[^\w]+/g,'_')}.png`;
+      await saveCanvasPng(canvas, fname);
+      success++;
+      // Small delay between downloads so the browser doesn't choke
+      await new Promise(res=>setTimeout(res,400));
     }catch(err){
       console.error(`Export failed for ${it.label}:`,err);
       failed++;
@@ -7169,7 +7903,7 @@ function printClientReport(){
 }
 function updateClientReportFields(){
   A.clientName=el('rt-client').value||'';
-  A.preparedBy=el('rt-preparer').value||'Team Parikh Realtors';
+  A.preparedBy=el('rt-preparer').value||'Team Parikh';
   // CRITICAL: only re-render if state is still valid. Otherwise typing in the
   // "Prepared for" / "Prepared by" fields could downgrade a valid report to
   // the "No valuation" fallback (which would then print as a useless PDF).
@@ -7212,10 +7946,17 @@ function renderClientReport(){
   const c=r.consensus;
   const lowR=Math.round(c*0.97), midR=c, hiR=Math.round(c*1.03);
 
-  // Top comps used (sorted by score, exclude excluded)
+  // Top comps used (sorted by score, exclude excluded). Dedupe so the same
+  // property never appears twice (MLS re-list / duplicate import rows).
+  const seenComp=new Set();
   const sortedComps=A.comps
     .filter(c2=>c2.status==='SLD' && !A.excluded.has(c2.mlsNo))
     .sort((a,b)=>b.score-a.score)
+    .filter(c2=>{
+      const key=c2.mlsNo || `${(c2.address||'').toLowerCase()}|${c2.unit||''}|${c2.sp||''}`;
+      if(seenComp.has(key)) return false;
+      seenComp.add(key); return true;
+    })
     .slice(0,6);
 
   const compRows=sortedComps.map(c2=>{
@@ -7256,9 +7997,18 @@ function renderClientReport(){
     const adjFields=[{k:'time',l:'Time / Market'},{k:'size',l:'Size'},{k:'lot',l:'Lot'},{k:'br',l:'Bedrooms'},{k:'bth',l:'Bathrooms'},{k:'cond',l:'Condition'},{k:'loc',l:'Location'},{k:'amen',l:'Amenities'}];
     adjBlock=`<div class="rp-sec">
       <div class="rp-sec-h"><span class="rp-sec-h-num">4</span>Comparable Adjustments</div>
-      <div style="font-size:10px;color:#5F6577;margin-bottom:7px">Appraiser-style adjustments applied to bring each comparable to the subject's profile. Positive values add to the comp's price; negative values subtract.</div>
+      <div style="font-size:10px;color:#5F6577;margin-bottom:7px">Statistical comp adjustments applied to bring each comparable to the subject's profile. Positive values add to the comp's price; negative values subtract.</div>
       <table class="rp-adj-table">
-        <thead><tr><th class="lbl">Adjustment</th>${usedComps.map(c2=>`<th>${c2.address.split(' ').slice(0,2).join(' ')}</th>`).join('')}</tr></thead>
+        <thead><tr><th class="lbl">Adjustment</th>${usedComps.map(c2=>{
+          // Build a readable short label: number + first street word, plus unit
+          // if present. Strips the trailing type suffix (Loop/Ct/Ln) when the
+          // result would otherwise be ambiguous like "5223 S".
+          const parts=(c2.address||'').trim().split(/\s+/);
+          let lbl=parts.slice(0,2).join(' ');
+          if(parts[1] && parts[1].length<=2 && parts[2]) lbl=parts.slice(0,3).join(' ');
+          if(c2.unit) lbl+=' #'+c2.unit;
+          return `<th title="${(c2.address||'')+(c2.unit?' #'+c2.unit:'')}">${lbl}</th>`;
+        }).join('')}</tr></thead>
         <tbody>
           ${adjFields.map(f=>{
             const cells=usedComps.map(c2=>{
@@ -7310,7 +8060,7 @@ function renderClientReport(){
   const weightSourceText = r.weightSource==='manual'
     ? `Method weights were set manually using our calibrated configuration for this market.`
     : r.weightSource==='adjustment-grid'
-    ? `Adjusted-comp valuation was emphasized given the appraiser-style adjustments applied.`
+    ? `Adjusted-comp valuation was emphasized given the comp adjustments applied.`
     : `Method weights were assigned dynamically based on data quality signals — comparable similarity, price-per-sqft consistency, and trend regression strength.`;
 
   const lbStr=A.lookbackMonths===null?'all available data':`the past ${A.lookbackMonths} months`;
@@ -7318,13 +8068,13 @@ function renderClientReport(){
   el('report-paper').innerHTML=`
     <div class="rp-letterhead">
       <div class="rp-brand-block">
-        <div class="rp-brand">Team Parikh <em>Realtors</em></div>
-        <div class="rp-brand-tag">Keller Williams · team-parikh.com</div>
+        <div class="rp-brand">Team <em>Parikh</em></div>
+        <div class="rp-brand-tag">Keller Williams Tri-Valley · team-parikh.com</div>
       </div>
       <div class="rp-meta">
         <div class="rp-meta-date"><strong>Report generated</strong><br>${dateStr}</div>
         ${A.clientName?`<div><strong>Prepared for:</strong> ${A.clientName}</div>`:''}
-        <div><strong>Prepared by:</strong> ${A.preparedBy||'Team Parikh Realtors'}</div>
+        <div><strong>Prepared by:</strong> ${A.preparedBy||'Team Parikh'}</div>
       </div>
     </div>
 
@@ -7390,7 +8140,7 @@ function renderClientReport(){
       <div class="rp-hero-price">${fmt(c)}</div>
       <div class="rp-hero-range">Likely Range: <b>${fmt(lowR)}</b> — <b>${fmt(hiR)}</b></div>
       <div class="rp-hero-conf ${confCls}">${r.conf} Confidence</div>
-      <div class="rp-hero-disclaimer">This is an <strong>automated valuation estimate</strong> derived from comparable sales data and is <strong>not an appraisal</strong>. Actual market value may vary based on property condition, market timing, buyer pool, and factors not captured in this model.</div>
+      <div class="rp-hero-disclaimer">This figure is produced by an <strong>automated mathematical model</strong> applied to comparable sales data. It is <strong>not an appraisal and not a formal opinion of value</strong>. Actual market value may vary based on property condition, market timing, buyer pool, and factors not captured in this model.</div>
     </div>
 
     <div class="rp-sec">
@@ -7431,7 +8181,7 @@ function renderClientReport(){
     </div>
 
     <div class="rp-foot">
-      <strong>Disclaimer.</strong> This Comparative Market Analysis is prepared for informational and advisory purposes only and is not an appraisal as defined under applicable law. Values represent our professional opinion based on currently available comparable sales data and market conditions as of ${dateStr}. Actual sale prices are subject to many factors including buyer-seller negotiation, financing, inspection results, market shifts, and property-specific conditions not visible in public data. Recipients should not rely solely on this report for tax, lending, or legal decisions. ${A.preparedBy||'Team Parikh'} makes no warranty as to the accuracy or completeness of the underlying MLS data.
+      <strong>Disclaimer.</strong> This Comparative Market Analysis is prepared for informational and advisory purposes only and is not an appraisal as defined under applicable law. Values are generated by an automated statistical model from currently available comparable sales data and market conditions, and do not constitute an appraisal or a formal opinion of value as of ${dateStr}. Actual sale prices are subject to many factors including buyer-seller negotiation, financing, inspection results, market shifts, and property-specific conditions not visible in public data. Recipients should not rely solely on this report for tax, lending, or legal decisions. ${A.preparedBy||'Team Parikh'} makes no warranty as to the accuracy or completeness of the underlying MLS data.
     </div>
   `;
 }
@@ -7443,18 +8193,25 @@ function renderClientReport(){
 // ═══════════════════════════════════
 // INIT
 // ═══════════════════════════════════
+function dgToggle(){
+  const cb=el('dg-agree'), btn=el('dg-btn');
+  if(btn) btn.disabled = !(cb && cb.checked);
+}
+function acknowledgeDisclosure(){
+  const g=el('disclosure-gate');
+  if(g) g.classList.add('dg-hidden');
+}
+
 async function init(){
-  // Inject the report-generation date stamp into the header
   const ds = el('hdr-date-stamp');
   if(ds) ds.textContent = new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
 
   // Disable proximity filter automatically when not on HTTPS
   // (geocoding requires HTTPS — file:// and blob: origins won't work)
+  // Proximity now works offline (address-based). On non-HTTPS we simply skip
+  // the optional geocoding refinement; the neighborhood ranking still works.
   if(location.protocol!=='https:'){
-    A.proximityEnabled=false;
-    const pt=el('prox-track');if(pt)pt.classList.remove('on');
-    const pl=el('prox-lbl');if(pl)pl.textContent='Off — requires HTTPS (works on your live site)';
-    const pe=el('prox-extra');if(pe)pe.style.display='none';
+    const pl=el('prox-lbl');if(pl&&!A.proximityEnabled)pl.textContent='Off — neighborhood ranking';
   }
   // Load any saved weight profiles before painting UI
   loadWeightProfilesFromStorage();
