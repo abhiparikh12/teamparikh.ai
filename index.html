@@ -284,6 +284,19 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--bl
 }
 .vm-gate.hidden { display: none; }
 
+.oh-lock-btn {
+  position: absolute; top: 36px; right: 56px; z-index: 60;
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 8px 14px; font-family: 'Jost', sans-serif;
+  font-size: 10px; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--gold); background: var(--gold-pale);
+  border: 1px solid var(--gold-border); border-radius: 2px;
+  cursor: pointer; transition: background 0.25s, color 0.25s;
+}
+.oh-lock-btn:hover { background: rgba(201,168,76,0.16); color: var(--gold-light); }
+.oh-lock-btn svg { opacity: 0.8; }
+@media (max-width: 700px) { .oh-lock-btn { top: 24px; right: 24px; } }
+
 /* ── BIO PHOTO ── */
 .bio-photo img {
   width: 100%; height: 100%;
@@ -360,6 +373,15 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--bl
       <line x1="2"  y1="20" x2="22" y2="20"/>
     </svg>
     Valuation Model
+  </button>
+
+  <button class="nav-item" id="nav-openhouse" onclick="showPage('openhouse', this)">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 9.5L12 3l9 6.5"/>
+      <path d="M5 9v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9"/>
+      <path d="M9 21v-6h6v6"/>
+    </svg>
+    Open House
   </button>
 
   <div class="sidebar-footer">
@@ -570,6 +592,52 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--bl
     </div>
   </div>
 
+  <!-- ═══════════════ PAGE: OPEN HOUSE ═══════════════ -->
+  <div id="page-openhouse" class="page">
+    <div class="page-header">
+      <div class="page-eyebrow">Internal Tool &middot; Team Parikh</div>
+      <h1>Team Parikh <em>Open House Manager</em></h1>
+      <button class="oh-lock-btn" onclick="relock('openhouse')" title="Lock this tool on this device">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        Lock
+      </button>
+    </div>
+    <div class="gold-rule"></div>
+    <div class="vm-gate-wrap">
+      <div class="vm-gate" id="vm-gate-openhouse">
+        <div class="pw-box">
+          <div class="pw-lock">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <div class="pw-eyebrow">Restricted Internal Access</div>
+          <div class="pw-title">Team Parikh <em>Open House Manager</em></div>
+          <div class="pw-sub">This tool is for Team Parikh use only. Enter your access code to manage open house sign-ins.</div>
+          <div class="pw-property">Team Parikh &middot; Open House Intelligence</div>
+          <div class="pw-input-wrap">
+            <input class="pw-input" id="pw-input-openhouse" type="password" maxlength="12"
+              placeholder="&middot; &middot; &middot; &middot;" autocomplete="off"
+              onkeydown="if(event.key==='Enter') checkPW('openhouse')">
+            <button class="pw-toggle" onclick="togglePWVis('openhouse')" title="Show/hide">
+              <svg id="eye-openhouse" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+          <button class="pw-btn" onclick="checkPW('openhouse')">Launch Open House Manager</button>
+          <div class="pw-error-msg" id="pw-error-openhouse">Incorrect access code. Please try again.</div>
+          <div class="pw-hint">Enter your access code to continue</div>
+        </div>
+      </div>
+      <iframe class="vm-frame" id="frame-openhouse" data-src="OpenHouse_Manager.html" title="Team Parikh Open House Manager"></iframe>
+    </div>
+  </div>
+
 </main>
 </div>
 
@@ -580,8 +648,18 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--bl
 const PROPERTY_CODES = {
   houlton:   '4978',
   leland:    '844',
-  valuation: '3083'
+  valuation: '3083',
+  openhouse: '6035'
 };
+/* Frames using the full-page "vm-gate" style gate id (id = vm-gate / vm-gate-<id>) */
+const VM_STYLE = { valuation: 'vm-gate', openhouse: 'vm-gate-openhouse' };
+/* Persist unlock state so entering a code once keeps it open in this browser */
+const UNLOCK_STORE = 'tp_portal_unlocked';
+function loadUnlocked(){ try{ return JSON.parse(localStorage.getItem(UNLOCK_STORE))||{}; }catch(e){ return {}; } }
+function persistUnlocked(){
+  var out={}; Object.keys(UNLOCKED).forEach(function(k){ if(UNLOCKED[k]) out[k]=true; });
+  try{ localStorage.setItem(UNLOCK_STORE, JSON.stringify(out)); }catch(e){}
+}
 const UNLOCKED = {};
 Object.keys(PROPERTY_CODES).forEach(function(k){ UNLOCKED[k]=false; });
 function showPage(pageId,btn){
@@ -592,6 +670,9 @@ function showPage(pageId,btn){
   document.getElementById('buyer-sub-nav').style.display=(pageId==='buyer')?'block':'none';
   if(pageId==='valuation'&&!UNLOCKED['valuation']){
     setTimeout(function(){var i=document.getElementById('pw-input-valuation');if(i)i.focus();},120);
+  }
+  if(pageId==='openhouse'&&!UNLOCKED['openhouse']){
+    setTimeout(function(){var i=document.getElementById('pw-input-openhouse');if(i)i.focus();},120);
   }
 }
 function selectProperty(propId,btn){
@@ -616,11 +697,12 @@ function selectProperty(propId,btn){
 function checkPW(propId){
   var input=document.getElementById('pw-input-'+propId);
   var error=document.getElementById('pw-error-'+propId);
-  var gate=propId==='valuation'?document.getElementById('vm-gate'):document.getElementById('gate-'+propId);
+  var gate=VM_STYLE[propId]?document.getElementById(VM_STYLE[propId]):document.getElementById('gate-'+propId);
   var frame=document.getElementById('frame-'+propId);
   var expected=PROPERTY_CODES[propId];
   if(input.value===expected){
     UNLOCKED[propId]=true;
+    persistUnlocked();
     gate.classList.add('hidden');
     error.classList.remove('visible');
     input.classList.remove('error');
@@ -628,7 +710,7 @@ function checkPW(propId){
     if(frame && !frame.src && frame.dataset.src){
       frame.src=frame.dataset.src;
     }
-    if(propId==='valuation'){
+    if(VM_STYLE[propId]){
       frame.classList.add('visible');
     } else {
       document.querySelectorAll('[data-property="'+propId+'"]').forEach(function(t){t.classList.add('unlocked');});
@@ -652,6 +734,37 @@ function togglePWVis(propId){
     icon.innerHTML='<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
   }
 }
+
+/* Re-lock a VM-style page (clears the remembered unlock for that tool in this browser) */
+function relock(propId){
+  UNLOCKED[propId]=false;
+  persistUnlocked();
+  var gate=VM_STYLE[propId]?document.getElementById(VM_STYLE[propId]):document.getElementById('gate-'+propId);
+  var frame=document.getElementById('frame-'+propId);
+  if(gate)gate.classList.remove('hidden');
+  if(frame)frame.classList.remove('visible');
+  var input=document.getElementById('pw-input-'+propId);
+  if(input)input.value='';
+}
+
+/* On load: restore any remembered unlocks so the gate stays open in this browser */
+(function restoreUnlocks(){
+  var saved=loadUnlocked();
+  Object.keys(saved).forEach(function(propId){
+    if(!saved[propId]||!(propId in PROPERTY_CODES))return;
+    UNLOCKED[propId]=true;
+    var gate=VM_STYLE[propId]?document.getElementById(VM_STYLE[propId]):document.getElementById('gate-'+propId);
+    var frame=document.getElementById('frame-'+propId);
+    if(gate)gate.classList.add('hidden');
+    if(frame){
+      if(!frame.src&&frame.dataset.src)frame.src=frame.dataset.src;
+      if(VM_STYLE[propId])frame.classList.add('visible');
+    }
+    if(!VM_STYLE[propId]){
+      document.querySelectorAll('[data-property="'+propId+'"]').forEach(function(t){t.classList.add('unlocked');});
+    }
+  });
+})();
 </script>
 </body>
 </html>
