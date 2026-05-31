@@ -15,7 +15,7 @@
   --txt:#EDF2FF;--txt2:#A0AFCC;--txt3:#5C6E94;
   --ff:'Outfit',sans-serif;--fd:'Cormorant Garamond',serif;--fm:'JetBrains Mono',monospace;
   --r:7px;--r2:11px;
-  --hdr:62px;--nav:44px;
+  --hdr:62px;--nav:44px;--ftr:30px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt);font-size:13px;line-height:1.5}
@@ -72,7 +72,7 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
 .dg-btn:not(:disabled):active{transform:translateY(0)}
 
 /* ── APP SHELL ── */
-#app{display:none;flex-direction:column;height:100vh;overflow:hidden}
+#app{display:none;flex-direction:column;height:calc(100vh - var(--ftr));overflow:hidden}
 #app.show{display:flex}
 
 /* ══════════════════════════════════════════════════════════════ */
@@ -508,9 +508,28 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
   flex-wrap:wrap;
   min-height:44px;
 }
-.hdr-toolbar-l{display:flex;align-items:center;gap:14px;flex-shrink:0}
-.hdr-tb-brand{font-family:var(--fd);font-size:14px;color:var(--gold);font-weight:600;white-space:nowrap;letter-spacing:.3px}
-.hdr-tb-brand em{font-style:italic;font-weight:400;color:var(--txt2);font-size:11px;letter-spacing:1.4px;text-transform:uppercase;margin-left:4px}
+.hdr-toolbar-l{display:flex;align-items:baseline;gap:16px;flex-shrink:0}
+.hdr-tb-brand{font-family:var(--fd);font-size:26px;color:#F1ECDD;font-weight:500;white-space:nowrap;letter-spacing:.4px}
+.hdr-tb-brand em{font-style:italic;font-weight:500;color:var(--gold);font-size:26px;letter-spacing:.4px;text-transform:none;margin-left:6px}
+
+/* ── FIXED FOOTER — single compact agent line ── */
+.hdr-footer{
+  position:fixed;left:0;right:0;bottom:0;z-index:50;
+  display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;
+  padding:6px 16px;
+  background:linear-gradient(180deg,rgba(10,12,20,.92) 0%,#0A0C14 100%);
+  border-top:1px solid rgba(201,168,76,.35);
+  backdrop-filter:blur(6px);
+  font-family:var(--ff);font-size:11px;color:var(--gold);letter-spacing:.2px;
+}
+.hdr-footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent 0%,rgba(201,168,76,.5) 50%,transparent 100%);}
+.ftr-agent{color:var(--gold)}
+.ftr-agent strong{color:#FFFFFF;font-weight:600;font-family:var(--fd);font-size:13px;letter-spacing:.3px}
+.ftr-agent a{color:var(--gold);text-decoration:none;font-family:var(--fm);font-size:10.5px}
+.ftr-agent a:hover{color:var(--gold2)}
+.ftr-dre{font-size:9px;color:var(--gold);letter-spacing:.1em}
+.ftr-div{color:var(--gold);font-weight:300}
 .hdr-tb-date{font-size:10.5px;color:var(--txt2);white-space:nowrap;padding:3px 10px;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.2);border-radius:14px}
 .hdr-tb-date strong{color:var(--gold);font-family:var(--fm);font-weight:500;margin-left:3px}
 
@@ -707,28 +726,13 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
 .hdr-btns{display:flex;gap:7px;flex-shrink:0;flex-wrap:wrap}
 
 /* Responsive — collapse to single-line hero on narrow screens */
-@media (max-width:1380px){
-  .hdr-hero{padding:24px 28px}
-  .hdr-title{font-size:46px}
-  .hdr-luxe-wrap{gap:10px}
-  .luxe-agent-card{padding:12px 16px 10px;min-width:0}
-  .luxe-brokerage{padding:12px 16px;min-width:0}
-  .luxe-ac-name{font-size:15px}
-  .luxe-ac-email{font-size:9.5px}
-  .luxe-br-name{font-size:13px}
-}
-@media (max-width:1180px){
-  .hdr-title{font-size:38px}
-  .luxe-brokerage{display:none}
-}
-@media (max-width:1000px){
-  .hdr-luxe-wrap{display:none}
-}
 @media (max-width:900px){
-  .hdr-title{font-size:32px;gap:10px}
-  .hdr-eyebrow{font-size:9px;letter-spacing:.25em}
-  .hdr-tb-brand{font-size:12px}
-  .hdr-tb-brand em{display:none}
+  .hdr-tb-brand{font-size:20px}
+  .hdr-tb-brand em{font-size:20px}
+}
+@media (max-width:680px){
+  .hdr-footer{gap:8px;padding:5px 10px;font-size:10px}
+  .ftr-div{display:none}
 }
 .btn{border:none;border-radius:6px;padding:6px 14px;font-family:var(--ff);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap}
 .btn-g{background:transparent;color:var(--txt2);border:1px solid var(--bdr)}.btn-g:hover{color:var(--txt);border-color:var(--txt2)}
@@ -1821,57 +1825,7 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
 <!-- APP -->
 <div id="app">
   <header class="hdr-wrap">
-    <!-- HERO BAND — luxury masthead with branding -->
-    <div class="hdr-hero">
-      <div class="hdr-hero-bg"></div>
-      <div class="hdr-hero-inner">
-        <div class="hdr-hero-left">
-          <div class="hdr-eyebrow">Internal Tool · Team Parikh</div>
-          <h1 class="hdr-title">
-            <span class="hdr-title-name">Team Parikh</span>
-            <span class="hdr-title-sub">Valuation Model</span>
-          </h1>
-        </div>
-        <div class="hdr-luxe-wrap">
-          <div class="luxe-agent-card">
-            <div class="luxe-ac-corners">
-              <span class="luxe-cor luxe-cor-tl"></span>
-              <span class="luxe-cor luxe-cor-tr"></span>
-              <span class="luxe-cor luxe-cor-bl"></span>
-              <span class="luxe-cor luxe-cor-br"></span>
-            </div>
-            <div class="luxe-ac-name">Abhishek <em>Parikh</em></div>
-            <div class="luxe-ac-flourish"></div>
-            <div class="luxe-ac-dre">DRE&nbsp;<span>02069777</span></div>
-            <a href="tel:9165297100" class="luxe-ac-link luxe-ac-phone">916.529.7100</a>
-            <a href="mailto:abhishek@team-parikh.com" class="luxe-ac-link luxe-ac-email">abhishek@team-parikh.com</a>
-          </div>
-          <div class="luxe-agent-card">
-            <div class="luxe-ac-corners">
-              <span class="luxe-cor luxe-cor-tl"></span>
-              <span class="luxe-cor luxe-cor-tr"></span>
-              <span class="luxe-cor luxe-cor-bl"></span>
-              <span class="luxe-cor luxe-cor-br"></span>
-            </div>
-            <div class="luxe-ac-name">Kavita <em>Parikh</em></div>
-            <div class="luxe-ac-flourish"></div>
-            <div class="luxe-ac-dre">DRE&nbsp;<span>02118709</span></div>
-            <a href="tel:4089140743" class="luxe-ac-link luxe-ac-phone">408.914.0743</a>
-            <a href="mailto:kavita@team-parikh.com" class="luxe-ac-link luxe-ac-email">kavita@team-parikh.com</a>
-          </div>
-          <a href="https://team-parikh.com" target="_blank" rel="noopener" class="luxe-brokerage">
-            <div class="luxe-br-orn-l">❦</div>
-            <div class="luxe-br-name">Keller Williams</div>
-            <div class="luxe-br-line"></div>
-            <div class="luxe-br-site">team-parikh.com</div>
-            <div class="luxe-br-tag">Search Homes</div>
-            <div class="luxe-br-orn-r">❦</div>
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <!-- TOOLBAR — utility row beneath the hero -->
+    <!-- TOOLBAR — promoted to top; primary masthead -->
     <div class="hdr-toolbar">
       <div class="hdr-toolbar-l">
         <span class="hdr-tb-brand">Team Parikh <em>Valuation Model</em></span>
@@ -2204,7 +2158,7 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
           </div>
         </div>
         <div class="opp-tool-grp" style="flex:1"></div>
-        <button class="btn btn-gold" onclick="runOpportunityScanner()">🔍 Scan</button>
+        <button class="btn btn-gold" onclick="runOpportunityScanner({refine:true})">🔍 Scan</button>
         <button class="btn btn-g" onclick="exportOpportunities()">⬇ Export</button>
       </div>
       <div id="opp-stats"></div>
@@ -2447,6 +2401,13 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
   </div><!-- /tab-content -->
     </div><!-- /main-area -->
   </div><!-- /app-body -->
+
+  <!-- FIXED FOOTER — single compact agent line -->
+  <footer class="hdr-footer">
+    <span class="ftr-agent"><strong>Abhishek Parikh</strong> · <a href="tel:9165297100">☎ 916.529.7100</a> · <a href="mailto:abhishek@team-parikh.com">abhishek@team-parikh.com</a> · <span class="ftr-dre">DRE 02069777</span></span>
+    <span class="ftr-div">|</span>
+    <span class="ftr-agent"><strong>Kavita Parikh</strong> · <a href="tel:4089140743">☎ 408.914.0743</a> · <a href="mailto:kavita@team-parikh.com">kavita@team-parikh.com</a> · <span class="ftr-dre">DRE 02118709</span></span>
+  </footer>
 </div><!-- /app -->
 
 <!-- ══════════════════════════════════════════════════════════════ -->
@@ -2545,6 +2506,7 @@ const A = {
 
 const STORAGE = 'piq_v5';
 const GEO_K   = 'piq_geo_v3';
+const SYNC_K  = 'piq_sync_v1';   // {maxUpdated:ISOstring, count:int} — incremental sync cursor
 // ═══════════════════════════════════
 // SUPABASE — Cloud Database
 // Data is shared across all users/browsers in real time.
@@ -2589,6 +2551,7 @@ function fromRow(r){
     closeDate:r.close_date?parseDate(r.close_date+''):null, // reuse robust parseDate
     listDate:r.list_date?parseDate(r.list_date+''):null,
     lat:r.lat, lng:r.lng,
+    updatedAt:r.updated_at||null,
   };
 }
 
@@ -2612,6 +2575,84 @@ async function fetchFromSupabase(timeoutMs){
     from+=PAGE;
   }
   return all.map(fromRow);
+}
+
+// ── INCREMENTAL SYNC HELPERS ─────────────────────────────────────────
+// Free-tier projects cold-start (~30s) on first hit, and a full pull of the
+// whole table is dozens of sequential round-trips. These helpers do a cheap
+// count probe (also warms the project) and a delta pull keyed on updated_at
+// (indexed), so a typical page open fetches 0–few rows instead of ~46k.
+
+function readSyncCursor(){
+  try{ return JSON.parse(localStorage.getItem(SYNC_K)) || {maxUpdated:null,count:0}; }
+  catch(ex){ return {maxUpdated:null,count:0}; }
+}
+function writeSyncCursor(c){ try{ localStorage.setItem(SYNC_K, JSON.stringify(c)); }catch(ex){} }
+
+// Compute the cursor (max updated_at + row count) from a set of raw rows.
+function cursorFromRows(rawRows){
+  let maxU=null;
+  for(const r of rawRows){ if(r.updated_at && (!maxU || r.updated_at>maxU)) maxU=r.updated_at; }
+  return {maxUpdated:maxU, count:rawRows.length};
+}
+
+// Cheap exact row count via Content-Range header (no body). Doubles as a
+// connection warm-up for paused free-tier projects.
+async function fetchCount(timeoutMs){
+  if(timeoutMs===undefined)timeoutMs=30000; // allow cold-start headroom
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(), timeoutMs);
+  try{
+    const resp=await fetch(SB_URL+'/rest/v1/listings?select=mls_no',
+      {method:'HEAD',
+       headers:Object.assign({},SB_HDR,{'Range-Unit':'items','Range':'0-0','Prefer':'count=exact'}),
+       signal:controller.signal});
+    // PostgREST returns total in Content-Range: "0-0/12345"
+    const cr=resp.headers.get('content-range')||'';
+    const m=cr.match(/\/(\d+)\s*$/);
+    return m?parseInt(m[1],10):null;
+  } finally { clearTimeout(timer); }
+}
+
+// Fetch only rows changed since `sinceIso` (parallel-safe; result is small).
+async function fetchUpdatedSince(sinceIso, timeoutMs){
+  if(timeoutMs===undefined)timeoutMs=20000;
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(), timeoutMs);
+  try{
+    const q=`${SB_URL}/rest/v1/listings?select=*&updated_at=gt.${encodeURIComponent(sinceIso)}&order=updated_at.asc`;
+    const resp=await fetch(q,{headers:SB_HDR, signal:controller.signal});
+    if(!resp.ok) throw new Error('delta fetch failed ('+resp.status+')');
+    return await resp.json(); // raw rows (keep updated_at for cursor)
+  } finally { clearTimeout(timer); }
+}
+
+// Full reload, pages fetched in PARALLEL using a known total count.
+async function fetchAllParallel(total, timeoutMs){
+  if(timeoutMs===undefined)timeoutMs=20000;
+  const PAGE=1000, pages=Math.ceil(total/PAGE);
+  const jobs=[];
+  for(let p=0;p<pages;p++){
+    const from=p*PAGE, to=from+PAGE-1;
+    jobs.push((async()=>{
+      const controller=new AbortController();
+      const timer=setTimeout(()=>controller.abort(), timeoutMs);
+      try{
+        const resp=await fetch(SB_URL+'/rest/v1/listings?select=*&order=mls_no',
+          {headers:Object.assign({},SB_HDR,{'Range-Unit':'items','Range':from+'-'+to}),
+           signal:controller.signal});
+        if(!resp.ok) throw new Error('page '+p+' failed ('+resp.status+')');
+        return await resp.json();
+      } finally { clearTimeout(timer); }
+    })());
+  }
+  // Cap concurrency to avoid hammering the free tier (6 at a time)
+  const out=[]; const LIMIT=6;
+  for(let i=0;i<jobs.length;i+=LIMIT){
+    const chunk=await Promise.all(jobs.slice(i,i+LIMIT));
+    chunk.forEach(rows=>out.push(...rows));
+  }
+  return out; // raw rows
 }
 
 // Upsert to Supabase in batches of 500 (merge on mls_no)
@@ -2939,10 +2980,31 @@ async function load(){
 
   // Fetch with cancel check
   try{
-    var rows=await fetchFromSupabase(15000);
+    // Count probe first (warms paused free-tier project, gives us page count)
+    var total=await fetchCount(30000);
+    var raw;
+    if(total!=null && total>0){
+      raw=await fetchAllParallel(total, 20000);   // parallel pages (raw rows)
+    }else{
+      // Count unavailable — sequential pager returning RAW rows (preserve updated_at)
+      raw=[]; var from=0, PAGE=1000;
+      while(true){
+        var c2=new AbortController(); var t2=setTimeout(function(){c2.abort();},15000);
+        var rp;
+        try{ rp=await fetch(SB_URL+'/rest/v1/listings?select=*&order=mls_no',
+          {headers:Object.assign({},SB_HDR,{'Range-Unit':'items','Range':from+'-'+(from+PAGE-1)}),signal:c2.signal}); }
+        finally{ clearTimeout(t2); }
+        if(!rp.ok) throw new Error('DB fetch failed ('+rp.status+')');
+        var rws=await rp.json(); raw=raw.concat(rws);
+        if(rws.length<PAGE) break; from+=PAGE;
+      }
+    }
     clearTimeout(skipTimer);clearTimeout(warnTimer);clearTimeout(hardTimer);
     if(!_cancelLoad){
-      if(rows.length>0){A.listings=rows;save();}
+      if(raw && raw.length>0){
+        A.listings=raw.map(fromRow); save();
+        writeSyncCursor(cursorFromRows(raw));
+      }
       else{if(wDrop)wDrop.style.display='';}
       if(wlLoad)wlLoad.style.display='none';
     }
@@ -2963,11 +3025,57 @@ async function load(){
 
 async function syncFromSupabase(){
   try{
-    var rows=await fetchFromSupabase(12000);
-    if(rows.length>0&&rows.length!==A.listings.length){
-      A.listings=rows;save();
-      updateHeader();rebuildCityTabs();populateIntelCityPills();populateOppCityDropdown();
+    const cur=readSyncCursor();
+    // If we have no cursor yet (e.g. cache loaded from an older version), fall
+    // back to a one-time full reload to establish the baseline cursor.
+    if(!cur.maxUpdated){
+      const total=await fetchCount(30000);
+      if(total==null) return;
+      const raw=await fetchAllParallel(total, 20000);
+      if(raw.length){
+        A.listings=raw.map(fromRow); save();
+        writeSyncCursor(cursorFromRows(raw));
+        updateHeader();rebuildCityTabs();populateIntelCityPills();populateOppCityDropdown();
+      }
+      return;
     }
+
+    // 1) Cheap count probe (also warms a paused free-tier project)
+    const total=await fetchCount(30000);
+
+    // 2) Delta: only rows changed since our cursor
+    const deltaRaw=await fetchUpdatedSince(cur.maxUpdated, 20000);
+
+    const noNewRows = deltaRaw.length===0;
+    const countMatches = (total==null) || (total===cur.count);
+
+    // Nothing changed and no deletions → done, zero heavy work
+    if(noNewRows && countMatches) return;
+
+    if(!noNewRows){
+      // Merge deltas into the in-memory list (replace by mls_no, append new)
+      const byMls=new Map(A.listings.map(l=>[l.mlsNo,l]));
+      for(const r of deltaRaw){ const l=fromRow(r); byMls.set(l.mlsNo, l); }
+      A.listings=Array.from(byMls.values());
+      // Advance cursor to newest updated_at we just pulled
+      let maxU=cur.maxUpdated;
+      for(const r of deltaRaw){ if(r.updated_at && r.updated_at>maxU) maxU=r.updated_at; }
+      cur.maxUpdated=maxU;
+    }
+
+    // Deletion detected (server count < what we hold): cheaper to do one full
+    // reload than to diff. This is rare (only on Clear/remove operations).
+    if(!countMatches && total!=null && total < A.listings.length){
+      const raw=await fetchAllParallel(total, 20000);
+      A.listings=raw.map(fromRow);
+      writeSyncCursor(cursorFromRows(raw));
+    } else {
+      cur.count = total!=null ? total : A.listings.length;
+      writeSyncCursor(cur);
+    }
+
+    save();
+    updateHeader();rebuildCityTabs();populateIntelCityPills();populateOppCityDropdown();
   }catch(ex){console.warn('Sync skipped:',ex.message);}
 }
 
@@ -2976,7 +3084,7 @@ async function clearAll(){
   toast('Deleting from cloud...','inf');
   try{
     await deleteAllFromSupabase();
-    localStorage.removeItem(STORAGE);localStorage.removeItem(GEO_K);
+    localStorage.removeItem(STORAGE);localStorage.removeItem(GEO_K);localStorage.removeItem(SYNC_K);
     A.listings=[];A.geoCache={};A.comps=[];A.excluded.clear();
     updateHeader();rebuildCityTabs();toast('All data cleared','inf');
   }catch(ex){toast('Cloud delete failed: '+ex.message,'err');}
@@ -4796,6 +4904,13 @@ function handleFile(file,isModal){
       toast(`Syncing ${A.listings.length.toLocaleString()} records to cloud…`,'inf');
       try{
         await upsertToSupabase(A.listings);
+        // We just wrote these rows with updated_at≈now. Advance the local cursor
+        // so the next background sync doesn't re-download everything we just sent.
+        try{
+          const total=await fetchCount(15000);
+          writeSyncCursor({maxUpdated:new Date().toISOString(),
+                           count: total!=null ? total : A.listings.length});
+        }catch(_){ writeSyncCursor({maxUpdated:new Date().toISOString(), count:A.listings.length}); }
         toast(`✓ ${r.added.toLocaleString()} added · ${r.updated.toLocaleString()} updated${pruneMsg} · synced to cloud`,'ok');
       }catch(e){
         toast(`Local update done — cloud sync failed: ${e.message}`,'err');
@@ -5058,7 +5173,10 @@ function populateIntelCityPills(){
 }
 
 // Quick valuation helper: estimate value of one listing using local sold comps
-// Used for both pricing accuracy and opportunity scanning
+// Used for both pricing accuracy and opportunity scanning.
+// Values via SIZE-ADJUSTED $/sqft: price-per-foot falls as homes get larger,
+// so a flat blended $/sqft systematically misvalues off-size listings (which
+// was the source of phantom "deep discount" opportunities on small units).
 function valueOneListing(target, allListings, opts={}){
   const minComps = opts.minComps || 5;
   const candidates = allListings.filter(l=>{
@@ -5067,36 +5185,220 @@ function valueOneListing(target, allListings, opts={}){
     if(!l.sp || !l.sqft) return false;
     if(l.city !== target.city) return false;            // same city only
     if(target.bt && l.bt && l.bt !== target.bt) return false; // same property type
-    // Sqft band ±25%
-    if(target.sqft && l.sqft && (l.sqft < target.sqft*0.75 || l.sqft > target.sqft*1.3)) return false;
-    // Year band ±25 years (loose)
+    // Sqft band ±15% SYMMETRIC (was −25%/+30%, which skewed the pool toward
+    // larger, lower-$/sqft homes and biased values upward)
+    if(target.sqft && l.sqft && (l.sqft < target.sqft*0.85 || l.sqft > target.sqft*1.15)) return false;
+    // Year band ±30 years (loose)
     if(target.yrBlt && l.yrBlt && Math.abs(l.yrBlt - target.yrBlt) > 30) return false;
     // Bed match ±1
     if(target.br && l.br && Math.abs(l.br - target.br) > 1) return false;
-    // Recency: prefer last 18 months when dated
-    if(l.closeDate){
-      const days = (TODAY.getTime() - l.closeDate.getTime()) / (864e5);
-      if(days > 540) return false;
-    }
+    // Recency: require dated solds within 18 months; UNDATED solds excluded
+    // (previously undated records bypassed the recency cap entirely)
+    if(!l.closeDate) return false;
+    const days = (TODAY.getTime() - l.closeDate.getTime()) / (864e5);
+    if(days > 540) return false;
     return true;
   });
   if(candidates.length < minComps) return null;
   // Score each
   const scored = candidates.map(c=>({...c, _score: score(target, c)})).sort((a,b)=>b._score - a._score);
   const top = scored.slice(0, 12);
-  // Weighted PPSF estimate
   const tw = top.reduce((s,c)=>s+c._score, 0);
-  if(!tw) return null;
-  const wPPSF = top.reduce((s,c)=>s + (c.ppsf||(c.sp/c.sqft))*c._score, 0)/tw;
-  if(!wPPSF || !target.sqft) return null;
-  const est = Math.round(wPPSF * target.sqft);
-  // Confidence band
-  const ppsfs = top.map(c=>c.ppsf||(c.sp/c.sqft));
-  const sd = S.stddev(ppsfs);
-  const sdPct = wPPSF ? sd/wPPSF : 0.15;
+  if(!tw || !target.sqft) return null;
+
+  // Per-comp $/sqft, IQR-stripped to drop outliers
+  const rawPPSF = top.map(c=>c.ppsf||(c.sp/c.sqft));
+  const cleanPPSF = S.iqr(rawPPSF);
+  // Weighted blended $/sqft (similarity-weighted, over the cleaned set)
+  let num=0, den=0;
+  top.forEach(c=>{
+    const p = c.ppsf||(c.sp/c.sqft);
+    if(cleanPPSF.includes(p)){ num += p*c._score; den += c._score; }
+  });
+  let wPPSF = den ? num/den : S.median(cleanPPSF);
+  if(!wPPSF) return null;
+
+  // ── SIZE ADJUSTMENT ───────────────────────────────────────────────
+  // Prefer a real regression of $/sqft on sqft when the comp set supports
+  // it (>=6 comps, meaningful fit). Otherwise fall back to the codebase's
+  // established marginal rate (−7% PPSF per +100% size delta).
+  const adjSqfts = top.filter(c=>cleanPPSF.includes(c.ppsf||(c.sp/c.sqft))).map(c=>c.sqft);
+  const adjPpsfs = top.filter(c=>cleanPPSF.includes(c.ppsf||(c.sp/c.sqft))).map(c=>c.ppsf||(c.sp/c.sqft));
+  let sizeAdjPPSF = wPPSF;
+  const reg = (adjSqfts.length>=6) ? S.linReg(adjSqfts, adjPpsfs) : null;
+  if(reg && reg.slope<0 && reg.r2>=0.25){
+    // Regression is informative and correctly downward-sloping → predict at target sqft
+    const predicted = reg.slope*target.sqft + reg.intercept;
+    // Blend predicted with weighted mean (70/30) to avoid over-trusting a noisy fit
+    sizeAdjPPSF = Math.max(50, predicted*0.7 + wPPSF*0.3);
+  } else {
+    // Fallback: marginal-rate adjustment vs comp-median sqft
+    const ms = S.median(adjSqfts);
+    if(ms){ const d=(target.sqft-ms)/ms; sizeAdjPPSF = wPPSF*(1 - d*0.07); }
+  }
+  // Age adjustment (newer = slight premium), consistent with modelA
+  if(target.yrBlt){
+    const my = S.median(top.filter(c=>c.yrBlt).map(c=>c.yrBlt));
+    if(my) sizeAdjPPSF *= (1 + (target.yrBlt-my)*0.003);
+  }
+  sizeAdjPPSF = Math.max(50, sizeAdjPPSF);
+
+  const est = Math.round(sizeAdjPPSF * target.sqft);
+  // Confidence band from cleaned $/sqft dispersion
+  const sd = S.stddev(cleanPPSF);
+  const sdPct = sizeAdjPPSF ? sd/sizeAdjPPSF : 0.15;
   const lo = Math.round(est * (1 - Math.max(0.04, sdPct)));
   const hi = Math.round(est * (1 + Math.max(0.04, sdPct)));
-  return {est, lo, hi, n: top.length, ppsf: Math.round(wPPSF), sdPct: (sdPct*100).toFixed(1), comps: top.slice(0,5)};
+  return {est, lo, hi, n: top.length, ppsf: Math.round(sizeAdjPPSF),
+          rawPpsf: Math.round(wPPSF), sdPct: (sdPct*100).toFixed(1),
+          r2: reg?reg.r2:null, comps: top.slice(0,5)};
+}
+
+// ════════════════════════════════════════════════════════════════════
+// STRICT OPPORTUNITY VALUATION
+// A real 15–20% underpricing almost never exists — listing agents price to
+// market. When the old scanner showed it, the model was wrong, not the agent.
+// This function is deliberately conservative:
+//   • TIGHT comparables only: sqft ±10%, lot ±25%, beds exact, baths ±0.5,
+//     year ±15, same city + property type, sold within 12 months.
+//   • PROXIMITY: prefers comps with a measured distance ≤0.25 mi (using any
+//     cached coordinates); address-affinity is the offline proxy when coords
+//     are absent. Comps proven to be >0.25 mi away are dropped.
+//   • APPRAISER ADJUSTMENTS: each comp's sale price is adjusted to the subject
+//     via suggestAdj (time/size/lot/bed/bath), then the value is the adjusted
+//     median — not a raw $/sqft blend.
+//   • SUFFICIENCY GATE: if there aren't enough genuinely-comparable, in-radius,
+//     recent comps, returns null — the listing is FILTERED OUT, never shown as
+//     a phantom discount.
+// `coordsKnown` (subject located) lets the caller enforce true 0.25-mi radius;
+// without it we fall back to attribute+affinity matching and tighten the gate.
+// ════════════════════════════════════════════════════════════════════
+const OPP_RADIUS_MI = 0.25;
+const OPP_MAX_AGE_DAYS = 365;     // comps older than ~12 months are excluded
+const OPP_MIN_STRICT_COMPS = 4;   // need at least this many tight, in-radius comps
+
+function valueListingStrict(target, allListings, opts={}){
+  const minComps = Math.max(OPP_MIN_STRICT_COMPS, opts.minComps||OPP_MIN_STRICT_COMPS);
+  const subjLocated = !!(target.lat && target.lng);
+
+  // ── 1) TIGHT attribute filter ──────────────────────────────────────
+  const tight = allListings.filter(l=>{
+    if(l.mlsNo === target.mlsNo) return false;
+    if(l.status !== 'SLD') return false;
+    if(!l.sp || !l.sqft) return false;
+    if(l.city !== target.city) return false;
+    if(target.bt && l.bt && l.bt !== target.bt) return false;
+    // Recency ≤ 12 months, dated only
+    if(!l.closeDate) return false;
+    const days = (TODAY.getTime() - l.closeDate.getTime())/(864e5);
+    if(days > OPP_MAX_AGE_DAYS) return false;
+    // Sqft ±10%
+    if(target.sqft && (l.sqft < target.sqft*0.90 || l.sqft > target.sqft*1.10)) return false;
+    // Beds exact (we relax to ±1 later only if too few)
+    if(target.br && l.br && l.br !== target.br) return false;
+    // Baths ±0.5
+    if(target.bth && l.bth && Math.abs(l.bth - target.bth) > 0.5) return false;
+    // Year ±15
+    if(target.yrBlt && l.yrBlt && Math.abs(l.yrBlt - target.yrBlt) > 15) return false;
+    // Lot ±25% (only when both present)
+    if(target.lotSqFt && l.lotSqFt && target.lotSqFt>0 && l.lotSqFt>0){
+      if(l.lotSqFt < target.lotSqFt*0.75 || l.lotSqFt > target.lotSqFt*1.25) return false;
+    }
+    return true;
+  });
+
+  // Relaxation ladder: if beds-exact is too thin, allow ±1 bed; if still thin,
+  // widen sqft to ±12%. Each relaxation is recorded so we can lower confidence.
+  let pool = tight, relaxed = 0;
+  if(pool.length < minComps){
+    relaxed = 1;
+    pool = allListings.filter(l=>{
+      if(l.mlsNo===target.mlsNo||l.status!=='SLD'||!l.sp||!l.sqft) return false;
+      if(l.city!==target.city) return false;
+      if(target.bt&&l.bt&&l.bt!==target.bt) return false;
+      if(!l.closeDate) return false;
+      if((TODAY.getTime()-l.closeDate.getTime())/(864e5) > OPP_MAX_AGE_DAYS) return false;
+      if(target.sqft&&(l.sqft<target.sqft*0.88||l.sqft>target.sqft*1.12)) return false;
+      if(target.br&&l.br&&Math.abs(l.br-target.br)>1) return false;
+      if(target.bth&&l.bth&&Math.abs(l.bth-target.bth)>1) return false;
+      if(target.yrBlt&&l.yrBlt&&Math.abs(l.yrBlt-target.yrBlt)>20) return false;
+      return true;
+    });
+  }
+
+  // ── 2) PROXIMITY filter ────────────────────────────────────────────
+  pool.forEach(c=>{
+    c._dist = (subjLocated && c.lat && c.lng)
+      ? haversine(target.lat, target.lng, c.lat, c.lng) : null;
+    c._aff = addressAffinity(target.address, c.address);
+  });
+
+  let located = pool.filter(c=>c._dist!=null);
+  let inRadius = located.filter(c=>c._dist <= OPP_RADIUS_MI);
+  let comps;
+  if(subjLocated && located.length >= minComps){
+    // We can measure distance for enough comps → enforce the true radius.
+    comps = inRadius;
+    // If radius is too thin, widen ONCE to 0.5 mi but mark lower confidence.
+    if(comps.length < minComps){
+      comps = located.filter(c=>c._dist <= 0.5);
+      relaxed = Math.max(relaxed, 2);
+    }
+  } else {
+    // Coords unavailable for most comps → use attribute pool, prefer same-street
+    // (address affinity) and DON'T claim radius accuracy. Gate is stricter below.
+    comps = pool.slice().sort((a,b)=>(b._aff||0)-(a._aff||0));
+    relaxed = Math.max(relaxed, subjLocated?relaxed:3); // 3 = unproven proximity
+  }
+
+  // ── 3) SUFFICIENCY GATE ────────────────────────────────────────────
+  // Need enough genuinely comparable comps. Stricter when proximity is unproven.
+  const needed = (relaxed>=3) ? minComps+2 : minComps;
+  if(comps.length < needed) return null;   // FILTERED OUT — no phantom discount
+
+  // ── 4) APPRAISER ADJUSTMENTS → adjusted sale prices ────────────────
+  // Use the same conservative appraiser logic as the CMA tab (suggestAdj):
+  // time + size + lot + bed + bath, applied to each comp's sale price.
+  const adjustedVals = [];
+  comps.forEach(c=>{
+    const a = suggestAdj(target, c, comps);
+    const adjSum = (a.time||0)+(a.size||0)+(a.lot||0)+(a.br||0)+(a.bth||0);
+    const adjPrice = c.sp + adjSum;          // comp adjusted toward subject
+    if(adjPrice>0) adjustedVals.push({adjPrice, c, a, adjSum});
+  });
+  if(adjustedVals.length < needed) return null;
+
+  // Strip outliers on adjusted price, then take the median (robust).
+  const prices = adjustedVals.map(x=>x.adjPrice);
+  const cleanPrices = S.iqr(prices);
+  const est = Math.round(S.median(cleanPrices));
+  if(!est) return null;
+
+  // Confidence band from adjusted-price dispersion.
+  const sd = S.stddev(cleanPrices);
+  const sdPct = est ? sd/est : 0.15;
+  const lo = Math.round(est * (1 - Math.max(0.04, sdPct)));
+  const hi = Math.round(est * (1 + Math.max(0.04, sdPct)));
+
+  // Gross adjustment % — appraiser sanity check. If comps needed huge
+  // adjustments to match, they weren't really comparable → low confidence.
+  const grossPcts = adjustedVals.map(x=>{
+    const g = Math.abs(x.a.time)+Math.abs(x.a.size)+Math.abs(x.a.lot)+Math.abs(x.a.br)+Math.abs(x.a.bth);
+    return x.c.sp ? g/x.c.sp*100 : 0;
+  });
+  const medGrossAdj = S.median(grossPcts) || 0;
+
+  return {
+    est, lo, hi,
+    n: adjustedVals.length,
+    nInRadius: subjLocated ? inRadius.length : null,
+    sdPct: (sdPct*100).toFixed(1),
+    medGrossAdj: medGrossAdj.toFixed(0),
+    relaxed,                                  // 0 tight, 1 attr-relaxed, 2 radius-widened, 3 proximity-unproven
+    proximityProven: subjLocated && located.length>=minComps,
+    ppsf: target.sqft ? Math.round(est/target.sqft) : null,
+    comps: adjustedVals.slice(0,5).map(x=>({...x.c, _adj:x.adjSum, _adjPrice:x.adjPrice})),
+  };
 }
 
 // PRD Module 6 — Pricing Accuracy classification
@@ -6601,10 +6903,18 @@ function assessRisk(listing, valuation){
   if(valuation && parseFloat(valuation.sdPct) > 18){
     risks.push({type:'spread', sev:'med', desc:`Comp spread is wide (σ ${valuation.sdPct}% of $/sqft) — neighborhood lacks pricing consistency, opportunity may be illusory`});
   }
+  // Extreme apparent discount — almost always a data artifact, not a real deal
+  // (leasehold, age-restricted, mobile/manufactured, pending litigation, BMR/
+  // deed-restricted, or a sqft/price entry error). Flag hard so it can't top the list.
+  if(valuation && valuation.est && listing.lp){
+    const gp = (valuation.est - listing.lp)/listing.lp*100;
+    if(gp > 35) risks.push({type:'extreme', sev:'hi', desc:`Apparent ${gp.toFixed(0)}% discount is implausibly large — verify for leasehold, deed/age restriction, manufactured home, or a sqft/price data error before treating as real`});
+  }
   return risks;
 }
 
-function runOpportunityScanner(){
+async function runOpportunityScanner(opts={}){
+  const doRefine = opts && opts.refine === true; // geocode-refine only when asked (Scan button)
   if(!A.listings.length){toast('Load MLS data first','err');return;}
   const cityFilt = el('opp-city').value || '';
   const typeFilt = el('opp-type').value || '';
@@ -6620,32 +6930,104 @@ function runOpportunityScanner(){
     return true;
   });
 
-  toast(`Scanning ${candidates.length} active listings…`,'inf');
+  toast(`Scanning ${candidates.length} active listings against tight local comps…`,'inf');
 
-  const results = [];
+  // ── PASS 1: strict attribute + appraiser-adjusted valuation ──────────
+  // Uses any cached coordinates for proximity; affinity otherwise. Listings
+  // without enough tight, recent, nearby comps are filtered out entirely.
+  let filteredNoComps = 0;
+  const stage1 = [];
   candidates.forEach(target=>{
-    const v = valueOneListing(target, A.listings, {minComps});
-    if(!v) return;
-    const gap = (v.est - target.lp)/v.est;
-    const gapPct = gap * 100;
-    if(gapPct < minTagPct) return; // listed at or above model — not an opportunity
+    const v = valueListingStrict(target, A.listings, {minComps});
+    if(!v){ filteredNoComps++; return; }   // insufficient comparables — skip
+    const gapPct = (v.est - target.lp)/target.lp * 100;
+    if(gapPct < minTagPct) return;          // priced at/above market — not a deal
+    stage1.push({target, v, gapPct});
+  });
+
+  // ── PASS 2: geocode-refine the shortlist to a TRUE 0.25-mi radius ────
+  // Only the most promising candidates (sorted by apparent gap) are geocoded,
+  // so we never hammer the geocoder with thousands of lookups. Anything that
+  // can't be confirmed against in-radius comps after geocoding is dropped.
+  stage1.sort((a,b)=>b.gapPct - a.gapPct);
+  const SHORTLIST = Math.min(stage1.length, 25);
+  const online = (typeof navigator==='undefined') || navigator.onLine;
+  if(doRefine && online && SHORTLIST>0){
+    toast(`Confirming top ${SHORTLIST} against comps within ${OPP_RADIUS_MI} mi…`,'inf');
+  }
+  for(let i=0; doRefine && i<SHORTLIST; i++){
+    const cand = stage1[i];
+    const t = cand.target;
+    if(!online) break;                       // offline: keep Pass-1 result as-is
+    // Geocode subject if needed (cheap budget; cached geocodes are free)
+    if(!t.lat || !t.lng){
+      const key=`${t.address}, ${t.city}, CA`.toLowerCase();
+      if(A.geoCache[key]){ t.lat=A.geoCache[key].lat; t.lng=A.geoCache[key].lng; }
+      else{
+        const g=await geocodeOne(t.address, t.city);
+        if(g){ t.lat=g.lat; t.lng=g.lng; await new Promise(r=>setTimeout(r,1050)); }
+      }
+    }
+    if(t.lat && t.lng){
+      // Geocode a handful of its tight comps so radius can be measured
+      const tightComps = A.listings.filter(l=>l.status==='SLD'&&l.city===t.city
+        &&(!t.bt||!l.bt||l.bt===t.bt)&&l.sqft&&t.sqft
+        &&l.sqft>=t.sqft*0.90&&l.sqft<=t.sqft*1.10
+        &&l.closeDate&&(TODAY.getTime()-l.closeDate.getTime())/(864e5)<=OPP_MAX_AGE_DAYS);
+      let budget=12;
+      for(const c of tightComps){
+        if(c.lat&&c.lng) continue;
+        const ck=`${c.address}, ${c.city}, CA`.toLowerCase();
+        if(A.geoCache[ck]){ c.lat=A.geoCache[ck].lat; c.lng=A.geoCache[ck].lng; }
+        else if(budget>0){
+          const g=await geocodeOne(c.address,c.city);
+          if(g){ c.lat=g.lat; c.lng=g.lng; }
+          budget--; await new Promise(r=>setTimeout(r,1050));
+        }
+      }
+      saveGeo();
+      // Re-value now that the subject is located (enforces true radius)
+      const v2 = valueListingStrict(t, A.listings, {minComps});
+      if(!v2){ cand.drop = true; continue; }   // no in-radius confirmation → drop
+      cand.v = v2;
+      cand.gapPct = (v2.est - t.lp)/t.lp * 100;
+      if(cand.gapPct < minTagPct) cand.drop = true;
+    }
+  }
+
+  // ── ASSEMBLE results ────────────────────────────────────────────────
+  const results = [];
+  stage1.forEach(cand=>{
+    if(cand.drop) return;
+    const {target, v, gapPct} = cand;
     let tag = 'Fair Deal', cls = 'opp-tag-fair';
     if(gapPct >= 12){tag='Deep Discount'; cls='opp-tag-deep';}
     else if(gapPct >= 7){tag='Strong Opportunity'; cls='opp-tag-strong';}
     else if(gapPct >= 3){tag='Buyer Advantage'; cls='opp-tag-buyer';}
-    // Reasons (PRD AC2: each opportunity includes explanation)
+    // Reasons
     const reasons = [];
-    reasons.push(`Listed ${gapPct.toFixed(1)}% below model value of ${fmt(v.est)} (range ${fmtK(v.lo)}–${fmtK(v.hi)})`);
-    const listPPSF = target.lp/target.sqft;
-    if(v.ppsf && listPPSF < v.ppsf*0.95) reasons.push(`List $/sqft ($${Math.round(listPPSF)}) is below comp $/sqft ($${v.ppsf})`);
-    reasons.push(`Valued against ${v.n} similar sold comp(s) in ${toTitle(target.city)} within last 18 months`);
-    if(target.cdom && target.cdom < 14) reasons.push(`Fresh listing (${target.cdom} days on market) — opportunity may close fast`);
-    // Risks (PRD Module 9)
+    reasons.push(`Listed ${gapPct.toFixed(1)}% below adjusted comp value of ${fmt(v.est)} (range ${fmtK(v.lo)}–${fmtK(v.hi)})`);
+    const proxTxt = v.proximityProven
+      ? `${v.nInRadius} comp(s) within ${OPP_RADIUS_MI} mi`
+      : `${v.n} closely-matched comp(s) (proximity not geo-confirmed)`;
+    reasons.push(`Valued against ${proxTxt}, sold within 12 months, with appraiser adjustments (size/lot/bed/bath/time) applied`);
+    reasons.push(`Median gross adjustment ${v.medGrossAdj}% — ${parseFloat(v.medGrossAdj)<10?'comps are tight':'comps required sizeable adjustment, treat with caution'}`);
+    if(v.relaxed===1) reasons.push(`Note: exact-bed comps were thin, so ±1 bed comps were included`);
+    if(v.relaxed===2) reasons.push(`Note: in-radius comps were thin, so radius was widened toward 0.5 mi`);
+    if(target.cdom && target.cdom < 14) reasons.push(`Fresh listing (${target.cdom} days on market)`);
+    // Risks
     const risks = assessRisk(target, v);
-    // Opportunity score = gap% × confidence factor − risk penalty
-    const confFactor = Math.max(0.4, 1 - parseFloat(v.sdPct)/100);
-    const riskPenalty = risks.reduce((s,r)=>s + (r.sev==='hi'?10:r.sev==='med'?4:1), 0);
-    const oppScore = Math.max(0, Math.min(100, Math.round(gapPct * 4 * confFactor - riskPenalty)));
+    if(!v.proximityProven) risks.push({type:'proximity', sev:'med', desc:`Proximity not geo-confirmed — comps matched on attributes only; verify they are truly in the same micro-neighborhood`});
+    if(parseFloat(v.medGrossAdj) >= 15) risks.push({type:'adj', sev:'med', desc:`Comps needed large adjustments (${v.medGrossAdj}% gross) — limited truly-similar inventory nearby`});
+
+    // Opportunity score
+    const gapComponent = 50 * (1 - Math.exp(-gapPct/9));
+    const confComponent = 25 * Math.max(0, Math.min(1, 1 - parseFloat(v.sdPct)/30));
+    const riskPenalty = risks.reduce((s,r)=>s + (r.sev==='hi'?12:r.sev==='med'?6:2), 0);
+    const proximityBonus = v.proximityProven ? 8 : 0;
+    const liquidityBonus = (target.cdom && target.cdom < 14) ? 4 : 0;
+    const oppScore = Math.max(0, Math.min(100,
+      Math.round(gapComponent + confComponent + proximityBonus + liquidityBonus - riskPenalty)));
     if(hideRisk && risks.some(r=>r.sev==='hi')) return;
     results.push({target, v, gapPct, tag, cls, reasons, risks, oppScore});
   });
@@ -6674,8 +7056,8 @@ function runOpportunityScanner(){
 
   const grid = el('opp-grid');
   if(!results.length){
-    grid.innerHTML = `<div class="opp-empty">No opportunities found.<br>Try lowering the <strong>Min Tag</strong> threshold or expanding the city scope.<br><br>Note: scanner needs at least ${minComps} qualified sold comps per active listing — sparse data limits findings.</div>`;
-    toast(`Scan complete — 0 opportunities`,'inf');
+    grid.innerHTML = `<div class="opp-empty">No opportunities found.<br>This is normal — agents price to market, so genuine underpricing is rare.<br><br>The scanner now requires at least ${Math.max(OPP_MIN_STRICT_COMPS,minComps)} closely-matched comps (sqft ±10%, same beds, baths ±0.5, sold within 12 months, ideally within ${OPP_RADIUS_MI} mi) before flagging a listing. ${filteredNoComps>0?`<strong>${filteredNoComps}</strong> active listing(s) were skipped for lack of tight comps.`:''}<br><br>Try lowering <strong>Min Tag</strong>, relaxing <strong>Min Comps</strong>, or widening the city scope.</div>`;
+    toast(`Scan complete — 0 opportunities (${filteredNoComps} skipped for thin comps)`,'inf');
     return;
   }
 
@@ -6699,7 +7081,7 @@ function runOpportunityScanner(){
       </div>
       <div class="opp-prices">
         <div class="opp-pr-cell"><div class="opp-pr-lbl">List Price</div><div class="opp-pr-val">${fmt(t.lp)}</div></div>
-        <div class="opp-pr-cell"><div class="opp-pr-lbl">Model Value</div><div class="opp-pr-val" style="color:var(--gold)">${fmt(r.v.est)}</div></div>
+        <div class="opp-pr-cell"><div class="opp-pr-lbl">Adjusted Comp Value${r.v.proximityProven?` <span style="color:var(--grn);font-size:9px">·${OPP_RADIUS_MI}mi ✓</span>`:''}</div><div class="opp-pr-val" style="color:var(--gold)">${fmt(r.v.est)}</div></div>
         <div class="opp-pr-cell"><div class="opp-pr-lbl">Gap (Day-1 Equity)</div><div class="opp-pr-val gap-pos">+${r.gapPct.toFixed(1)}%</div></div>
       </div>
       <div class="opp-meta">${meta}</div>
@@ -6715,7 +7097,7 @@ function runOpportunityScanner(){
     </div>`;
   }).join('');
 
-  toast(`Scan complete — ${results.length} opportunities`,'ok');
+  toast(`Scan complete — ${results.length} opportunit${results.length===1?'y':'ies'} · ${filteredNoComps} skipped for thin comps`,'ok');
 }
 
 function exportOpportunities(){
