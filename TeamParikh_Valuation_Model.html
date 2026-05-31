@@ -1086,6 +1086,28 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
 .opp-score-num{font-family:var(--fm);font-size:13px;font-weight:600;color:var(--gold)}
 .opp-empty{padding:80px 24px;text-align:center;color:var(--txt3);line-height:2;grid-column:1/-1}
 .opp-stats-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:0;background:var(--sur2);border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden}
+@media (max-width:880px){.opp-chart-grid{grid-template-columns:1fr !important}}
+/* Forensic tables — dark UI native, no eye-straining light/dark zebra. */
+.fx-table{width:100%;border-collapse:collapse;font-size:11.5px}
+.fx-table thead th{
+  position:sticky;top:0;background:var(--sur2);color:var(--txt2);
+  font-weight:600;text-align:right;padding:8px 10px;font-size:9.5px;
+  letter-spacing:.05em;text-transform:uppercase;
+  border-bottom:1px solid var(--bdr);white-space:nowrap;cursor:default;
+}
+.fx-table thead th:first-child{text-align:left}
+.fx-table td{
+  padding:7px 10px;text-align:right;color:var(--txt);
+  border-bottom:1px solid rgba(40,51,79,.45);white-space:nowrap;
+  font-family:'JetBrains Mono',monospace;font-size:11.5px;
+}
+.fx-table td:first-child{
+  text-align:left;color:var(--txt);font-family:var(--ff);font-weight:500;
+}
+/* Subtle separation: every other row gets a barely-there lift, same hue family. */
+.fx-table tbody tr:nth-child(even) td{background:rgba(255,255,255,.022)}
+.fx-table tbody tr:hover td{background:rgba(201,168,76,.07)}
+.fx-table tbody tr:last-child td{border-bottom:none}
 .opp-stat{padding:11px 13px;border-right:1px solid var(--bdr);text-align:center}
 .opp-stat:last-child{border-right:none}
 .opp-stat-num{font-family:var(--fm);font-size:20px;font-weight:500;color:var(--txt)}
@@ -1325,6 +1347,20 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
 
 /* ══════════════════════════════════════════════════════════════ */
 /* TUNE PANE — Backtest & Weight Tuning                          */
+.cma-active-profile{
+  display:flex;align-items:center;gap:8px;margin:8px 0 2px;padding:8px 10px;
+  border-radius:var(--r);font-size:11.5px;line-height:1.4;
+  background:rgba(201,168,76,.10);border:1px solid rgba(201,168,76,.45);color:var(--txt);
+}
+.cma-active-profile .cap-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;box-shadow:0 0 0 3px rgba(201,168,76,.18)}
+.cma-active-profile strong{color:var(--gold2)}
+.cma-active-profile .cap-clear{
+  margin-left:auto;flex-shrink:0;cursor:pointer;border:1px solid var(--bdr);
+  background:var(--sur2);color:var(--txt2);border-radius:5px;font-family:var(--ff);
+  font-size:10.5px;padding:4px 8px;transition:all .15s;
+}
+.cma-active-profile .cap-clear:hover{color:var(--txt);border-color:var(--gold)}
+.wp-item.wp-active{border-color:rgba(201,168,76,.55);background:rgba(201,168,76,.08)}
 /* ══════════════════════════════════════════════════════════════ */
 .tune-pane{flex:1;overflow:auto;flex-direction:column}
 .tune-wrap{padding:16px 18px;display:flex;flex-direction:column;gap:14px;max-width:1500px;margin:0 auto;width:100%}
@@ -1936,6 +1972,14 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
             <input id="s-lp" type="number" placeholder="e.g. 750000">
           </div>
 
+          <div class="fg" style="margin-top:4px">
+            <label>Method Weighting <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--txt3);font-size:10px">(Dynamic, or a tuned profile)</span></label>
+            <select id="cma-profile-sel" class="fbi-sel" onchange="onCmaProfileChange()">
+              <option value="__dynamic">Dynamic — auto-weight (default)</option>
+            </select>
+          </div>
+          <div id="cma-active-profile" class="cma-active-profile" style="display:none"></div>
+
           <button class="btn-run" onclick="runCMA()">⚡ Run CMA Analysis</button>
           <div id="autofill-msg" style="font-size:11px;color:var(--grn);text-align:center;margin-top:6px;display:none;line-height:1.6"></div>
           <div style="border-top:1px solid var(--bdr);margin-top:11px;padding-top:10px">
@@ -2157,10 +2201,22 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
             <label style="display:flex;align-items:center;gap:5px;font-size:11px;cursor:pointer;color:var(--txt2)"><input type="checkbox" id="opp-hideRisk" style="accent-color:var(--gold)" onchange="runOpportunityScanner()"> Filter out</label>
           </div>
         </div>
+        <div class="opp-tool-grp">
+          <div class="opp-tool-lbl">Bias Correction</div>
+          <div class="opp-tool-row">
+            <label style="display:flex;align-items:center;gap:5px;font-size:11px;cursor:pointer;color:var(--txt2)"><input type="checkbox" id="opp-bias-toggle" style="accent-color:var(--gold)" onchange="toggleBiasFromScanner(this.checked)"> <span id="opp-bias-lbl">Not learned</span></label>
+          </div>
+        </div>
         <div class="opp-tool-grp" style="flex:1"></div>
         <button class="btn btn-gold" onclick="runOpportunityScanner({refine:true})">🔍 Scan</button>
+        <button class="btn btn-blue" onclick="runOpportunityBacktest()" title="Replay history: of listings the model would have flagged as deals, how many actually sold at or above the model's estimate?">🧪 Backtest accuracy</button>
         <button class="btn btn-g" onclick="exportOpportunities()">⬇ Export</button>
       </div>
+      <div id="opp-bt-progress" class="bt-prog" style="display:none;margin:0">
+        <div class="bt-prog-bar"><div class="bt-prog-fill" id="opp-bt-prog-fill"></div></div>
+        <div class="bt-prog-txt" id="opp-bt-prog-txt">Preparing…</div>
+      </div>
+      <div id="opp-bt-results"></div>
       <div id="opp-stats"></div>
       <div class="opp-grid" id="opp-grid"><div class="opp-empty">Click <strong>Scan</strong> to find mispriced active listings.<br>Each opportunity is valued against local sold comps with risk flags.</div></div>
     </div>
@@ -2196,8 +2252,12 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
                 <select id="bt-city" class="fbi-sel"><option value="">All Cities</option></select>
               </div>
               <div class="fg">
-                <label>Property Type</label>
-                <select id="bt-bt" class="fbi-sel"><option value="">Any</option><option value="DE">SFR (Detached)</option><option value="CO">Condo</option><option value="TH">Townhome</option></select>
+                <label>Property Type <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--txt3);font-size:10px">(tick all that apply — leave all unticked for Any)</span></label>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;padding:2px 0">
+                  <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="bt-bt-de" style="accent-color:var(--gold)"> SFR</label>
+                  <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="bt-bt-co" style="accent-color:var(--gold)"> Condo</label>
+                  <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="bt-bt-th" style="accent-color:var(--gold)"> Townhome</label>
+                </div>
               </div>
               <div class="fg">
                 <label>Test Window <span class="hint">(recent sales used as test cases)</span></label>
@@ -2215,8 +2275,9 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
                   <option value="100">100 (fast)</option>
                   <option value="300" selected>300 (recommended)</option>
                   <option value="500">500</option>
-                  <option value="1000">1,000 (slow)</option>
-                  <option value="99999">All available</option>
+                  <option value="1000">1,000</option>
+                  <option value="3000">3,000 (robust)</option>
+                  <option value="99999">All available (full data — slow)</option>
                 </select>
               </div>
               <div class="fg">
@@ -2235,6 +2296,19 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
               <div id="bt-progress" class="bt-prog" style="display:none">
                 <div class="bt-prog-bar"><div class="bt-prog-fill" id="bt-prog-fill"></div></div>
                 <div class="bt-prog-txt" id="bt-prog-txt">Preparing…</div>
+              </div>
+              <div style="border-top:1px solid var(--bdr);margin-top:12px;padding-top:12px">
+                <div class="tune-help" style="margin-top:0">Run <strong>both</strong> valuation engines — the CMA's weighted A/B/C model and the Opportunity scanner's median-adjusted-comps model — on the same sold homes, point-in-time, and see which is more accurate and less biased.</div>
+                <button class="btn btn-blue" style="width:100%;margin-top:10px" onclick="runEngineComparison()">⚖ Compare Engines (CMA vs Opportunity)</button>
+                <div id="ec-progress" class="bt-prog" style="display:none">
+                  <div class="bt-prog-bar"><div class="bt-prog-fill" id="ec-prog-fill"></div></div>
+                  <div class="bt-prog-txt" id="ec-prog-txt">Preparing…</div>
+                </div>
+                <div style="border-top:1px dashed var(--bdr);margin-top:12px;padding-top:12px">
+                  <div class="tune-help" style="margin-top:0"><strong>Step 1:</strong> the scanner now values listings with the CMA engine. Learn its segment-by-segment bias from history so estimates self-correct before flagging deals.</div>
+                  <label style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--txt2);cursor:pointer;margin-top:8px"><input type="checkbox" id="opp-use-cma" checked onchange="A.oppUseCMAEngine=this.checked;toast(this.checked?'Scanner using CMA engine':'Scanner using legacy median engine','inf')" style="accent-color:var(--gold)"> Scanner uses CMA engine</label>
+                  <button class="btn btn-gold" style="width:100%;margin-top:8px" onclick="learnBiasModel()">🎯 Learn Bias Model</button>
+                </div>
               </div>
             </div>
 
@@ -2288,6 +2362,11 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
                 <button class="btn btn-gold" onclick="saveWeightProfile()">Save</button>
               </div>
               <div id="wp-list" class="wp-list"></div>
+              <div style="display:flex;gap:6px;margin-top:8px">
+                <button class="btn btn-g" style="flex:1;font-size:11px" onclick="exportWeightProfiles()" title="Download all profiles as a file you can share or load on another device">⬇ Export profiles</button>
+                <button class="btn btn-g" style="flex:1;font-size:11px" onclick="el('wp-import-file').click()" title="Load profiles from an exported file">⬆ Import</button>
+                <input type="file" id="wp-import-file" accept="application/json,.json" style="display:none" onchange="importWeightProfiles(this)">
+              </div>
             </div>
 
             <!-- A/B COMPARISON -->
@@ -2451,6 +2530,7 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
     </div>
     <div class="m-acts">
       <button class="btn btn-g" onclick="clearAll()">🗑 Clear All</button>
+      <button class="btn btn-g" onclick="forceFullReload()">🔄 Reload All From Cloud</button>
       <button class="btn btn-g" onclick="hideModal()">Cancel</button>
       <button class="btn btn-gold" onclick="hideModal()">Done</button>
     </div>
@@ -2496,7 +2576,10 @@ const A = {
   // ── v2.0: Tuning, Backtesting, Client Report ──
   weightMode: 'dynamic',    // 'dynamic' | 'manual' — controls calcAll() weight selection
   manualWeights: {wA:0.40, wB:0.40, wC:0.20},  // user-set weights when mode='manual'
-  weightProfiles: {},       // { profileName: {wA, wB, wC, scope, savedAt, note} }
+  weightProfiles: {},       // { profileName: {wA, wB, wC, scope, btTypes, savedAt, note} }
+  activeProfile: null,      // name of the profile currently driving manual weights (#2)
+  oppUseCMAEngine: true,    // Step 1a: opportunity scanner uses calcAll, not median-of-adjusted
+  biasModel: null,          // Step 1b: { enabled, overall, byType:{}, byCityType:{}, byBand:[], learnedAt, n }
   backtestResults: null,    // last backtest run results { cases, summary, segments, generatedAt }
   backtestSettings: {city:'', lookback:12, sample:300, minComps:5, propertyType:''},
   lastValuation: null,      // most recent calcAll result, used for Client Report
@@ -2596,18 +2679,21 @@ function cursorFromRows(rawRows){
   return {maxUpdated:maxU, count:rawRows.length};
 }
 
-// Cheap exact row count via Content-Range header (no body). Doubles as a
-// connection warm-up for paused free-tier projects.
+// Cheap row count via Content-Range header. Uses a GET with Range 0-0 (returns
+// at most 1 row) rather than HEAD, because some CORS setups don't expose
+// content-range on HEAD responses — which would return null and break sync.
+// Doubles as a connection warm-up for paused free-tier projects.
 async function fetchCount(timeoutMs){
   if(timeoutMs===undefined)timeoutMs=30000; // allow cold-start headroom
   const controller=new AbortController();
   const timer=setTimeout(()=>controller.abort(), timeoutMs);
   try{
     const resp=await fetch(SB_URL+'/rest/v1/listings?select=mls_no',
-      {method:'HEAD',
+      {method:'GET',
        headers:Object.assign({},SB_HDR,{'Range-Unit':'items','Range':'0-0','Prefer':'count=exact'}),
        signal:controller.signal});
-    // PostgREST returns total in Content-Range: "0-0/12345"
+    // PostgREST returns total in Content-Range: "0-0/12345" (the value after the
+    // slash is the TRUE total and is NOT affected by the server max-rows cap).
     const cr=resp.headers.get('content-range')||'';
     const m=cr.match(/\/(\d+)\s*$/);
     return m?parseInt(m[1],10):null;
@@ -2627,30 +2713,43 @@ async function fetchUpdatedSince(sinceIso, timeoutMs){
   } finally { clearTimeout(timer); }
 }
 
-// Full reload, pages fetched in PARALLEL using a known total count.
+// Full reload. Pages are fetched in parallel BATCHES, but we keep going until a
+// batch comes back short — we do NOT trust `total` to decide when to stop,
+// because PostgREST's exact-count can be capped/unreliable and would otherwise
+// truncate the pull (the cause of the "stuck at 11k" bug). `total` is only a
+// hint for how many pages to request per batch.
 async function fetchAllParallel(total, timeoutMs){
   if(timeoutMs===undefined)timeoutMs=20000;
-  const PAGE=1000, pages=Math.ceil(total/PAGE);
-  const jobs=[];
-  for(let p=0;p<pages;p++){
-    const from=p*PAGE, to=from+PAGE-1;
-    jobs.push((async()=>{
-      const controller=new AbortController();
-      const timer=setTimeout(()=>controller.abort(), timeoutMs);
-      try{
-        const resp=await fetch(SB_URL+'/rest/v1/listings?select=*&order=mls_no',
-          {headers:Object.assign({},SB_HDR,{'Range-Unit':'items','Range':from+'-'+to}),
-           signal:controller.signal});
-        if(!resp.ok) throw new Error('page '+p+' failed ('+resp.status+')');
-        return await resp.json();
-      } finally { clearTimeout(timer); }
-    })());
-  }
-  // Cap concurrency to avoid hammering the free tier (6 at a time)
-  const out=[]; const LIMIT=6;
-  for(let i=0;i<jobs.length;i+=LIMIT){
-    const chunk=await Promise.all(jobs.slice(i,i+LIMIT));
-    chunk.forEach(rows=>out.push(...rows));
+  const PAGE=1000;
+  const out=[];
+  const BATCH=6;                 // pages per parallel wave
+  let base=0, done=false;
+  // Safety ceiling so a misbehaving endpoint can't loop forever.
+  const MAX_PAGES=500;           // 500k rows ceiling
+  while(!done && (base/PAGE) < MAX_PAGES){
+    const jobs=[];
+    for(let k=0;k<BATCH;k++){
+      const from=(base + k*PAGE), to=from+PAGE-1;
+      jobs.push((async()=>{
+        const controller=new AbortController();
+        const timer=setTimeout(()=>controller.abort(), timeoutMs);
+        try{
+          const resp=await fetch(SB_URL+'/rest/v1/listings?select=*&order=mls_no',
+            {headers:Object.assign({},SB_HDR,{'Range-Unit':'items','Range':from+'-'+to}),
+             signal:controller.signal});
+          if(!resp.ok) throw new Error('page failed ('+resp.status+')');
+          return await resp.json();
+        } finally { clearTimeout(timer); }
+      })());
+    }
+    const chunk=await Promise.all(jobs);
+    let shortSeen=false;
+    for(const rows of chunk){
+      out.push(...rows);
+      if(rows.length < PAGE) shortSeen=true;   // a short page means we've hit the end
+    }
+    if(shortSeen) done=true;
+    base += BATCH*PAGE;
   }
   return out; // raw rows
 }
@@ -3043,6 +3142,20 @@ async function syncFromSupabase(){
     // 1) Cheap count probe (also warms a paused free-tier project)
     const total=await fetchCount(30000);
 
+    // SELF-HEAL: if the server has a materially different row count than what we
+    // hold locally, our cache/cursor is stale or was truncated — do a full
+    // reload rather than trusting an incremental delta. This recovers from the
+    // earlier "stuck at 11k" state automatically on the next sync.
+    if(total!=null && Math.abs(total - A.listings.length) > 50){
+      const raw=await fetchAllParallel(total, 20000);
+      if(raw.length){
+        A.listings=raw.map(fromRow); save();
+        writeSyncCursor(cursorFromRows(raw));
+        updateHeader();rebuildCityTabs();populateIntelCityPills();populateOppCityDropdown();
+      }
+      return;
+    }
+
     // 2) Delta: only rows changed since our cursor
     const deltaRaw=await fetchUpdatedSince(cur.maxUpdated, 20000);
 
@@ -3063,12 +3176,14 @@ async function syncFromSupabase(){
       cur.maxUpdated=maxU;
     }
 
-    // Deletion detected (server count < what we hold): cheaper to do one full
-    // reload than to diff. This is rare (only on Clear/remove operations).
-    if(!countMatches && total!=null && total < A.listings.length){
+    // Count drifted (rows added or removed beyond our delta view): reconcile
+    // with a full reload to stay exact.
+    if(!countMatches && total!=null){
       const raw=await fetchAllParallel(total, 20000);
-      A.listings=raw.map(fromRow);
-      writeSyncCursor(cursorFromRows(raw));
+      if(raw.length){
+        A.listings=raw.map(fromRow);
+        writeSyncCursor(cursorFromRows(raw));
+      }
     } else {
       cur.count = total!=null ? total : A.listings.length;
       writeSyncCursor(cur);
@@ -3077,6 +3192,25 @@ async function syncFromSupabase(){
     save();
     updateHeader();rebuildCityTabs();populateIntelCityPills();populateOppCityDropdown();
   }catch(ex){console.warn('Sync skipped:',ex.message);}
+}
+
+// Force a clean, complete reload from the cloud, ignoring the local cursor.
+// Use this to recover if the cache ever drifts from the server (e.g. a partial
+// or truncated pull). Pulls every row, rebuilds the cache and cursor.
+async function forceFullReload(){
+  toast('Reloading all records from cloud…','inf');
+  try{
+    const total=await fetchCount(30000);
+    const raw=await fetchAllParallel(total||0, 20000);
+    if(raw.length){
+      A.listings=raw.map(fromRow); save();
+      writeSyncCursor(cursorFromRows(raw));
+      updateHeader();rebuildCityTabs();populateIntelCityPills();populateOppCityDropdown();
+      toast(`✓ Reloaded ${raw.length.toLocaleString()} records from cloud`,'ok');
+    } else {
+      toast('No records returned from cloud','warn');
+    }
+  }catch(ex){ toast('Reload failed: '+ex.message,'err'); }
 }
 
 async function clearAll(){
@@ -3274,8 +3408,9 @@ function showTab(id){
   document.querySelectorAll('.tab-pane').forEach(p=>p.classList.toggle('active',p.id==='pane-'+id));
   // Route city context to the right handler
   if(id==='intel') renderMarketIntel();
-  else if(id==='opps') runOpportunityScanner();
+  else if(id==='opps'){ syncBiasToggle(); runOpportunityScanner(); }
   else if(id==='tune') initTunePane();
+  else if(id==='cma'){ syncProfileDropdowns(); updateActiveProfileBadge(); }
   else if(id!=='cma'){ if(el('ctbody-'+id)) renderCityPane(id); }
 }
 
@@ -4171,8 +4306,11 @@ function calcAll(subj,comps){
   let weights={wA:0.40,wB:0.40,wC:0.20};
   let weightSource='dynamic'; // for narrative
 
-  // When adjustment mode is ON, weight the appraiser-adjusted model heavily
-  if(A.adjUseInValuation && D_){
+  // When adjustment mode is ON, weight the appraiser-adjusted model heavily —
+  // UNLESS the user has explicitly chosen Manual weights / a profile, which
+  // must always win (otherwise applying a profile silently does nothing while
+  // the adjustment grid is active).
+  if(A.adjUseInValuation && D_ && A.weightMode!=='manual'){
     if(A_)ests.push({v:A_.mid,w:.20,label:'A',name:'Method A ($/SqFt, Time-Adj.)'});
     if(D_)ests.push({v:D_.est,w:.55,label:'D',name:'Method D (Comp-Adjusted Model)'});
     if(C_)ests.push({v:C_.est,w:.25,label:'C',name:'Method C (Trend + Market)'});
@@ -4464,6 +4602,8 @@ function runCMA(){
   renderValuation(res);
   renderReport(res);
   renderAdjustmentGrid();   // VIW v1: render appraiser layer
+  updateActiveProfileBadge();
+  syncProfileDropdowns();
 
   const scopeStr=cities?cities.map(toTitle).join(', '):'all cities';
   toast(`CMA complete — ${candidates.length} comps in ${scopeStr}`+(A.proximityEnabled?' · applying radius filter…':''),'ok');
@@ -4609,9 +4749,19 @@ function renderValuation(r){
   // Explanation card
   const expEl=el('val-explain');
   expEl.style.display='block';
-  const wExpl = A.adjUseInValuation && r.D
-    ? `Method D (Comp-Adjusted Model) is weighted at <strong>55%</strong>, Method C (Trend) at <strong>25%</strong>, Method A ($/SqFt) at <strong>20%</strong>. Adjustments applied per grid below.`
-    : `Weights are <strong>dynamically assigned</strong> based on data quality — trend strength (R²), comp similarity scores, and PPSF variance all influence allocation. Toggle the adjustment grid to switch to comp-adjusted model weighting.`;
+  // Build the explanation from the SAME source/weights calcAll actually used,
+  // so this text never contradicts the live reconciliation bars above.
+  const w=r.weights||{wA:0.4,wB:0.4,wC:0.2};
+  const pA=Math.round((w.wA||0)*100), pB=Math.round((w.wB||0)*100), pC=Math.round((w.wC||0)*100);
+  let wExpl;
+  if(r.weightSource==='manual'){
+    const prof = A.activeProfile ? ` from profile <strong>${A.activeProfile}</strong>` : '';
+    wExpl = `Weights are <strong>manually set</strong>${prof}: Method A ($/SqFt) at <strong>${pA}%</strong>, Method B (Similarity) at <strong>${pB}%</strong>, Method C (Trend) at <strong>${pC}%</strong>. These override the model's automatic weighting.`;
+  } else if(r.weightSource==='adjustment-grid' && r.D){
+    wExpl = `Method D (Comp-Adjusted Model) is weighted at <strong>55%</strong>, Method C (Trend) at <strong>25%</strong>, Method A ($/SqFt) at <strong>20%</strong>. Adjustments applied per grid below.`;
+  } else {
+    wExpl = `Weights are <strong>dynamically assigned</strong> based on data quality — trend strength (R²), comp similarity scores, and PPSF variance all influence allocation (currently A <strong>${pA}%</strong> · B <strong>${pB}%</strong> · C <strong>${pC}%</strong>). Toggle the adjustment grid or pick a tuned profile to override.`;
+  }
   const lbLabel=A.lookbackMonths===null?'all available data':`the past ${A.lookbackMonths} months`;
   expEl.innerHTML = `<div class="expl-card"><strong>How This Value Was Derived</strong>${`<span style='float:right;font-size:10px;color:var(--txt2)'>Using ${lbLabel} of sales</span>`}${wExpl} Time adjustment is applied to each comp's $/sqft using the market trend slope, bringing older sales to present-day equivalents before averaging.</div>`;
 }
@@ -5277,6 +5427,37 @@ const OPP_RADIUS_MI = 0.25;
 const OPP_MAX_AGE_DAYS = 365;     // comps older than ~12 months are excluded
 const OPP_MIN_STRICT_COMPS = 4;   // need at least this many tight, in-radius comps
 
+// ── STEP 1b: BIAS MODEL LOOKUP ──────────────────────────────────────
+// Price bands used for bias segmentation (shared with learnBiasModel).
+const BIAS_BANDS=[
+  {lbl:'<$750K',min:0,max:750000},
+  {lbl:'$750K–1M',min:750000,max:1000000},
+  {lbl:'$1M–1.5M',min:1000000,max:1500000},
+  {lbl:'$1.5M–2M',min:1500000,max:2000000},
+  {lbl:'$2M–3M',min:2000000,max:3000000},
+  {lbl:'$3M+',min:3000000,max:Infinity},
+];
+function bandFor(price){return BIAS_BANDS.find(b=>price>=b.min&&price<b.max)||null;}
+
+// Returns the most specific learned bias for a target, with graceful fallback:
+// city+type → type → price-band → overall. bias>0 means engine runs HIGH.
+function lookupBias(target){
+  const m=A.biasModel; if(!m) return null;
+  const city=target.city, bt=target.bt;
+  if(city&&bt&&m.byCityType){
+    const k=city+'|'+bt;
+    if(m.byCityType[k]&&m.byCityType[k].n>=m.minCell) return {bias:m.byCityType[k].bias,source:`${toTitle(city)} ${({DE:'SFR',CO:'Condo',TH:'TH'}[bt]||bt)}`};
+  }
+  if(bt&&m.byType&&m.byType[bt]&&m.byType[bt].n>=m.minCell)
+    return {bias:m.byType[bt].bias,source:`${({DE:'SFR',CO:'Condo',TH:'Townhome'}[bt]||bt)} (all cities)`};
+  if(m.byBand){
+    const b=bandFor(target.lp||target.sp||0);
+    if(b&&m.byBand[b.lbl]&&m.byBand[b.lbl].n>=m.minCell) return {bias:m.byBand[b.lbl].bias,source:`${b.lbl} band`};
+  }
+  if(m.overall&&m.overall.n) return {bias:m.overall.bias,source:'overall'};
+  return null;
+}
+
 function valueListingStrict(target, allListings, opts={}){
   const minComps = Math.max(OPP_MIN_STRICT_COMPS, opts.minComps||OPP_MIN_STRICT_COMPS);
   const subjLocated = !!(target.lat && target.lng);
@@ -5371,8 +5552,41 @@ function valueListingStrict(target, allListings, opts={}){
   // Strip outliers on adjusted price, then take the median (robust).
   const prices = adjustedVals.map(x=>x.adjPrice);
   const cleanPrices = S.iqr(prices);
-  const est = Math.round(S.median(cleanPrices));
+  const strictEst = Math.round(S.median(cleanPrices));   // legacy median-of-adjusted
+  if(!strictEst) return null;
+
+  // ── STEP 1a: UNIFIED ENGINE ────────────────────────────────────────
+  // The backtest showed the CMA engine (calcAll) is more accurate and far
+  // less biased than this median-of-adjusted-comps method. So by default we
+  // value the listing with calcAll on the SAME tight comps selected above,
+  // and use that as the estimate. The strict median is kept as a fallback and
+  // sanity reference. Toggle A.oppUseCMAEngine=false to revert.
+  let est = strictEst;
+  let engineUsed = 'strict';
+  if(A.oppUseCMAEngine!==false){
+    try{
+      const savedAdj=A.adjUseInValuation, savedMode=A.weightMode;
+      A.adjUseInValuation=false; A.weightMode='dynamic'; // native CMA weighting
+      const cmaComps = comps.map(c=>c); // same selected comps
+      const r = calcAll(target, cmaComps);
+      A.adjUseInValuation=savedAdj; A.weightMode=savedMode;
+      if(r && r.consensus){ est = r.consensus; engineUsed='cma'; }
+    }catch(ex){ /* fall back to strict median */ }
+  }
   if(!est) return null;
+
+  // ── STEP 1b: PER-SEGMENT BIAS CORRECTION ───────────────────────────
+  // If a bias model has been learned (via the backtest), divide the estimate
+  // by (1+bias) for the matching segment so a systematically-high engine stops
+  // manufacturing phantom discounts. Falls back: city+type → type → overall.
+  let biasApplied=0, biasSource='none';
+  if(A.biasModel && A.biasModel.enabled){
+    const b=lookupBias(target);
+    if(b && Math.abs(b.bias)>=0.005){            // ignore trivial (<0.5%) corrections
+      est = Math.round(est/(1+b.bias));
+      biasApplied=b.bias; biasSource=b.source;
+    }
+  }
 
   // Confidence band from adjusted-price dispersion.
   const sd = S.stddev(cleanPrices);
@@ -5390,6 +5604,8 @@ function valueListingStrict(target, allListings, opts={}){
 
   return {
     est, lo, hi,
+    strictEst, engineUsed,
+    biasApplied, biasSource,
     n: adjustedVals.length,
     nInRadius: subjLocated ? inRadius.length : null,
     sdPct: (sdPct*100).toFixed(1),
@@ -6935,13 +7151,13 @@ async function runOpportunityScanner(opts={}){
   // ── PASS 1: strict attribute + appraiser-adjusted valuation ──────────
   // Uses any cached coordinates for proximity; affinity otherwise. Listings
   // without enough tight, recent, nearby comps are filtered out entirely.
-  let filteredNoComps = 0;
+  let filteredNoComps = 0, valuedBelowTag = 0;
   const stage1 = [];
   candidates.forEach(target=>{
     const v = valueListingStrict(target, A.listings, {minComps});
     if(!v){ filteredNoComps++; return; }   // insufficient comparables — skip
     const gapPct = (v.est - target.lp)/target.lp * 100;
-    if(gapPct < minTagPct) return;          // priced at/above market — not a deal
+    if(gapPct < minTagPct){ valuedBelowTag++; return; }  // priced at/above market — not a deal
     stage1.push({target, v, gapPct});
   });
 
@@ -7012,6 +7228,8 @@ async function runOpportunityScanner(opts={}){
       : `${v.n} closely-matched comp(s) (proximity not geo-confirmed)`;
     reasons.push(`Valued against ${proxTxt}, sold within 12 months, with appraiser adjustments (size/lot/bed/bath/time) applied`);
     reasons.push(`Median gross adjustment ${v.medGrossAdj}% — ${parseFloat(v.medGrossAdj)<10?'comps are tight':'comps required sizeable adjustment, treat with caution'}`);
+    if(v.engineUsed==='cma') reasons.push(`Valued with the CMA engine (weighted $/sqft + similarity + trend)`);
+    if(v.biasApplied && Math.abs(v.biasApplied)>=0.005) reasons.push(`Estimate corrected ${v.biasApplied>0?'down':'up'} ${(Math.abs(v.biasApplied)*100).toFixed(1)}% for learned ${v.biasSource} bias — phantom-discount guard`);
     if(v.relaxed===1) reasons.push(`Note: exact-bed comps were thin, so ±1 bed comps were included`);
     if(v.relaxed===2) reasons.push(`Note: in-radius comps were thin, so radius was widened toward 0.5 mi`);
     if(target.cdom && target.cdom < 14) reasons.push(`Fresh listing (${target.cdom} days on market)`);
@@ -7056,8 +7274,8 @@ async function runOpportunityScanner(opts={}){
 
   const grid = el('opp-grid');
   if(!results.length){
-    grid.innerHTML = `<div class="opp-empty">No opportunities found.<br>This is normal — agents price to market, so genuine underpricing is rare.<br><br>The scanner now requires at least ${Math.max(OPP_MIN_STRICT_COMPS,minComps)} closely-matched comps (sqft ±10%, same beds, baths ±0.5, sold within 12 months, ideally within ${OPP_RADIUS_MI} mi) before flagging a listing. ${filteredNoComps>0?`<strong>${filteredNoComps}</strong> active listing(s) were skipped for lack of tight comps.`:''}<br><br>Try lowering <strong>Min Tag</strong>, relaxing <strong>Min Comps</strong>, or widening the city scope.</div>`;
-    toast(`Scan complete — 0 opportunities (${filteredNoComps} skipped for thin comps)`,'inf');
+    grid.innerHTML = `<div class="opp-empty">No opportunities cleared your filters.<br><br><strong>${candidates.length}</strong> active listing(s) scanned: <strong>${valuedBelowTag}</strong> were valued but priced at/above market (no discount ≥ ${minTagPct}%)${filteredNoComps>0?`, and <strong>${filteredNoComps}</strong> were skipped for lack of tight comps`:''}.${A.biasModel&&A.biasModel.enabled?`<br><br><span style="color:var(--gold)">Bias correction is ON</span> — estimates are pulled toward actual sale levels, so fewer phantom discounts appear. Toggle it off to compare.`:''}<br><br>Try lowering <strong>Min Tag</strong> (currently ${minTagPct}%+), relaxing <strong>Min Comps</strong>, or widening the city scope.</div>`;
+    toast(`Scan complete — 0 deals · ${valuedBelowTag} valued at/above market · ${filteredNoComps} thin comps`,'inf');
     return;
   }
 
@@ -7119,9 +7337,405 @@ function exportOpportunities(){
   toast('Opportunities exported','ok');
 }
 
-// ═══════════════════════════════════
-// ▲▲▲ END VIW v1.0 MODULES ▲▲▲
-// ═══════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════
+// OPPORTUNITY BACKTEST — did flagged "deals" actually pay off?
+// ═══════════════════════════════════════════════════════════════════
+// Method (point-in-time, no look-ahead):
+//   1. Walk every SOLD listing that has a list price + list/close dates.
+//   2. Rewind the clock to the day it was LISTED. Value it with the SAME
+//      strict comp engine the scanner uses, but only on comps that had
+//      already closed by that date (withAsOfDate caps the 12-mo window;
+//      we also hard-filter comps to closeDate < listDate).
+//   3. If the model says "listed >= Min Tag % below estimate", it WOULD
+//      have been flagged as an opportunity.
+//   4. Outcome test (per your spec): a flagged deal is a HIT if it actually
+//      sold AT OR ABOVE the model's point-in-time estimate — i.e. the
+//      day-1 equity the model promised was real.
+//   Reports precision (flagged deals that paid off), predicted vs realized
+//      equity capture, and a breakdown by the tag tier the model assigned.
+async function runOpportunityBacktest(){
+  if(!A.listings.length){toast('Load MLS data first','err');return;}
+  const cityFilt = el('opp-city').value || '';
+  const typeFilt = el('opp-type').value || '';
+  const minTagPct = parseFloat(el('opp-mintag').value) || 0;
+  const minComps = parseInt(el('opp-mincomp').value) || 5;
+
+  // Build the test pool: sold listings we can reconstruct a "listing moment" for.
+  const pool = A.listings.filter(l=>{
+    if(l.status!=='SLD') return false;
+    if(!l.sp || !l.sqft || !l.closeDate) return false;
+    if(cityFilt && l.city!==cityFilt) return false;
+    if(typeFilt && l.bt!==typeFilt) return false;
+    // Need a list price to know what a buyer would have paid at the time.
+    if(!l.lp || l.lp<=0) return false;
+    return true;
+  });
+
+  if(pool.length<10){
+    el('opp-bt-results').innerHTML = `<div class="card" style="margin-bottom:13px"><div style="padding:14px;color:var(--txt2);font-size:12.5px;line-height:1.7">Not enough closed sales with list prices to backtest (found <strong>${pool.length}</strong>, need 10+). Widen the city scope or load more historical data with list prices.</div></div>`;
+    toast('Too few closed sales with list prices to backtest','err');
+    return;
+  }
+
+  el('opp-bt-progress').style.display='block';
+  el('opp-bt-results').innerHTML='';
+
+  const evaluated=[];      // every sold case we could value at its listing moment
+  const flagged=[];        // subset the model would have flagged as a deal
+  const total=pool.length;
+  let i=0;
+
+  const chunk=async ()=>{
+    const end=Math.min(i+40,total);
+    for(;i<end;i++){
+      const target=pool[i];
+      // Listing moment: list date if present, else fall back to ~ (close - DOM).
+      let listMoment=target.listDate ? new Date(target.listDate) : null;
+      if(!listMoment){
+        const dom=(target.cdom||target.dom||30);
+        listMoment=new Date(target.closeDate); listMoment.setDate(listMoment.getDate()-dom);
+      }
+      // As-of cutoff: one day before listing, so no look-ahead.
+      const asOf=new Date(listMoment); asOf.setDate(asOf.getDate()-1);
+      if(asOf<=new Date(2000,0,1)) continue;
+
+      // Value strictly, point-in-time. We pass a comp universe restricted to
+      // sales that closed before the listing moment (kills look-ahead), and
+      // exclude the target itself. withAsOfDate caps the recency window.
+      const universe=A.listings.filter(l=>
+        l.mlsNo!==target.mlsNo &&
+        (l.status!=='SLD' || (l.closeDate && l.closeDate<asOf))
+      );
+      const v=withAsOfDate(asOf,()=>valueListingStrict(target, universe, {minComps}));
+      if(!v) continue; // couldn't value with tight comps at the time — skip
+
+      const gapPct=(v.est - target.lp)/target.lp*100;       // model's apparent discount vs list
+      const realizedPct=(target.sp - v.est)/v.est*100;       // actual sale vs model estimate
+      const hit = target.sp >= v.est;                        // per spec: sold >= estimate
+      const predEquity=v.est - target.lp;                    // what the model promised
+      const realEquity=target.sp - target.lp;                // what a buyer-at-list actually got
+      const wouldFlag = gapPct >= minTagPct;
+
+      let tag='Fair Deal';
+      if(gapPct>=12) tag='Deep Discount';
+      else if(gapPct>=7) tag='Strong Opportunity';
+      else if(gapPct>=3) tag='Buyer Advantage';
+
+      const rec={
+        mlsNo:target.mlsNo, address:target.address, city:target.city, bt:target.bt,
+        lp:target.lp, sp:target.sp, est:v.est, lo:v.lo, hi:v.hi,
+        gapPct, realizedPct, hit, predEquity, realEquity, tag, wouldFlag,
+        soldInRange: target.sp>=v.lo && target.sp<=v.hi,
+        n:v.n,
+      };
+      evaluated.push(rec);
+      if(wouldFlag) flagged.push(rec);
+    }
+    el('opp-bt-prog-fill').style.width=(i/total*100).toFixed(1)+'%';
+    el('opp-bt-prog-txt').textContent=`Replayed ${i} of ${total} closed sales · ${flagged.length} would have been flagged`;
+    if(i<total){ await new Promise(r=>setTimeout(r,12)); return chunk(); }
+  };
+  await chunk();
+
+  el('opp-bt-progress').style.display='none';
+
+  if(!flagged.length){
+    el('opp-bt-results').innerHTML=`<div class="card" style="margin-bottom:13px"><div style="padding:14px;color:var(--txt2);font-size:12.5px;line-height:1.7">Replayed <strong>${evaluated.length}</strong> closed sales, but the model would not have flagged any as deals at the current <strong>Min Tag (${minTagPct}%+)</strong> threshold. Lower Min Tag to test a looser bar.</div></div>`;
+    toast(`Backtest done — 0 flagged of ${evaluated.length} at ${minTagPct}%+`,'inf');
+    return;
+  }
+
+  // ── Metrics ────────────────────────────────────────────────────────
+  const hits=flagged.filter(r=>r.hit).length;
+  const precision=hits/flagged.length;                         // % of flagged that paid off
+  const inRange=flagged.filter(r=>r.soldInRange).length;
+  const medPredGap=S.median(flagged.map(r=>r.gapPct));
+  const medRealized=S.median(flagged.map(r=>r.realizedPct));   // actual sale vs estimate (median)
+  const sumPredEq=flagged.reduce((s,r)=>s+r.predEquity,0);
+  const sumRealEq=flagged.reduce((s,r)=>s+r.realEquity,0);
+  const captureRatio=sumPredEq!==0 ? sumRealEq/sumPredEq : 0;   // realized / predicted equity
+  // Baseline: across ALL evaluated sales, how often did sale >= estimate anyway?
+  const baseHits=evaluated.filter(r=>r.hit).length;
+  const baseRate=baseHits/evaluated.length;
+  const lift=precision-baseRate;                               // does flagging beat random?
+
+  // By tag tier
+  const tiers=['Deep Discount','Strong Opportunity','Buyer Advantage','Fair Deal'];
+  const byTier=tiers.map(t=>{
+    const grp=flagged.filter(r=>r.tag===t);
+    if(!grp.length) return null;
+    return {tier:t, n:grp.length, hitRate:grp.filter(r=>r.hit).length/grp.length,
+            medReal:S.median(grp.map(r=>r.realizedPct))};
+  }).filter(Boolean);
+
+  // ── SEGMENTATION (forensic) ─────────────────────────────────────────
+  const TYPE_LBL={DE:'SFR',CO:'Condo',TH:'Townhome'};
+  // Helper: roll a list of flagged records into a stat block.
+  const seg=(grp)=>{
+    if(!grp.length) return null;
+    const eqAbove=grp.filter(r=>r.sp>r.lp);                 // sold above list (bidding/underpricing)
+    return {
+      n:grp.length,
+      hitRate:grp.filter(r=>r.hit).length/grp.length,        // sold >= model estimate
+      medGap:S.median(grp.map(r=>r.gapPct)),                 // how far below est. they were listed
+      medReal:S.median(grp.map(r=>r.realizedPct)),           // sale vs estimate (median %)
+      medOverList:S.median(grp.map(r=>(r.sp-r.lp)/r.lp*100)),// sale vs LIST (% over asking)
+      pctSoldOverList:eqAbove.length/grp.length,             // share that sold above asking
+      medEquity:S.median(grp.map(r=>r.realEquity)),          // realized $ vs list
+      totalEquity:grp.reduce((s,r)=>s+r.realEquity,0),
+    };
+  };
+  // By city
+  const cityKeys=[...new Set(flagged.map(r=>r.city))];
+  const byCity=cityKeys.map(c=>({key:c,label:toTitle(c||'—'),...seg(flagged.filter(r=>r.city===c))}))
+                       .filter(x=>x.n).sort((a,b)=>b.n-a.n);
+  // By property type
+  const typeKeys=[...new Set(flagged.map(r=>r.bt))];
+  const byType=typeKeys.map(t=>({key:t,label:TYPE_LBL[t]||t||'—',...seg(flagged.filter(r=>r.bt===t))}))
+                       .filter(x=>x.n).sort((a,b)=>b.n-a.n);
+  // City × Type crosstab (only cells with enough sample to be meaningful)
+  const MIN_CELL=8;
+  const cross=[];
+  cityKeys.forEach(c=>{ typeKeys.forEach(t=>{
+    const grp=flagged.filter(r=>r.city===c && r.bt===t);
+    if(grp.length>=MIN_CELL){
+      cross.push({city:c, cityLabel:toTitle(c||'—'), bt:t, typeLabel:TYPE_LBL[t]||t||'—', ...seg(grp)});
+    }
+  });});
+
+  // ── TREND DETECTION — auto-surface the interesting patterns ─────────
+  // We look for segments where listings sold meaningfully OVER asking (real
+  // underpricing the buyer could exploit) vs segments where the apparent
+  // discount evaporated (sold below model estimate).
+  const insights=[];
+  // 1) Strongest underpricing pockets: highest median % over list, decent sample.
+  const overListPockets=cross.filter(x=>x.medOverList>=2 && x.pctSoldOverList>=0.5)
+                             .sort((a,b)=>b.medOverList-a.medOverList).slice(0,4);
+  overListPockets.forEach(x=>{
+    insights.push({kind:'hot', text:`<strong>${x.typeLabel} in ${x.cityLabel}</strong> are consistently underlisted — ${x.n} flagged sales closed a median <strong>${x.medOverList.toFixed(1)}% over asking</strong>, with ${pct0(x.pctSoldOverList)} selling above list. Real competition; expect to bid over for these.`});
+  });
+  // 2) Best equity-capture pockets: sold at/above model estimate often.
+  const reliablePockets=cross.filter(x=>x.hitRate>=0.55 && x.n>=MIN_CELL)
+                             .sort((a,b)=>b.hitRate-a.hitRate).slice(0,3);
+  reliablePockets.forEach(x=>{
+    if(!overListPockets.find(o=>o.city===x.city&&o.bt===x.bt))
+      insights.push({kind:'good', text:`<strong>${x.typeLabel} in ${x.cityLabel}</strong> is where the model is most trustworthy — ${pct0(x.hitRate)} of ${x.n} flagged listings sold at or above the model's estimate.`});
+  });
+  // 3) Mirage pockets: model flagged a discount but homes sold well BELOW estimate.
+  const miragePockets=cross.filter(x=>x.medReal<=-4 && x.n>=MIN_CELL)
+                           .sort((a,b)=>a.medReal-b.medReal).slice(0,3);
+  miragePockets.forEach(x=>{
+    insights.push({kind:'warn', text:`<strong>${x.typeLabel} in ${x.cityLabel}</strong>: apparent discounts here are largely a <strong>mirage</strong> — flagged homes sold a median ${Math.abs(x.medReal).toFixed(1)}% <em>below</em> the model estimate. The model overvalues this segment; discount the gap before trusting it.`});
+  });
+  // 4) Type-level summary: which property type shows the most real underpricing.
+  if(byType.length>1){
+    const topType=[...byType].sort((a,b)=>b.medOverList-a.medOverList)[0];
+    if(topType && topType.medOverList>=1.5)
+      insights.push({kind:'hot', text:`Across all cities, <strong>${topType.label}</strong> shows the most real underpricing — median ${topType.medOverList.toFixed(1)}% over asking on ${topType.n} flagged sales.`});
+  }
+  // 5) City-level: the single city with the most flagged volume + how it behaved.
+  if(byCity.length){
+    const topCity=byCity[0];
+    insights.push({kind:'info', text:`<strong>${topCity.label}</strong> produced the most flagged opportunities (${topCity.n}); those homes sold a median ${topCity.medOverList>=0?'+':''}${topCity.medOverList.toFixed(1)}% vs asking and ${pct0(topCity.hitRate)} hit the model estimate.`});
+  }
+  if(!insights.length){
+    insights.push({kind:'info', text:`No single city/type pocket reached the ${MIN_CELL}-sale minimum to call a reliable pattern. Widen the city scope or lower Min Tag to build bigger segments.`});
+  }
+
+  A.oppBacktest={evaluated,flagged,precision,baseRate,lift,captureRatio,sumPredEq,sumRealEq,byTier,byCity,byType,cross,insights,minTagPct,minCell:MIN_CELL,generatedAt:new Date()};
+  renderOppBacktest(A.oppBacktest);
+  toast(`Backtest complete — ${(precision*100).toFixed(0)}% of flagged deals paid off (${hits}/${flagged.length})`,'ok');
+}
+
+// small local percent formatter (0 decimals) used in insight strings
+function pct0(x){return `${(x*100).toFixed(0)}%`;}
+
+function renderOppBacktest(bt){
+  const root=el('opp-bt-results'); if(!root) return;
+  const pct=x=>`${(x*100).toFixed(0)}%`;
+  const sg=x=>x>=0?'+':'';
+  const liftColor=bt.lift>0.05?'var(--grn)':bt.lift< -0.05?'var(--red)':'var(--org)';
+  const capColor=bt.captureRatio>=0.9?'var(--grn)':bt.captureRatio>=0.6?'var(--org)':'var(--red)';
+
+  // Color helpers for segment columns
+  const hitC=v=>v>=0.6?'var(--grn)':v>=0.45?'var(--org)':'var(--red)';
+  const overC=v=>v>=2?'var(--grn)':v>=0?'var(--gold)':'var(--red)';   // sold over list = real deal
+  const realC=v=>v>=-2?'var(--grn)':v>=-6?'var(--org)':'var(--red)';  // sale vs estimate
+
+  // Plain-language verdict
+  let verdict;
+  if(bt.precision>=0.7 && bt.lift>0.05)
+    verdict=`The scanner is <strong>reliable</strong>: ${pct(bt.precision)} of flagged listings actually sold at or above the model's estimate — well above the ${pct(bt.baseRate)} base rate. Flagged equity was largely real.`;
+  else if(bt.precision>=0.55)
+    verdict=`<strong>Moderately useful</strong>: ${pct(bt.precision)} of flagged listings paid off vs a ${pct(bt.baseRate)} base rate. Treat flags as leads to verify, and lean on the strongest city/type pockets below.`;
+  else
+    verdict=`<strong>Read this carefully</strong>: only ${pct(bt.precision)} of flagged listings sold at or above the model's estimate (base rate ${pct(bt.baseRate)}), and equity capture is ${pct(bt.captureRatio)}. The model tends to <strong>overvalue the homes it flags</strong> — the headline "discount vs estimate" overstates the deal. The buyer-useful signal is which segments still sold <em>over asking</em> (real competition), shown below.`;
+
+  // Insights
+  const iconFor={hot:'🔥',good:'✅',warn:'⚠️',info:'•'};
+  const colorFor={hot:'var(--grn)',good:'var(--blue)',warn:'var(--red)',info:'var(--txt2)'};
+  const insightHTML=bt.insights.map(o=>`<div style="display:flex;gap:9px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--bdr)">
+      <span style="flex-shrink:0;font-size:13px;line-height:1.5;color:${colorFor[o.kind]}">${iconFor[o.kind]}</span>
+      <span style="font-size:12.5px;color:var(--txt);line-height:1.6">${o.text}</span></div>`).join('');
+
+  // Segment table builder
+  const segTable=(rows,firstCol)=>{
+    if(!rows.length) return `<div style="font-size:11.5px;color:var(--txt3);padding:8px 0">Not enough sample to segment.</div>`;
+    const body=rows.map(r=>`<tr>
+      <td style="text-align:left">${r.label||((r.typeLabel||'')+' · '+(r.cityLabel||''))}</td>
+      <td class="num">${r.n}</td>
+      <td class="num" style="color:${overC(r.medOverList)}"><strong>${sg(r.medOverList)}${r.medOverList.toFixed(1)}%</strong></td>
+      <td class="num">${pct(r.pctSoldOverList)}</td>
+      <td class="num" style="color:${hitC(r.hitRate)}">${pct(r.hitRate)}</td>
+      <td class="num" style="color:${realC(r.medReal)}">${sg(r.medReal)}${r.medReal.toFixed(1)}%</td>
+      <td class="num">${fmtK(r.medEquity)}</td>
+    </tr>`).join('');
+    return `<table class="fx-table" style="width:100%">
+      <thead><tr>
+        <th style="text-align:left">${firstCol}</th>
+        <th class="num" title="Flagged sales in this segment">Flagged</th>
+        <th class="num" title="Median sale price vs original list price — positive means sold OVER asking (real underpricing)">Med. vs List</th>
+        <th class="num" title="Share that sold above asking price">% Over List</th>
+        <th class="num" title="Share that sold at or above the model's estimate">Hit Est.</th>
+        <th class="num" title="Median sale vs model estimate — negative means model ran high">vs Est.</th>
+        <th class="num" title="Median realized equity (sale − list)">Med. Equity</th>
+      </tr></thead><tbody>${body}</tbody></table>`;
+  };
+
+  const tierRows=bt.byTier.map(t=>`<tr>
+      <td style="text-align:left">${t.tier}</td><td class="num">${t.n}</td>
+      <td class="num" style="color:${hitC(t.hitRate)}">${pct(t.hitRate)}</td>
+      <td class="num" style="color:${realC(t.medReal)}">${sg(t.medReal)}${t.medReal.toFixed(1)}%</td></tr>`).join('');
+
+  root.innerHTML=`
+  <div class="card" style="margin-bottom:13px">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+      <div class="card-title" style="margin:0">🧪 Opportunity Forensics</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn btn-g" style="font-size:11px;padding:5px 11px" onclick="exportOppBacktest()">⬇ CSV</button>
+        <div style="font-size:10.5px;color:var(--txt3)">${bt.evaluated.length} sales replayed · ${bt.flagged.length} flagged at ${bt.minTagPct}%+ · ${new Date(bt.generatedAt).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</div>
+      </div>
+    </div>
+
+    <div class="opp-stats-bar" style="margin-bottom:14px">
+      <div class="opp-stat"><div class="opp-stat-num" style="color:var(--gold)">${pct(bt.precision)}</div><div class="opp-stat-lbl">Sold ≥ Model Est.</div></div>
+      <div class="opp-stat"><div class="opp-stat-num">${pct(bt.baseRate)}</div><div class="opp-stat-lbl">Base Rate (All Sales)</div></div>
+      <div class="opp-stat"><div class="opp-stat-num" style="color:${liftColor}">${sg(bt.lift)}${(bt.lift*100).toFixed(0)} pts</div><div class="opp-stat-lbl">Lift vs Base Rate</div></div>
+      <div class="opp-stat"><div class="opp-stat-num" style="color:${capColor}">${pct(bt.captureRatio)}</div><div class="opp-stat-lbl">Equity Capture</div></div>
+      <div class="opp-stat"><div class="opp-stat-num">${fmt(bt.sumRealEq)}</div><div class="opp-stat-lbl">Total Realized vs List</div></div>
+    </div>
+
+    <div style="font-size:12.5px;color:var(--txt);line-height:1.7;margin-bottom:14px;padding:11px 13px;background:var(--sur);border-radius:var(--r);border:1px solid var(--bdr)">${verdict}</div>
+
+    <div style="font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">What The Data Is Telling You</div>
+    <div style="margin-bottom:16px">${insightHTML}</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px" class="opp-chart-grid">
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">List → Sale vs Model Estimate</div>
+        <div style="height:280px;background:var(--sur);border:1px solid var(--bdr);border-radius:var(--r);padding:8px"><canvas id="opp-bt-scatter"></canvas></div>
+        <div style="font-size:9.5px;color:var(--txt3);margin-top:5px;line-height:1.5">Each dot is a flagged listing. X = how far below estimate it was listed. Y = where it actually sold vs estimate. Dots above the line beat the estimate; the cluster's height shows the systematic bias.</div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Underpricing By Segment (Med. % Over Asking)</div>
+        <div style="height:280px;background:var(--sur);border:1px solid var(--bdr);border-radius:var(--r);padding:8px"><canvas id="opp-bt-segbar"></canvas></div>
+        <div style="font-size:9.5px;color:var(--txt3);margin-top:5px;line-height:1.5">Top city×type pockets by sample. Green bars = sold over asking (genuine competition / underpricing); red = sold under asking.</div>
+      </div>
+    </div>
+
+    <div style="font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">By Property Type</div>
+    ${segTable(bt.byType,'Type')}
+
+    <div style="font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 6px">By City</div>
+    ${segTable(bt.byCity,'City')}
+
+    <div style="font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 6px">City × Type Pockets <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--txt3)">(≥${bt.minCell} flagged sales)</span></div>
+    ${segTable([...bt.cross].sort((a,b)=>b.medOverList-a.medOverList),'Segment')}
+
+    <div style="font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 6px">By Tag Tier</div>
+    <table class="fx-table" style="width:100%">
+      <thead><tr><th style="text-align:left">Tier (model said)</th><th class="num">Flagged</th><th class="num">Hit Est.</th><th class="num">vs Est.</th></tr></thead>
+      <tbody>${tierRows}</tbody>
+    </table>
+
+    <div style="font-size:10px;color:var(--txt3);margin-top:12px;line-height:1.6">
+      <strong>How to read this for buyers:</strong> <span style="color:var(--grn)">Med. vs List</span> is the headline — a positive number means homes in that segment sold <em>over asking</em>, so the model found genuine competition your buyer should expect to bid into. <span style="color:var(--gold)">Hit Est.</span> / <span style="color:var(--org)">vs Est.</span> show whether the model's <em>estimate</em> held up; a negative "vs Est." means the model ran high for that segment, so trust the list-price signal over the estimate there. Every case used only comps that closed before its listing date (no look-ahead). This measures discount-spotting, not whether you'd win at list.
+    </div>
+  </div>`;
+
+  setTimeout(()=>{ renderOppScatter(bt.flagged); renderOppSegBar(bt.cross.length?bt.cross:bt.byCity); },60);
+}
+
+let _oppScatter=null, _oppSegBar=null;
+function renderOppScatter(flagged){
+  const cv=el('opp-bt-scatter'); if(!cv) return;
+  if(_oppScatter) _oppScatter.destroy();
+  // X = listed below estimate (gapPct), Y = sold vs estimate (realizedPct). Cap outliers for readability.
+  const cap=(v,m)=>Math.max(-m,Math.min(m,v));
+  const pts=flagged.map(r=>({x:cap(r.gapPct,40),y:cap(r.realizedPct,40),
+    bg:r.hit?'rgba(56,198,139,0.45)':'rgba(238,94,94,0.40)'}));
+  _oppScatter=new Chart(cv.getContext('2d'),{
+    type:'scatter',
+    data:{datasets:[
+      {label:'Flagged sale',data:pts,parsing:false,
+       backgroundColor:pts.map(p=>p.bg),pointRadius:2.5,pointHoverRadius:4},
+      {label:'Sold = Estimate',data:[{x:-40,y:0},{x:40,y:0}],showLine:true,parsing:false,
+       borderColor:'rgba(160,175,204,0.5)',borderDash:[6,4],pointRadius:0,borderWidth:1.2},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#A0AFCC',font:{size:9},boxWidth:10}},
+        tooltip:{callbacks:{label:c=>c.datasetIndex===1?'Sold exactly at estimate':`Listed ${c.parsed.x.toFixed(1)}% below est · sold ${c.parsed.y>=0?'+':''}${c.parsed.y.toFixed(1)}% vs est`}}},
+      scales:{
+        x:{title:{display:true,text:'Listed below estimate (%)',color:'#A0AFCC',font:{size:9}},
+           ticks:{color:'#5C6E94',font:{size:8.5}},grid:{color:'rgba(40,51,79,0.4)'}},
+        y:{title:{display:true,text:'Sold vs estimate (%)',color:'#A0AFCC',font:{size:9}},
+           ticks:{color:'#5C6E94',font:{size:8.5}},grid:{color:'rgba(40,51,79,0.4)'}},
+      }}
+  });
+}
+function renderOppSegBar(segs){
+  const cv=el('opp-bt-segbar'); if(!cv) return;
+  if(_oppSegBar) _oppSegBar.destroy();
+  const top=[...segs].sort((a,b)=>b.n-a.n).slice(0,10)
+                     .sort((a,b)=>b.medOverList-a.medOverList);
+  const labels=top.map(s=>s.typeLabel?`${s.typeLabel} · ${s.cityLabel}`:s.label);
+  const data=top.map(s=>+s.medOverList.toFixed(1));
+  const colors=data.map(v=>v>=2?'rgba(56,198,139,0.8)':v>=0?'rgba(201,168,76,0.8)':'rgba(238,94,94,0.8)');
+  _oppSegBar=new Chart(cv.getContext('2d'),{
+    type:'bar',
+    data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:0}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},
+        tooltip:{callbacks:{label:c=>`${c.label}: ${c.parsed.x>=0?'+':''}${c.parsed.x}% vs asking (n=${top[c.dataIndex].n})`}}},
+      scales:{
+        x:{title:{display:true,text:'Median sale vs asking (%)',color:'#A0AFCC',font:{size:9}},
+           ticks:{color:'#5C6E94',font:{size:8.5}},grid:{color:'rgba(40,51,79,0.4)'}},
+        y:{ticks:{color:'#A0AFCC',font:{size:9}},grid:{display:false}},
+      }}
+  });
+}
+
+function exportOppBacktest(){
+  const bt=A.oppBacktest;
+  if(!bt||!bt.flagged?.length){toast('Run the backtest first','err');return;}
+  const TYPE_LBL={DE:'SFR',CO:'Condo',TH:'Townhome'};
+  const hdr=['MLS#','Address','City','Type','Tag','ListPrice','SalePrice','ModelEst','EstLo','EstHi',
+             'ListedBelowEst%','SaleVsEst%','SaleVsList%','SoldOverList','SoldAtOrAboveEst','RealizedEquity','Comps'];
+  const rows=bt.flagged.map(r=>[
+    r.mlsNo,r.address,toTitle(r.city||''),TYPE_LBL[r.bt]||r.bt,r.tag,
+    r.lp,r.sp,r.est,r.lo,r.hi,
+    r.gapPct.toFixed(1),r.realizedPct.toFixed(1),((r.sp-r.lp)/r.lp*100).toFixed(1),
+    r.sp>r.lp?'Y':'N', r.hit?'Y':'N', r.realEquity, r.n
+  ]);
+  const csv=[hdr,...rows].map(r=>r.map(x=>`"${String(x??'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='TeamParikh_Opportunity_Backtest.csv';
+  a.click();
+  toast('Backtest detail exported','ok');
+}
+
+
 
 // ═══════════════════════════════════════════════════════════════════
 // ▼▼▼ v2.0 — BACKTEST · TUNING · CLIENT REPORT ▼▼▼
@@ -7146,6 +7760,8 @@ function initTunePane(){
   // Show last results if any
   if(A.backtestResults) renderBacktestResults(A.backtestResults);
   updateTuneQuickStats();
+  syncProfileDropdowns();
+  updateActiveProfileBadge();
 }
 
 function updateTuneQuickStats(){
@@ -7172,6 +7788,7 @@ function populateBacktestCityDropdown(){
 // ───────────────────────────────────────────────────────
 function setWeightMode(mode){
   A.weightMode=mode;
+  if(mode==='dynamic') A.activeProfile=null;
   const sliders=el('weight-sliders');
   if(sliders) sliders.dataset.disabled = (mode==='dynamic')?'true':'false';
   // Re-run CMA if subject is loaded
@@ -7180,6 +7797,8 @@ function setWeightMode(mode){
     renderValuation(r);renderReport(r);renderAdjustmentGrid();
   }
   updateTuneQuickStats();
+  updateActiveProfileBadge();
+  syncProfileDropdowns();
   toast(mode==='manual'?'Manual weights enabled — adjust the sliders':'Dynamic weighting restored','inf');
 }
 
@@ -7220,6 +7839,9 @@ function onWeightSlider(label){
   el('ws-total').textContent='Total: '+total+'%';
   // Persist to state
   A.manualWeights={wA:fA/100,wB:fB/100,wC:fC/100};
+  A.activeProfile=null; // hand-tuning diverges from any named profile
+  updateActiveProfileBadge();
+  syncProfileDropdowns();
   // Re-run CMA
   if(A.weightMode==='manual'&&A.subject&&A.comps.length){
     const r=calcAll(A.subject,A.comps);
@@ -7257,37 +7879,127 @@ function saveWeightProfilesToStorage(){
   try{ localStorage.setItem(WEIGHT_PROFILES_KEY, JSON.stringify(A.weightProfiles)); }catch(ex){}
 }
 
+// #4: Profiles are portable. Export writes a JSON file the user can share or
+// load in another browser/device; localStorage alone doesn't travel.
+function exportWeightProfiles(){
+  const names=Object.keys(A.weightProfiles||{});
+  if(!names.length){toast('No profiles to export','err');return;}
+  const payload={kind:'piq_weight_profiles',version:1,exportedAt:new Date().toISOString(),profiles:A.weightProfiles};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=`valuation-weight-profiles-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  toast(`Exported ${names.length} profile${names.length>1?'s':''}`,'ok');
+}
+
+function importWeightProfiles(input){
+  const file=input&&input.files&&input.files[0];
+  if(!file){return;}
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const data=JSON.parse(reader.result);
+      const incoming=data&&data.profiles?data.profiles:data; // accept raw map too
+      if(!incoming||typeof incoming!=='object'){throw new Error('bad format');}
+      let added=0, overwritten=0;
+      Object.keys(incoming).forEach(name=>{
+        const p=incoming[name];
+        if(!p||typeof p.wA!=='number') return;
+        if(A.weightProfiles[name]) overwritten++; else added++;
+        A.weightProfiles[name]=p;
+      });
+      saveWeightProfilesToStorage();
+      renderProfileList();
+      syncProfileDropdowns();
+      toast(`Imported ${added} new, ${overwritten} updated`,'ok');
+    }catch(ex){
+      toast('Could not read that file — expected an exported profiles JSON','err');
+    }
+    input.value=''; // allow re-importing the same file
+  };
+  reader.readAsText(file);
+}
+
 function saveWeightProfile(){
   const name=(el('wp-name').value||'').trim();
   if(!name){toast('Enter a profile name','err');return;}
   const scope=el('bt-city')?.value || '';
-  const bt=el('bt-bt')?.value || '';
+  // Capture the backtest property-type multi-select as structured metadata (#3)
+  const btTypes=[];
+  if(el('bt-bt-de')&&el('bt-bt-de').checked) btTypes.push('DE');
+  if(el('bt-bt-co')&&el('bt-bt-co').checked) btTypes.push('CO');
+  if(el('bt-bt-th')&&el('bt-bt-th').checked) btTypes.push('TH');
+  const TYPE_LBL={DE:'SFR',CO:'Condo',TH:'Townhome'};
+  const btLabel=(btTypes.length && btTypes.length<3)?btTypes.map(t=>TYPE_LBL[t]||t).join(' + '):'Any type';
+  // Snapshot the backtest accuracy this profile was tuned against, for context (#3)
+  const mdape=A.backtestResults?.summary?.consensus?.mdape;
   A.weightProfiles[name]={
     wA:A.manualWeights.wA, wB:A.manualWeights.wB, wC:A.manualWeights.wC,
-    scope:scope||'All Cities', bt:bt||'Any', savedAt:new Date().toISOString(),
+    scope:scope||'', scopeLabel:scope?toTitle(scope):'All Cities',
+    btTypes, btLabel,
+    mdape:(typeof mdape==='number')?mdape:null,
+    savedAt:new Date().toISOString(),
   };
   saveWeightProfilesToStorage();
   el('wp-name').value='';
   renderProfileList();
+  syncProfileDropdowns();
   toast(`Profile "${name}" saved`,'ok');
 }
 
+// Applies a profile's weights to state. If a CMA is already on screen, re-runs
+// it live; otherwise sets state so the NEXT CMA run uses it (#1, #2).
 function applyWeightProfile(name){
   const p=A.weightProfiles[name];
   if(!p){toast('Profile not found','err');return;}
   A.manualWeights={wA:p.wA,wB:p.wB,wC:p.wC};
   A.weightMode='manual';
+  A.activeProfile=name;                 // persistent "active profile" state (#2)
   if(el('wmode-man')) el('wmode-man').checked=true;
-  setWeightMode('manual');
+  // #3: warn if this profile was tuned for a different city/type than the
+  // current subject — don't block, just inform.
+  let mismatch='';
+  if(A.subject){
+    if(p.scope && A.subject.city && p.scope!==A.subject.city)
+      mismatch=` (tuned for ${p.scopeLabel}, subject is in ${toTitle(A.subject.city)})`;
+  }
+  setWeightMode('manual');              // re-runs live if subject+comps loaded
   syncWeightSlidersFromState();
-  toast(`Applied profile "${name}"`,'ok');
+  renderProfileList();
+  syncProfileDropdowns();
+  updateActiveProfileBadge();
+  // #2: surface the change where the user is actually looking — the CMA pane.
+  if(A.subject && A.comps.length){
+    toast(`Applied "${name}" — valuation updated${mismatch}`,'ok');
+  } else {
+    // No CMA on screen: jump to CMA tab so the apply isn't invisible.
+    if(typeof showTab==='function') showTab('cma');
+    toast(`Profile "${name}" is now active — run a CMA to use it${mismatch}`,'ok');
+  }
+}
+
+// Clears the active manual profile and returns the model to Dynamic weighting.
+function clearActiveProfile(){
+  A.activeProfile=null;
+  A.weightMode='dynamic';
+  if(el('wmode-dyn')) el('wmode-dyn').checked=true;
+  setWeightMode('dynamic');
+  renderProfileList();
+  syncProfileDropdowns();
+  updateActiveProfileBadge();
+  toast('Back to Dynamic weighting','inf');
 }
 
 function deleteWeightProfile(name){
   if(!confirm(`Delete profile "${name}"?`)) return;
   delete A.weightProfiles[name];
+  if(A.activeProfile===name) A.activeProfile=null;
   saveWeightProfilesToStorage();
   renderProfileList();
+  syncProfileDropdowns();
+  updateActiveProfileBadge();
   toast(`Profile "${name}" deleted`,'inf');
 }
 
@@ -7298,13 +8010,57 @@ function renderProfileList(){
   list.innerHTML=names.map(n=>{
     const p=A.weightProfiles[n];
     const wStr=`${Math.round(p.wA*100)}/${Math.round(p.wB*100)}/${Math.round(p.wC*100)}`;
-    return `<div class="wp-item">
-      <div class="wp-item-name" title="${p.scope} · ${p.bt}">${n}</div>
+    const scopeLbl=p.scopeLabel||p.scope||'All Cities';
+    const btLbl=p.btLabel||'Any type';
+    const mdapeLbl=(typeof p.mdape==='number')?` · ${(p.mdape*100).toFixed(1)}% MdAPE`:'';
+    const active=A.activeProfile===n;
+    return `<div class="wp-item${active?' wp-active':''}">
+      <div class="wp-item-name" title="${scopeLbl} · ${btLbl}${mdapeLbl}">${active?'● ':''}${n}<div style="font-size:9px;color:var(--txt3);font-weight:400;letter-spacing:0;text-transform:none">${scopeLbl} · ${btLbl}${mdapeLbl}</div></div>
       <div class="wp-item-w">${wStr}</div>
-      <button class="wp-item-btn" onclick="applyWeightProfile('${n.replace(/'/g,"\\'")}')">Apply</button>
+      <button class="wp-item-btn" onclick="applyWeightProfile('${n.replace(/'/g,"\\'")}')">${active?'Re-apply':'Apply'}</button>
       <button class="wp-item-btn dl" onclick="deleteWeightProfile('${n.replace(/'/g,"\\'")}')">×</button>
     </div>`;
   }).join('');
+}
+
+// Keeps the CMA-pane profile dropdown in sync with saved profiles (#1).
+function syncProfileDropdowns(){
+  const sel=el('cma-profile-sel'); if(!sel) return;
+  const names=Object.keys(A.weightProfiles);
+  const cur=A.weightMode==='manual'&&A.activeProfile?A.activeProfile:'__dynamic';
+  sel.innerHTML='<option value="__dynamic">Dynamic — auto-weight (default)</option>'
+    + names.map(n=>{
+        const p=A.weightProfiles[n];
+        const w=`${Math.round(p.wA*100)}/${Math.round(p.wB*100)}/${Math.round(p.wC*100)}`;
+        return `<option value="${n.replace(/"/g,'&quot;')}">${n} · ${w}</option>`;
+      }).join('');
+  sel.value=cur;
+}
+
+// Reads the CMA-pane dropdown and applies the chosen profile (or Dynamic) (#1).
+function onCmaProfileChange(){
+  const sel=el('cma-profile-sel'); if(!sel) return;
+  const val=sel.value;
+  if(val==='__dynamic'){ clearActiveProfile(); }
+  else { applyWeightProfile(val); }
+}
+
+// Persistent badge on the CMA pane showing which weighting is active (#2).
+function updateActiveProfileBadge(){
+  const b=el('cma-active-profile'); if(!b) return;
+  if(A.weightMode==='manual' && A.activeProfile){
+    const p=A.weightProfiles[A.activeProfile];
+    const w=p?`${Math.round(p.wA*100)}/${Math.round(p.wB*100)}/${Math.round(p.wC*100)}`:'';
+    b.style.display='flex';
+    b.innerHTML=`<span class="cap-dot"></span><span><strong>Manual profile active:</strong> ${A.activeProfile} <span style="opacity:.7">(${w})</span></span><button class="cap-clear" onclick="clearActiveProfile()">Switch to Dynamic</button>`;
+  } else if(A.weightMode==='manual'){
+    b.style.display='flex';
+    const m=A.manualWeights||{wA:.4,wB:.4,wC:.2};
+    b.innerHTML=`<span class="cap-dot"></span><span><strong>Manual weights active</strong> <span style="opacity:.7">(${Math.round(m.wA*100)}/${Math.round(m.wB*100)}/${Math.round(m.wC*100)})</span></span><button class="cap-clear" onclick="clearActiveProfile()">Switch to Dynamic</button>`;
+  } else {
+    b.style.display='none';
+    b.innerHTML='';
+  }
 }
 
 // ───────────────────────────────────────────────────────
@@ -7337,7 +8093,11 @@ function targetAsSubject(l){
  */
 async function runBacktestCore(opts){
   const cityFilter=opts.cityFilter||'';
-  const btFilter=opts.btFilter||'';
+  // btTypes: array of selected types (DE/CO/TH). Empty = Any.
+  // Back-compat: accept legacy single btFilter string too.
+  let btTypes=Array.isArray(opts.btTypes)?opts.btTypes.slice():[];
+  if(!btTypes.length && opts.btFilter) btTypes=[opts.btFilter];
+  const typeSel = btTypes.length>0 && btTypes.length<3; // 3 = all = no filter
   const lookback=opts.lookback||12;
   const sample=opts.sample||300;
   const minComps=opts.minComps||5;
@@ -7352,7 +8112,7 @@ async function runBacktestCore(opts){
     l.status==='SLD' && l.closeDate && l.closeDate>=cutoff &&
     l.sp && l.sqft && l.sqft>0 &&
     (!cityFilter || l.city===cityFilter) &&
-    (!btFilter || l.bt===btFilter)
+    (!typeSel || (l.bt && btTypes.includes(l.bt)))
   );
   if(!pool.length) return {cases:[], reason:'No sold listings match those filters'};
   if(pool.length>sample){
@@ -7374,12 +8134,16 @@ async function runBacktestCore(opts){
     for(;i<end;i++){
       const target=pool[i];
       const asOf=new Date(target.closeDate); asOf.setDate(asOf.getDate()-1);
-      // Scope: same-city only, or any-city (the latter for testing wider radius)
+      // Comp pool for this prediction. When the user selected multiple types
+      // (e.g. Condo + Townhome — loosely correlated in this market), allow
+      // comps of ANY selected type rather than locking to the target's own
+      // type. This mirrors how runCMA() blends ticked types. When no type
+      // filter is set, fall back to same-type matching as before.
       const candidates=A.listings.filter(l=>
         l.status==='SLD' && l.closeDate && l.closeDate<asOf &&
         l.mlsNo!==target.mlsNo && l.sp && l.sqft &&
         (scope==='same' ? l.city===target.city : true) &&
-        (target.bt?l.bt===target.bt:true)
+        (typeSel ? (l.bt && btTypes.includes(l.bt)) : (target.bt?l.bt===target.bt:true))
       );
       if(candidates.length<minComps) continue;
       const subj=targetAsSubject(target);
@@ -7429,7 +8193,10 @@ async function runBacktestCore(opts){
 async function runBacktest(){
   if(!A.listings.length){toast('Load MLS data first','err');return;}
   const cityFilter=el('bt-city').value||'';
-  const btFilter=el('bt-bt').value||'';
+  const btTypes=[];
+  if(el('bt-bt-de')&&el('bt-bt-de').checked) btTypes.push('DE');
+  if(el('bt-bt-co')&&el('bt-bt-co').checked) btTypes.push('CO');
+  if(el('bt-bt-th')&&el('bt-bt-th').checked) btTypes.push('TH');
   const lookback=parseInt(el('bt-lookback').value)||12;
   const sample=parseInt(el('bt-sample').value)||300;
   const minComps=parseInt(el('bt-mincomps').value)||5;
@@ -7443,7 +8210,7 @@ async function runBacktest(){
   };
 
   const {cases, reason} = await runBacktestCore({
-    cityFilter, btFilter, lookback, sample, minComps,
+    cityFilter, btTypes, lookback, sample, minComps,
     compLookbackMonths:24, topN:25, scope:'same', progressFn
   });
 
@@ -7462,11 +8229,390 @@ async function runBacktest(){
   const calibration=computeCalibration(cases);
   const attribution=computeFeatureAttribution(cases);
 
-  A.backtestResults={cases,summary,segments,optimal,calibration,attribution,settings:{cityFilter,btFilter,lookback,sample,minComps},generatedAt:new Date()};
+  A.backtestResults={cases,summary,segments,optimal,calibration,attribution,settings:{cityFilter,btTypes,lookback,sample,minComps},generatedAt:new Date()};
 
   renderBacktestResults(A.backtestResults);
   updateTuneQuickStats();
   toast(`Backtest complete — ${cases.length} predictions, MAPE ${(summary.consensus.mape*100).toFixed(1)}%`,'ok');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ENGINE COMPARISON — CMA (calcAll) vs Opportunity (valueListingStrict)
+// Head-to-head on the SAME sold homes, SAME point-in-time comp pool, so the
+// only thing that varies is the valuation math. Reports bias, MdAPE, MAPE,
+// and hit-rates side by side and declares a winner.
+// ═══════════════════════════════════════════════════════════════════
+async function runEngineComparison(){
+  if(!A.listings.length){toast('Load MLS data first','err');return;}
+  const cityFilter=el('bt-city').value||'';
+  const btTypes=[];
+  if(el('bt-bt-de')&&el('bt-bt-de').checked) btTypes.push('DE');
+  if(el('bt-bt-co')&&el('bt-bt-co').checked) btTypes.push('CO');
+  if(el('bt-bt-th')&&el('bt-bt-th').checked) btTypes.push('TH');
+  const typeSel=btTypes.length>0 && btTypes.length<3;
+  const lookback=parseInt(el('bt-lookback').value)||12;
+  const sample=parseInt(el('bt-sample').value)||300;
+  const minComps=parseInt(el('bt-mincomps').value)||5;
+  const compLookbackMonths=24, topN=25;
+
+  // Build target pool — same rules as runBacktestCore.
+  const cutoff=new Date(TODAY_REAL); cutoff.setMonth(cutoff.getMonth()-lookback);
+  let pool=A.listings.filter(l=>
+    l.status==='SLD' && l.closeDate && l.closeDate>=cutoff &&
+    l.sp && l.sqft && l.sqft>0 &&
+    (!cityFilter || l.city===cityFilter) &&
+    (!typeSel || (l.bt && btTypes.includes(l.bt)))
+  );
+  if(pool.length>sample) pool=[...pool].sort(()=>Math.random()-0.5).slice(0,sample);
+  if(!pool.length){ el('bt-results-area').innerHTML=`<div class="bt-empty"><div class="bt-empty-ic">⚠️</div><div class="bt-empty-t">No test cases</div><div class="bt-empty-s">No sold listings match those filters.</div></div>`; return; }
+  pool.sort((a,b)=>a.closeDate.getTime()-b.closeDate.getTime());
+
+  el('ec-progress').style.display='block';
+  el('bt-results-area').innerHTML='<div class="bt-empty"><div class="bt-empty-ic">⚖</div><div class="bt-empty-t">Comparing engines…</div><div class="bt-empty-s">Valuing each sold home with BOTH engines on identical comps.</div></div>';
+
+  // Save mutated globals
+  const savedAdj=A.adjUseInValuation; A.adjUseInValuation=false;
+  const savedMode=A.weightMode;       A.weightMode='dynamic'; // test the CMA's native dynamic weighting
+  const savedExcluded=A.excluded;     A.excluded=new Set();
+  const savedComps=A.comps;           const savedSubject=A.subject;
+
+  const rows=[];   // {actual, cma, opp, city, bt}
+  const total=pool.length;
+  let i=0, bothValued=0;
+
+  const chunk=async ()=>{
+    const end=Math.min(i+30,total);
+    for(;i<end;i++){
+      const target=pool[i];
+      const asOf=new Date(target.closeDate); asOf.setDate(asOf.getDate()-1);
+      // Same candidate set runBacktestCore uses for the CMA engine.
+      const candidates=A.listings.filter(l=>
+        l.status==='SLD' && l.closeDate && l.closeDate<asOf &&
+        l.mlsNo!==target.mlsNo && l.sp && l.sqft &&
+        l.city===target.city &&
+        (typeSel ? (l.bt && btTypes.includes(l.bt)) : (target.bt?l.bt===target.bt:true))
+      );
+      if(candidates.length<minComps) continue;
+      const subj=targetAsSubject(target);
+      const lookbackCut=new Date(asOf); lookbackCut.setMonth(lookbackCut.getMonth()-compLookbackMonths);
+      const recent=candidates.filter(c=>c.closeDate>=lookbackCut);
+      const compPool=recent.length>=minComps?recent:candidates;
+
+      // ENGINE 1 — CMA (calcAll), top-N by similarity, dynamic weights.
+      const cmaRes=withAsOfDate(asOf,()=>{
+        compPool.forEach(c=>c.score=score(subj,c));
+        const top=[...compPool].sort((a,b)=>b.score-a.score).slice(0,topN);
+        return calcAll(subj,top);
+      });
+      const cmaEst=cmaRes&&cmaRes.consensus?cmaRes.consensus:null;
+
+      // ENGINE 2 — Opportunity (valueListingStrict) on the SAME comp universe.
+      // We hand it the same point-in-time candidate pool (it does its own tight
+      // filtering inside, but only sees pre-asOf sales).
+      const universe=candidates.concat([]); // sold-before-asOf set
+      const oppRes=withAsOfDate(asOf,()=>valueListingStrict(target, universe, {minComps}));
+      const oppEst=oppRes&&oppRes.est?oppRes.est:null;
+
+      if(cmaEst==null && oppEst==null) continue;
+      if(cmaEst!=null && oppEst!=null) bothValued++;
+      rows.push({actual:target.sp, cma:cmaEst, opp:oppEst, city:target.city, bt:target.bt});
+    }
+    el('ec-prog-fill').style.width=(i/total*100).toFixed(1)+'%';
+    el('ec-prog-txt').textContent=`Compared ${i} of ${total} · ${bothValued} valued by both engines`;
+    if(i<total){ await new Promise(r=>setTimeout(r,12)); return chunk(); }
+  };
+  await chunk();
+
+  // restore
+  A.adjUseInValuation=savedAdj; A.weightMode=savedMode;
+  A.excluded=savedExcluded; A.comps=savedComps; A.subject=savedSubject;
+  el('ec-progress').style.display='none';
+
+  // For a fair head-to-head, score only cases BOTH engines could value.
+  const paired=rows.filter(r=>r.cma!=null && r.opp!=null);
+  if(paired.length<10){
+    el('bt-results-area').innerHTML=`<div class="bt-empty"><div class="bt-empty-ic">⚠️</div><div class="bt-empty-t">Too few comparable cases</div><div class="bt-empty-s">Only ${paired.length} homes were valued by both engines (need 10+). Lower Min Comps or widen the window.</div></div>`;
+    return;
+  }
+
+  const cmaM=metricsFor(paired.map(r=>r.cma), paired.map(r=>r.actual));
+  const oppM=metricsFor(paired.map(r=>r.opp), paired.map(r=>r.actual));
+  // Paired test: both engines saw identical comps per home, so compare their
+  // per-home absolute % errors head-to-head. This is far more robust than
+  // comparing two summary numbers — it answers "how often does CMA actually
+  // beat Opp on the same house, and by how much."
+  const diffs=paired.map(r=>{
+    const eC=Math.abs(r.cma-r.actual)/r.actual;
+    const eO=Math.abs(r.opp-r.actual)/r.actual;
+    return {eC, eO, d:eO-eC};   // d>0 means CMA was closer on this home
+  });
+  const cmaCloser=diffs.filter(x=>x.d>0).length;
+  const oppCloser=diffs.filter(x=>x.d<0).length;
+  const cmaWinRate=cmaCloser/diffs.length;          // share of homes CMA wins
+  const medPairedDiff=S.median(diffs.map(x=>x.d));   // median (Opp err − CMA err)
+  // Rough significance: standard error of the mean paired difference. If the
+  // mean edge is more than ~2 SE from zero, the difference is unlikely to be noise.
+  const meanD=S.mean(diffs.map(x=>x.d));
+  const sdD=S.stddev(diffs.map(x=>x.d));
+  const seD=sdD/Math.sqrt(diffs.length);
+  const tStat=seD>0?meanD/seD:0;
+  const significant=Math.abs(tStat)>=2;             // ~95% confidence
+  const paired_stats={cmaCloser,oppCloser,cmaWinRate,medPairedDiff,meanD,seD,tStat,significant};
+  A.engineComparison={paired, cmaM, oppM, paired_stats, settings:{cityFilter,btTypes,lookback,sample,minComps}, generatedAt:new Date()};
+  renderEngineComparison(A.engineComparison);
+  toast(`Engine comparison done — ${paired.length} homes valued by both`,'ok');
+}
+
+function renderEngineComparison(ec){
+  const root=el('bt-results-area'); if(!root) return;
+  const {cmaM, oppM, paired, paired_stats:ps}=ec;
+  const pc=x=>x==null?'—':`${(x*100).toFixed(1)}%`;
+  const sgn=x=>x==null?'—':`${x>=0?'+':''}${(x*100).toFixed(1)}%`;
+
+  // Winner logic: lower MdAPE wins accuracy; bias closer to 0 wins calibration.
+  const accWin = cmaM.mdape<oppM.mdape ? 'cma' : 'opp';
+  const biasWin = Math.abs(cmaM.bias)<Math.abs(oppM.bias) ? 'cma' : 'opp';
+  const NAME={cma:'CMA engine (weighted A/B/C)', opp:'Opportunity engine (median adj. comps)'};
+
+  // Overall verdict — accuracy primary, but gated by the PAIRED significance test.
+  const winner=accWin;
+  const wM=winner==='cma'?cmaM:oppM, lM=winner==='cma'?oppM:cmaM;
+  const mdapeGap=((lM.mdape-wM.mdape)*100).toFixed(1);
+  const winnerWinRate = winner==='cma'?ps.cmaWinRate:(1-ps.cmaWinRate);
+
+  let verdict;
+  if(!ps.significant){
+    // The summary numbers may favor one engine, but the paired test says the
+    // difference is within noise. Say so plainly.
+    verdict=`On ${paired.length} homes valued by both, the two engines are <strong>statistically tied</strong>. The ${NAME[winner]} has a nominally lower typical error (MdAPE ${pc(wM.mdape)} vs ${pc(lM.mdape)}), but head-to-head it only wins ${pc(winnerWinRate)} of homes and the average edge isn't distinguishable from zero (t≈${ps.tStat.toFixed(1)}). Treat them as equivalent on accuracy at this sample — decide on bias and simplicity, not these point estimates.`;
+  } else {
+    verdict=`On ${paired.length} homes valued by both, the <strong>${NAME[winner]}</strong> is <strong>significantly more accurate</strong> — typical error ${pc(wM.mdape)} vs ${pc(lM.mdape)} (${mdapeGap}-pt edge), and it wins head-to-head on ${pc(winnerWinRate)} of individual homes (t≈${ps.tStat.toFixed(1)}, unlikely to be noise). `;
+  }
+  // Bias commentary — always relevant, independent of accuracy significance.
+  const biasName=biasWin==='cma'?'CMA':'Opportunity';
+  verdict+=` On calibration, the <strong>${biasName}</strong> engine is closer to neutral (bias ${sgn(biasWin==='cma'?cmaM.bias:oppM.bias)} vs ${sgn(biasWin==='cma'?oppM.bias:cmaM.bias)}).`;
+  if(oppM.bias>0.02 && cmaM.bias<=0.02) verdict+=` The Opportunity engine's <strong>${sgn(oppM.bias)} positive bias</strong> is the phantom-discount mechanism; the CMA engine doesn't share it.`;
+  else if(cmaM.bias>0.02 && oppM.bias>0.02) verdict+=` Both engines run somewhat high here, so a bias correction would help either way.`;
+  else verdict+=` Neither shows a large directional bias in this run.`;
+
+  const row=(label,c,o,fmtFn,lowerBetter,absBest)=>{
+    const cv=c, ov=o;
+    let cWin;
+    if(absBest){ cWin=Math.abs(cv)<Math.abs(ov); }
+    else { cWin=lowerBetter?(cv<ov):(cv>ov); }
+    const cCol=cWin?'var(--grn)':'var(--txt)';
+    const oCol=!cWin?'var(--grn)':'var(--txt)';
+    return `<tr><td style="text-align:left">${label}</td>
+      <td class="num" style="color:${cCol};font-weight:${cWin?600:400}">${fmtFn(cv)}</td>
+      <td class="num" style="color:${oCol};font-weight:${!cWin?600:400}">${fmtFn(ov)}</td></tr>`;
+  };
+
+  root.innerHTML=`
+  <div class="card" style="margin-bottom:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+      <div class="card-title" style="margin:0">⚖ Engine Comparison — CMA vs Opportunity</div>
+      <div style="font-size:10.5px;color:var(--txt3)">${paired.length} homes valued by both · point-in-time · ${new Date(ec.generatedAt).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</div>
+    </div>
+
+    <div style="font-size:12.5px;color:var(--txt);line-height:1.7;margin-bottom:14px;padding:11px 13px;background:var(--sur);border-radius:var(--r);border:1px solid var(--bdr)">${verdict}</div>
+
+    <table class="fx-table" style="width:100%">
+      <thead><tr>
+        <th style="text-align:left">Metric</th>
+        <th class="num">CMA Engine</th>
+        <th class="num">Opportunity Engine</th>
+      </tr></thead>
+      <tbody>
+        ${row('Median error (MdAPE) — lower is better', cmaM.mdape, oppM.mdape, pc, true, false)}
+        ${row('Mean error (MAPE) — lower is better', cmaM.mape, oppM.mape, pc, true, false)}
+        ${row('Bias (signed) — closer to 0 is better', cmaM.bias, oppM.bias, sgn, true, true)}
+        ${row('Within ±5% of actual — higher is better', cmaM.hit5, oppM.hit5, pc, false, false)}
+        ${row('Within ±10% of actual — higher is better', cmaM.hit10, oppM.hit10, pc, false, false)}
+        ${row('Within ±15% of actual — higher is better', cmaM.hit15, oppM.hit15, pc, false, false)}
+        ${row('Head-to-head: homes this engine valued closer', ps.cmaWinRate, 1-ps.cmaWinRate, pc, false, false)}
+      </tbody>
+    </table>
+    <div style="font-size:11px;color:${ps.significant?'var(--grn)':'var(--org)'};margin-top:8px;font-weight:500">
+      ${ps.significant
+        ? `✓ The accuracy difference is statistically significant (t≈${ps.tStat.toFixed(1)}, n=${paired.length}) — unlikely to be sampling noise.`
+        : `⚠ The accuracy difference is NOT statistically significant (t≈${ps.tStat.toFixed(1)}, n=${paired.length}). Run at a larger sample / "All available" before treating either engine as the clear winner on accuracy.`}
+    </div>
+
+    <div style="height:300px;background:var(--sur);border:1px solid var(--bdr);border-radius:var(--r);padding:8px;margin-top:14px"><canvas id="ec-scatter"></canvas></div>
+    <div style="font-size:10px;color:var(--txt3);margin-top:8px;line-height:1.6">
+      <strong>How this was run:</strong> both engines valued the same sold homes using only comps that closed before each sale (no look-ahead), drawn from the same point-in-time candidate pool. The CMA engine used its native dynamic weights; the Opportunity engine used its tight-comp median-adjusted method. Green = the better engine on that metric. "Head-to-head" is the paired test: for each home both engines saw identical comps, so it counts which engine landed closer — more robust than comparing the two summary numbers. Bias is mean signed error: positive means the engine predicts higher than homes actually sold. Only homes both engines could value are scored.
+    </div>
+  </div>`;
+
+  setTimeout(()=>renderEngineScatter(paired),60);
+}
+
+let _ecScatter=null;
+function renderEngineScatter(paired){
+  const cv=el('ec-scatter'); if(!cv) return;
+  if(_ecScatter) _ecScatter.destroy();
+  const cmaPts=paired.map(r=>({x:r.actual,y:r.cma}));
+  const oppPts=paired.map(r=>({x:r.actual,y:r.opp}));
+  const allV=paired.flatMap(r=>[r.actual,r.cma,r.opp]);
+  const minV=Math.min(...allV), maxV=Math.max(...allV);
+  _ecScatter=new Chart(cv.getContext('2d'),{
+    type:'scatter',
+    data:{datasets:[
+      {label:'CMA engine',data:cmaPts,parsing:false,backgroundColor:'rgba(201,168,76,0.45)',pointRadius:2.3,pointHoverRadius:4},
+      {label:'Opportunity engine',data:oppPts,parsing:false,backgroundColor:'rgba(62,142,247,0.40)',pointRadius:2.3,pointHoverRadius:4},
+      {label:'Perfect',data:[{x:minV,y:minV},{x:maxV,y:maxV}],parsing:false,showLine:true,borderColor:'rgba(56,198,139,0.55)',borderDash:[6,4],pointRadius:0,borderWidth:1.3},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#A0AFCC',font:{size:9.5},boxWidth:10}},
+        tooltip:{callbacks:{label:c=>c.datasetIndex===2?'Perfect prediction':`${c.dataset.label}: actual $${(c.parsed.x/1000).toFixed(0)}K → est $${(c.parsed.y/1000).toFixed(0)}K`}}},
+      scales:{
+        x:{title:{display:true,text:'Actual sale price',color:'#A0AFCC',font:{size:9.5}},ticks:{color:'#5C6E94',font:{size:8.5},callback:v=>'$'+(v/1000).toFixed(0)+'K'},grid:{color:'rgba(40,51,79,0.4)'}},
+        y:{title:{display:true,text:'Engine estimate',color:'#A0AFCC',font:{size:9.5}},ticks:{color:'#5C6E94',font:{size:8.5},callback:v=>'$'+(v/1000).toFixed(0)+'K'},grid:{color:'rgba(40,51,79,0.4)'}},
+      }}
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// STEP 1b: LEARN BIAS MODEL — measure the unified engine's signed error
+// point-in-time, overall and per segment, so future estimates self-correct.
+// Uses MEDIAN signed error (robust to outliers). Correction is applied as
+// est / (1 + bias).
+// ═══════════════════════════════════════════════════════════════════
+async function learnBiasModel(){
+  if(!A.listings.length){toast('Load MLS data first','err');return;}
+  const cityFilter=el('bt-city').value||'';
+  const btTypes=[];
+  if(el('bt-bt-de')&&el('bt-bt-de').checked) btTypes.push('DE');
+  if(el('bt-bt-co')&&el('bt-bt-co').checked) btTypes.push('CO');
+  if(el('bt-bt-th')&&el('bt-bt-th').checked) btTypes.push('TH');
+  const typeSel=btTypes.length>0 && btTypes.length<3;
+  const lookback=parseInt(el('bt-lookback').value)||12;
+  const sample=parseInt(el('bt-sample').value)||300;
+  const minComps=parseInt(el('bt-mincomps').value)||5;
+  const compLookbackMonths=24, topN=25, minCell=30;
+
+  const cutoff=new Date(TODAY_REAL); cutoff.setMonth(cutoff.getMonth()-lookback);
+  let pool=A.listings.filter(l=>
+    l.status==='SLD' && l.closeDate && l.closeDate>=cutoff &&
+    l.sp && l.sqft && l.sqft>0 &&
+    (!cityFilter || l.city===cityFilter) &&
+    (!typeSel || (l.bt && btTypes.includes(l.bt)))
+  );
+  if(pool.length>sample) pool=[...pool].sort(()=>Math.random()-0.5).slice(0,sample);
+  if(pool.length<30){toast('Need 30+ sold homes to learn bias','err');return;}
+  pool.sort((a,b)=>a.closeDate.getTime()-b.closeDate.getTime());
+
+  el('ec-progress').style.display='block';
+  el('ec-prog-txt').textContent='Learning bias model…';
+
+  // Measure the UNIFIED engine's RAW error: force CMA engine, bias correction OFF.
+  const savedAdj=A.adjUseInValuation, savedMode=A.weightMode, savedUse=A.oppUseCMAEngine, savedBias=A.biasModel;
+  A.adjUseInValuation=false; A.weightMode='dynamic'; A.oppUseCMAEngine=true; A.biasModel=null;
+  const savedExcluded=A.excluded; A.excluded=new Set();
+  const savedComps=A.comps, savedSubject=A.subject;
+
+  const errs=[];  // {err: (est-actual)/actual, city, bt, band}
+  const total=pool.length; let i=0;
+  const chunk=async ()=>{
+    const end=Math.min(i+30,total);
+    for(;i<end;i++){
+      const target=pool[i];
+      const asOf=new Date(target.closeDate); asOf.setDate(asOf.getDate()-1);
+      const universe=A.listings.filter(l=>
+        l.mlsNo!==target.mlsNo &&
+        (l.status!=='SLD' || (l.closeDate && l.closeDate<asOf)));
+      const v=withAsOfDate(asOf,()=>valueListingStrict(target, universe, {minComps}));
+      if(!v||!v.est) continue;
+      const err=(v.est-target.sp)/target.sp;
+      const band=bandFor(target.sp); 
+      errs.push({err, city:target.city, bt:target.bt, band:band?band.lbl:null});
+    }
+    el('ec-prog-fill').style.width=(i/total*100).toFixed(1)+'%';
+    el('ec-prog-txt').textContent=`Learning bias… ${i}/${total}`;
+    if(i<total){ await new Promise(r=>setTimeout(r,12)); return chunk(); }
+  };
+  await chunk();
+
+  A.adjUseInValuation=savedAdj; A.weightMode=savedMode; A.oppUseCMAEngine=savedUse;
+  A.excluded=savedExcluded; A.comps=savedComps; A.subject=savedSubject;
+  el('ec-progress').style.display='none';
+
+  if(errs.length<30){ A.biasModel=savedBias; toast('Too few valuations to learn bias','err'); return; }
+
+  const med=arr=>S.median(arr);
+  const seg=(filt)=>{ const g=errs.filter(filt).map(e=>e.err); return g.length?{bias:med(g),n:g.length}:null; };
+  const overall={bias:med(errs.map(e=>e.err)), n:errs.length};
+  const byType={}; ['DE','CO','TH'].forEach(t=>{const s=seg(e=>e.bt===t); if(s)byType[t]=s;});
+  const byCityType={};
+  [...new Set(errs.map(e=>e.city))].forEach(c=>{ ['DE','CO','TH'].forEach(t=>{
+    const s=seg(e=>e.city===c&&e.bt===t); if(s&&s.n>=minCell) byCityType[c+'|'+t]=s;
+  });});
+  const byBand={}; BIAS_BANDS.forEach(b=>{const s=seg(e=>e.band===b.lbl); if(s)byBand[b.lbl]=s;});
+
+  A.biasModel={enabled:true, minCell, overall, byType, byCityType, byBand,
+    settings:{cityFilter,btTypes,lookback,sample,minComps},
+    learnedAt:new Date()};
+  renderBiasModel(A.biasModel);
+  syncBiasToggle();
+  toast(`Bias model learned from ${errs.length} homes — overall ${(overall.bias*100).toFixed(1)}%`,'ok');
+}
+
+function renderBiasModel(m){
+  const root=el('bt-results-area'); if(!root) return;
+  const pc=x=>`${x>=0?'+':''}${(x*100).toFixed(1)}%`;
+  const TYPE={DE:'SFR',CO:'Condo',TH:'Townhome'};
+  const biasCol=b=>Math.abs(b)<0.01?'var(--grn)':(b>0?'var(--org)':'var(--blue)');
+  const rowsType=Object.entries(m.byType).map(([t,s])=>{
+    const col=biasCol(s.bias);
+    return '<tr><td style="text-align:left">'+(TYPE[t]||t)+'</td><td class="num">'+s.n+'</td><td class="num" style="color:'+col+'">'+pc(s.bias)+'</td><td class="num">'+pc(-s.bias)+'</td></tr>';
+  }).join('');
+  const ctEntries=Object.entries(m.byCityType).sort((a,b)=>b[1].bias-a[1].bias);
+  const rowsCT=ctEntries.map(([k,s])=>{
+    const parts=k.split('|'); const c=parts[0], t=parts[1];
+    const col=biasCol(s.bias);
+    return '<tr><td style="text-align:left">'+toTitle(c)+' · '+(TYPE[t]||t)+'</td><td class="num">'+s.n+'</td><td class="num" style="color:'+col+'">'+pc(s.bias)+'</td><td class="num">'+pc(-s.bias)+'</td></tr>';
+  }).join('');
+  root.innerHTML=`
+  <div class="card" style="margin-bottom:12px">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+      <div class="card-title" style="margin:0">🎯 Learned Bias Model</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <label style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--txt2);cursor:pointer"><input type="checkbox" id="bias-enabled" ${m.enabled?'checked':''} onchange="toggleBiasModel(this.checked)" style="accent-color:var(--gold)"> Apply to scanner</label>
+        <div style="font-size:10.5px;color:var(--txt3)">${m.overall.n} homes · ${new Date(m.learnedAt).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</div>
+      </div>
+    </div>
+    <div style="font-size:12.5px;color:var(--txt);line-height:1.7;margin-bottom:12px;padding:11px 13px;background:var(--sur);border-radius:var(--r);border:1px solid var(--bdr)">
+      Overall the unified engine runs <strong style="color:${m.overall.bias>0?'var(--org)':'var(--grn)'}">${pc(m.overall.bias)}</strong> vs actual sale prices. With this model applied, each scanner estimate is divided by (1 + the matching segment's bias), so a segment that runs ${pc(m.overall.bias)} high gets pulled down before the discount gap is computed. Correction uses the most specific segment with ≥${m.minCell} sales: city+type, then type, then price band, then overall.
+    </div>
+    <div style="font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Bias By Type</div>
+    <table class="fx-table" style="width:100%"><thead><tr><th style="text-align:left">Type</th><th class="num">Homes</th><th class="num">Engine Bias</th><th class="num">Correction</th></tr></thead><tbody>${rowsType||'<tr><td colspan=4 style="text-align:left;color:var(--txt3)">—</td></tr>'}</tbody></table>
+    <div style="font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 6px">Bias By City × Type <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--txt3)">(≥${m.minCell} sales)</span></div>
+    <table class="fx-table" style="width:100%"><thead><tr><th style="text-align:left">Segment</th><th class="num">Homes</th><th class="num">Engine Bias</th><th class="num">Correction</th></tr></thead><tbody>${rowsCT||'<tr><td colspan=4 style="text-align:left;color:var(--txt3)">No segment reached the minimum sample.</td></tr>'}</tbody></table>
+    <div style="font-size:10px;color:var(--txt3);margin-top:10px;line-height:1.6"><strong>Engine Bias</strong> = median (estimate − actual)/actual, point-in-time. Positive = runs high. <strong>Correction</strong> is what gets applied to pull the estimate toward reality. Re-learn whenever you load fresh data; a bias learned in one market regime can be wrong if the market shifts.</div>
+  </div>`;
+}
+
+function toggleBiasModel(on){
+  if(A.biasModel){ A.biasModel.enabled=!!on; toast(on?'Bias correction ON':'Bias correction OFF','inf'); }
+  syncBiasToggle();
+}
+
+// Scanner-tab toggle + status pill. Reflects whether a model exists and is on.
+function toggleBiasFromScanner(on){
+  if(!A.biasModel){ toast('Learn a bias model first (Tune tab → Learn Bias Model)','err'); syncBiasToggle(); return; }
+  A.biasModel.enabled=!!on;
+  toast(on?'Bias correction ON — re-scan to apply':'Bias correction OFF','inf');
+  syncBiasToggle();
+}
+function syncBiasToggle(){
+  const cb=el('opp-bias-toggle'), lbl=el('opp-bias-lbl'), tuneCb=el('bias-enabled');
+  const has=!!A.biasModel, on=has && A.biasModel.enabled;
+  if(cb){ cb.checked=on; cb.disabled=!has; }
+  if(tuneCb){ tuneCb.checked=on; }
+  if(lbl){
+    if(!has) lbl.textContent='Not learned';
+    else lbl.textContent = on ? `On (overall ${(A.biasModel.overall.bias*100).toFixed(1)}%)` : 'Off';
+  }
 }
 
 // ───────────────────────────────────────────────────────
@@ -7563,9 +8709,12 @@ function applyOptimalWeights(){
   const o=A.backtestResults.optimal;
   A.manualWeights={wA:o.wA,wB:o.wB,wC:o.wC};
   A.weightMode='manual';
+  A.activeProfile=null; // auto-tuned set isn't a named profile until saved
   if(el('wmode-man')) el('wmode-man').checked=true;
   setWeightMode('manual');
   syncWeightSlidersFromState();
+  updateActiveProfileBadge();
+  syncProfileDropdowns();
   toast(`Optimal weights applied: ${Math.round(o.wA*100)}/${Math.round(o.wB*100)}/${Math.round(o.wC*100)}`,'ok');
 }
 
@@ -7779,7 +8928,9 @@ function renderBacktestResults(rb){
 
   // Header summary line
   const scopeStr=settings.cityFilter?toTitle(settings.cityFilter):'All Cities';
-  const btStr=settings.btFilter?{DE:'SFR',CO:'Condo',TH:'TH'}[settings.btFilter]:'all property types';
+  const TYPE_LBL={DE:'SFR',CO:'Condo',TH:'Townhome'};
+  let _bts=Array.isArray(settings.btTypes)?settings.btTypes:(settings.btFilter?[settings.btFilter]:[]);
+  const btStr=(_bts.length && _bts.length<3)?_bts.map(t=>TYPE_LBL[t]||t).join(' + '):'all property types';
   const genStr=new Date(generatedAt).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
 
   root.innerHTML=`
@@ -8148,19 +9299,22 @@ async function runABComparison(){
   if(!A.listings.length){toast('Load MLS data first','err');return;}
   // Pull base settings from main backtest form
   const cityFilter=el('bt-city').value||'';
-  const btFilter=el('bt-bt').value||'';
+  const btTypes=[];
+  if(el('bt-bt-de')&&el('bt-bt-de').checked) btTypes.push('DE');
+  if(el('bt-bt-co')&&el('bt-bt-co').checked) btTypes.push('CO');
+  if(el('bt-bt-th')&&el('bt-bt-th').checked) btTypes.push('TH');
   const lookback=parseInt(el('bt-lookback').value)||12;
   const sample=parseInt(el('bt-sample').value)||300;
 
   const optsA = {
-    cityFilter, btFilter, lookback, sample,
+    cityFilter, btTypes, lookback, sample,
     compLookbackMonths: parseInt(el('ab-A-comps').value),
     topN: parseInt(el('ab-A-topn').value),
     minComps: parseInt(el('ab-A-mincomps').value),
     scope: el('ab-A-scope').value,
   };
   const optsB = {
-    cityFilter, btFilter, lookback, sample,
+    cityFilter, btTypes, lookback, sample,
     compLookbackMonths: parseInt(el('ab-B-comps').value),
     topN: parseInt(el('ab-B-topn').value),
     minComps: parseInt(el('ab-B-mincomps').value),
@@ -8621,6 +9775,8 @@ async function init(){
   loadWeightProfilesFromStorage();
   await load();
   updateHeader();
+  syncProfileDropdowns();
+  updateActiveProfileBadge();
 
   if(A.listings.length>0){
     el('welcome').style.display='none';el('app').classList.add('show');
