@@ -274,6 +274,14 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--bl
   display: none; background: #0C0F1A;
 }
 .vm-frame.visible { display: block; }
+
+/* When the embedded tool (which has its OWN header) is unlocked and shown,
+   collapse the wrapper's page-header + gold rule so the iframe uses the full
+   height instead of stacking a second redundant banner on top. */
+.page.vm-active .page-header,
+.page.vm-active > .gold-rule { display: none; }
+.page.vm-active .vm-gate-wrap { min-height: 100vh; }
+.page.vm-active .vm-frame { min-height: 100vh; }
 .vm-gate {
   position: absolute; inset: 0; z-index: 50;
   background:
@@ -712,6 +720,8 @@ function checkPW(propId){
     }
     if(VM_STYLE[propId]){
       frame.classList.add('visible');
+      var pg=document.getElementById('page-'+propId);
+      if(pg)pg.classList.add('vm-active');
     } else {
       document.querySelectorAll('[data-property="'+propId+'"]').forEach(function(t){t.classList.add('unlocked');});
     }
@@ -743,6 +753,8 @@ function relock(propId){
   var frame=document.getElementById('frame-'+propId);
   if(gate)gate.classList.remove('hidden');
   if(frame)frame.classList.remove('visible');
+  var pg=document.getElementById('page-'+propId);
+  if(pg)pg.classList.remove('vm-active');
   var input=document.getElementById('pw-input-'+propId);
   if(input)input.value='';
 }
@@ -759,6 +771,8 @@ function relock(propId){
     if(frame){
       if(!frame.src&&frame.dataset.src)frame.src=frame.dataset.src;
       if(VM_STYLE[propId])frame.classList.add('visible');
+      var pg=document.getElementById('page-'+propId);
+      if(pg&&VM_STYLE[propId])pg.classList.add('vm-active');
     }
     if(!VM_STYLE[propId]){
       document.querySelectorAll('[data-property="'+propId+'"]').forEach(function(t){t.classList.add('unlocked');});
