@@ -371,6 +371,10 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--bl
       844 Leland Way
       <span class="lock-dot"></span>
     </button>
+    <button class="nav-sub-item" data-property="moraga" onclick="selectProperty('moraga', this)">
+      749 Moraga Drive
+      <span class="lock-dot"></span>
+    </button>
   </div>
 
   <button class="nav-item" id="nav-valuation" onclick="showPage('valuation', this)">
@@ -485,6 +489,10 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--bl
         <div class="sub-tab-dot"></div>
         844 Leland Way &middot; Livermore, CA 94550
       </button>
+      <button class="sub-tab-btn" data-property="moraga" onclick="selectProperty('moraga', this)">
+        <div class="sub-tab-dot"></div>
+        749 Moraga Drive &middot; Livermore, CA 94550
+      </button>
     </div>
 
     <!-- ── EMPTY STATE — shown when no property is selected ── -->
@@ -554,6 +562,37 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--bl
         </div>
       </div>
       <iframe class="advisory-frame" id="frame-leland" data-src="buyer-leland.html" title="844 Leland Way Buyer Advisory"></iframe>
+    </div>
+
+    <!-- ── PROPERTY: 749 MORAGA DRIVE ── -->
+    <div id="subtab-moraga" class="sub-page">
+      <div class="pw-gate" id="gate-moraga">
+        <div class="pw-box">
+          <div class="pw-lock">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <div class="pw-eyebrow">Confidential Property Report</div>
+          <div class="pw-title">Buyer <em>Advisory</em></div>
+          <div class="pw-sub">Access restricted to the prospective buyer for this property.</div>
+          <div class="pw-property">749 Moraga Drive &middot; Livermore, CA 94550</div>
+          <div class="pw-input-wrap">
+            <input class="pw-input" id="pw-input-moraga" type="password" maxlength="12" placeholder="&middot; &middot; &middot; &middot;" autocomplete="off" onkeydown="if(event.key==='Enter') checkPW('moraga')">
+            <button class="pw-toggle" onclick="togglePWVis('moraga')" title="Show/hide">
+              <svg id="eye-moraga" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+          <button class="pw-btn" onclick="checkPW('moraga')">Unlock Report</button>
+          <div class="pw-error-msg" id="pw-error-moraga">Incorrect access code. Please try again.</div>
+          <div class="pw-hint">Enter your access code to continue</div>
+        </div>
+      </div>
+      <iframe class="advisory-frame" id="frame-moraga" data-src="buyer-moraga.html" title="749 Moraga Drive Buyer Advisory"></iframe>
     </div>
 
   </div>
@@ -656,6 +695,7 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--bl
 const PROPERTY_CODES = {
   houlton:   '4978',
   leland:    '844',
+  moraga:    '749',
   valuation: '3083',
   openhouse: '6035'
 };
