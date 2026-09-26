@@ -1816,6 +1816,63 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
     word-break:break-word!important;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════ */
+/* PHONE LAYOUT (≤760px) — desktop styles above are unchanged     */
+/* ══════════════════════════════════════════════════════════════ */
+@media screen and (max-width:760px){
+  /* Let the page scroll naturally instead of fixed-height panes */
+  #app{height:auto;min-height:100vh;overflow:visible}
+  .app-body,.main-area,#tab-content,.tab-pane,.city-pane,.city-table-wrap{overflow:visible}
+  .app-body{flex-direction:column}
+  #tab-content{flex-direction:column;overflow:visible!important}
+
+  /* Header: brand wraps, buttons scroll sideways in one row */
+  .hdr-toolbar{padding:8px 12px;gap:8px}
+  .hdr-toolbar-l{flex-wrap:wrap;gap:6px 12px;flex-shrink:1;min-width:0}
+  .hdr-tb-brand,.hdr-tb-brand em{font-size:20px;white-space:normal}
+  .hdr-btns{width:100%;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+  .date-bar{height:auto;flex-wrap:wrap;row-gap:6px;padding:6px 12px}
+  .db-divider{display:none}
+
+  /* Left icon rail becomes a sticky tab row across the top */
+  .side-nav{width:100%;min-width:0;flex-direction:row;justify-content:space-around;align-items:center;
+    padding:4px 8px;border-right:none;border-bottom:1px solid var(--bdr);position:sticky;top:0;z-index:40}
+  .sn-btn{width:auto;flex:1;max-width:90px;height:46px}
+  .sn-btn.active::after{right:auto;left:50%;top:auto;bottom:-5px;transform:translateX(-50%);width:28px;height:3px;border-radius:2px 2px 0 0}
+  .sn-divider{display:none}
+  .city-bar{position:sticky;top:55px;z-index:39}
+
+  /* CMA: inputs stacked above results */
+  #pane-cma{flex-direction:column}
+  .cma-sidebar{width:100%;min-width:0;border-right:none;border-bottom:1px solid var(--bdr);overflow:visible}
+  .cma-main{overflow:visible;padding:10px}
+  .mi-pane,.opp-pane,.tune-pane{overflow:visible;padding:10px}
+  .tune-wrap{padding:10px}
+  .tune-hero{flex-direction:column;gap:12px}
+
+  /* Multi-column grids collapse */
+  .rpt-grid,.mi-row-3,.opp-grid,.mx-cards{grid-template-columns:1fr}
+  .sum-g,.adj-summary,.mi-row-4,.opp-meta,.opp-stats-bar{grid-template-columns:repeat(2,1fr)}
+  .hm-grid{grid-template-columns:repeat(3,1fr)}
+  .mkt-hero-main,.mi-mb-left{min-width:0;flex-basis:auto}
+  .recon-method-name{width:110px}
+  .val-grid{grid-template-columns:1fr}
+  .mi-row-2,.mi-row-3{grid-template-columns:1fr!important}
+  .mi-row-4{grid-template-columns:1fr!important}
+  .mi-row>*,.val-grid>*,.mi-stat-grid>*{min-width:0}
+  .mi-stat-grid{grid-template-columns:repeat(2,1fr)!important}
+  .conf-row,.mi-title{flex-wrap:wrap}
+  .mi-bar-lbl{width:90px}
+
+  /* Wide tables scroll sideways inside their card */
+  .adj-tbl,.fx-table,.ab-table,.bt-segment-table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap}
+  .bt-segment-table{table-layout:auto}
+  .tbl-wrap{max-height:none}
+
+  /* Agent footer sits at the end of the page instead of covering content */
+  .hdr-footer{position:static}
+}
 </style>
 </head>
 <body>
