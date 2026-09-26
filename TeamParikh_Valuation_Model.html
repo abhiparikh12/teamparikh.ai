@@ -2093,7 +2093,7 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
           <div class="fg"><label>Max Days on Market</label><input id="f-dom" type="number" placeholder="No limit"></div>
           <div class="fg" style="background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.2);border-radius:5px;padding:7px 9px">
             <div style="font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">📅 Date Range</div>
-            <div style="font-size:11px;color:var(--txt2)">Controlled by the <strong style="color:var(--txt)">Period</strong> bar above the tabs — applies to both CMA and city views.</div>
+            <div style="font-size:11px;color:var(--txt2)">Controlled by the <strong style="color:var(--txt)">Period</strong> bar above the tabs. Same-street / same-HOA sales from the last 3 years are always kept (time-adjusted to today).</div>
           </div>
           <div class="fg">
             <label>Stories</label>
@@ -2215,7 +2215,7 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
     <div class="tab-pane opp-pane" id="pane-opps">
       <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;margin-bottom:12px;background:rgba(245,162,58,.10);border:1px solid rgba(245,162,58,.5);border-radius:var(--r)">
         <span style="font-size:16px;flex-shrink:0">🚧</span>
-        <div style="font-size:12px;line-height:1.5;color:var(--txt)"><strong style="color:var(--org)">Screening tool — a flag means "find out why", not "free equity".</strong> Backtest on the last 12 months: listings priced below the model's likely range sold, at the median, <strong>at their list price</strong> — about 12% under the model. The list price usually reflects condition or location the MLS data can't show. Use this list to find homes worth a closer look.</div>
+        <div style="font-size:12px;line-height:1.5;color:var(--txt)"><strong style="color:var(--org)">Listings expected to sell above their asking price.</strong> Each value is the <em>expected sale price</em>: list price × the local sale-to-list ratio, nudged by how far the comps disagree with the list. Back-tested, a listing the comps call 10% underpriced sells only ~2% higher than typical — list prices usually reflect condition the MLS data can't show. Expect competition on these, not a bargain.</div>
       </div>
       <!-- opp-city select kept hidden — driven by unified city bar -->
       <select id="opp-city" style="display:none" onchange="runOpportunityScanner()"><option value="">All Cities</option></select>
@@ -7153,7 +7153,7 @@ async function runOpportunityScanner(opts={}){
     const v = valueListingStrict(target, pool, {minComps});
     if(!v){ filteredNoComps++; return; }   // insufficient comparables — skip
     const gapPct = (v.est - target.lp)/target.lp * 100;
-    if(gapPct < minTagPct || target.lp > v.lo){ valuedBelowTag++; return; }  // v7: must be listed BELOW the model's likely range, not just under the midpoint
+    if(gapPct < minTagPct){ valuedBelowTag++; return; }  // priced at/above market — not a deal
     stage1.push({target, v, gapPct});
   });
 
@@ -7218,7 +7218,7 @@ async function runOpportunityScanner(opts={}){
     else if(gapPct >= 3){tag='Buyer Advantage'; cls='opp-tag-buyer';}
     // Reasons
     const reasons = [];
-    reasons.push(`Listed ${gapPct.toFixed(1)}% below the model value of ${fmt(v.est)} (likely range ${fmtK(v.lo)}–${fmtK(v.hi)})`);
+    reasons.push(`Expected to sell ${gapPct.toFixed(1)}% above list at ${fmt(v.est)} (likely ${fmtK(v.lo)}–${fmtK(v.hi)}); comps alone say ${fmt(v.compsValue||v.est)}`);
     const proxTxt = v.proximityProven
       ? `${v.nInRadius} same-street / same-HOA comp(s)`
       : `the ${v.n} most similar sales in the area`;
@@ -7269,7 +7269,7 @@ async function runOpportunityScanner(opts={}){
 
   const grid = el('opp-grid');
   if(!results.length){
-    grid.innerHTML = `<div class="opp-empty">No opportunities cleared your filters.<br><br><strong>${candidates.length}</strong> active listing(s) scanned: <strong>${valuedBelowTag}</strong> were valued but not listed below the model's likely range (or discount < ${minTagPct}%)${filteredNoComps>0?`, and <strong>${filteredNoComps}</strong> were skipped for lack of tight comps`:''}.${A.biasModel&&A.biasModel.enabled?`<br><br><span style="color:var(--gold)">Bias correction is ON</span> — estimates are pulled toward actual sale levels, so fewer phantom discounts appear. Toggle it off to compare.`:''}<br><br>Try lowering <strong>Min Tag</strong> (currently ${minTagPct}%+), relaxing <strong>Min Comps</strong>, or widening the city scope.</div>`;
+    grid.innerHTML = `<div class="opp-empty">No opportunities cleared your filters.<br><br><strong>${candidates.length}</strong> active listing(s) scanned: <strong>${valuedBelowTag}</strong> were valued but priced at/above market (no discount ≥ ${minTagPct}%)${filteredNoComps>0?`, and <strong>${filteredNoComps}</strong> were skipped for lack of tight comps`:''}.${A.biasModel&&A.biasModel.enabled?`<br><br><span style="color:var(--gold)">Bias correction is ON</span> — estimates are pulled toward actual sale levels, so fewer phantom discounts appear. Toggle it off to compare.`:''}<br><br>Try lowering <strong>Min Tag</strong> (currently ${minTagPct}%+), relaxing <strong>Min Comps</strong>, or widening the city scope.</div>`;
     toast(`Scan complete — 0 deals · ${valuedBelowTag} valued at/above market · ${filteredNoComps} thin comps`,'inf');
     return;
   }
@@ -7294,8 +7294,8 @@ async function runOpportunityScanner(opts={}){
       </div>
       <div class="opp-prices">
         <div class="opp-pr-cell"><div class="opp-pr-lbl">List Price</div><div class="opp-pr-val">${fmt(t.lp)}</div></div>
-        <div class="opp-pr-cell"><div class="opp-pr-lbl">Adjusted Comp Value${r.v.proximityProven?` <span style="color:var(--grn);font-size:9px">· nbhd ✓</span>`:''}</div><div class="opp-pr-val" style="color:var(--gold)">${fmt(r.v.est)}</div></div>
-        <div class="opp-pr-cell"><div class="opp-pr-lbl">Gap (Day-1 Equity)</div><div class="opp-pr-val gap-pos">+${r.gapPct.toFixed(1)}%</div></div>
+        <div class="opp-pr-cell"><div class="opp-pr-lbl">Expected Sale Price${r.v.proximityProven?` <span style="color:var(--grn);font-size:9px">· nbhd ✓</span>`:''}</div><div class="opp-pr-val" style="color:var(--gold)">${fmt(r.v.est)}</div></div>
+        <div class="opp-pr-cell"><div class="opp-pr-lbl">vs List</div><div class="opp-pr-val gap-pos">+${r.gapPct.toFixed(1)}%</div></div>
       </div>
       <div class="opp-meta">${meta}</div>
       <div class="opp-score-row">
@@ -7409,7 +7409,7 @@ async function runOpportunityBacktest(){
       const hit = target.sp >= v.est;                        // per spec: sold >= estimate
       const predEquity=v.est - target.lp;                    // what the model promised
       const realEquity=target.sp - target.lp;                // what a buyer-at-list actually got
-      const wouldFlag = gapPct >= minTagPct && target.lp < v.lo;
+      const wouldFlag = gapPct >= minTagPct;
 
       let tag='Fair Deal';
       if(gapPct>=12) tag='Deep Discount';
@@ -9803,6 +9803,7 @@ function parseRow(row, src){
     offers:num(g('Num of Off','Number of Offers')), howSold:((g('How Sold')||'')+'').trim(),
     lat:(lat&&lat>30&&lat<45)?lat:null, lng:(lng&&lng<-110&&lng>-125)?lng:null,
     subdiv:((g('Subdivision','Subdivision Name','Tract','Complex Name','Neighborhood')||'')+'').trim().toUpperCase()||null,
+    elem:((g('Elementary School','Elem School','Elementary','Elem Schl','School Elementary','Elementary Sch','Elem')||'')+'').trim().toUpperCase().replace(/\s+(ELEMENTARY|ELEM\.?|SCHOOL|ES)\b/g,'').trim()||null,
     street:sp_.street, hnum:sp_.hnum, src:src||null,
   };
   // Only SOLD records have a real close date; pendings carry a *scheduled* COE.
@@ -9915,8 +9916,10 @@ const HOA_GROWTH=0.045;   // typical annual HOA dues escalation used to align du
    Returns {tag, factor}: factor multiplies the similarity distance (lower = closer). */
 function communityMatch(s, c){
   if(s.subdiv && c.subdiv && s.subdiv===c.subdiv) return {tag:'Same subdivision', factor:0.35, level:4};
+  const sameSchool = s.elem && c.elem && s.elem===c.elem;
   if(s.lat!=null && c.lat!=null){
     const mi=miles(s,c);
+    if(mi>1.0 && sameSchool) return {tag:`Same elementary (${mi.toFixed(1)} mi)`, factor:0.8, level:2, mi};
     if(mi<=0.25) return {tag:`${mi.toFixed(2)} mi`, factor:0.4, level:4, mi};
     if(mi<=0.5)  return {tag:`${mi.toFixed(2)} mi`, factor:0.6, level:3, mi};
     if(mi<=1.0)  return {tag:`${mi.toFixed(2)} mi`, factor:0.85, level:2, mi};
@@ -9930,6 +9933,8 @@ function communityMatch(s, c){
     const d=Math.abs(Math.log(c.hoaMo)+HOA_GROWTH*yrs-Math.log(s.hoaMo));
     if(d<0.07) return {tag:'Same HOA community', factor:0.5, level:3};
   }
+  if(sameSchool) return {tag:'Same elementary school', factor:0.7, level:2};
+  if(s.elem && c.elem && !sameSchool) return {tag:'Different school', factor:sameZip?1.15:1.3, level:0};
   if(sameZip) return {tag:'Same zip', factor:0.9, level:1};
   return {tag:'Same city', factor:1.0, level:0};
 }
@@ -10027,11 +10032,11 @@ function trendSummary(ix, asOf){
 }
 
 /* ── 7. VALUATION ─────────────────────────────────────────────────────────── */
-const VAL_DEFAULTS={k:8, monthsBack:36, sizeBand:0.30, sizeBandWide:0.45, minPool:5};
+const VAL_DEFAULTS={k:10, monthsBack:36, sizeBand:0.30, sizeBandWide:0.45, minPool:5, nbhdFactor:0.2, nbhdTimeRelief:3, nbhdFirst:true, nbhdMax:12};
 function subjectFrom(rec){
   return {address:rec.address, unit:rec.unit, city:rec.city, zip:rec.zip, bt:rec.bt, sqft:rec.sqft, br:rec.br,
     baths:rec.baths, yr:rec.yr, lot:rec.lot, hoaRaw:rec.hoaRaw, hoaFreq:rec.hoaFreq, hoaMo:rec.hoaMo,
-    lat:rec.lat, lng:rec.lng, subdiv:rec.subdiv, street:rec.street, hnum:rec.hnum, pkey:rec.pkey, id:rec.id, lp:rec.lp};
+    lat:rec.lat, lng:rec.lng, subdiv:rec.subdiv, elem:rec.elem, olp:rec.olp, status:rec.status, street:rec.street, hnum:rec.hnum, pkey:rec.pkey, id:rec.id, lp:rec.lp};
 }
 function normSubject(s){
   const sp_=streetParts(s.address||'');
@@ -10052,10 +10057,10 @@ function value(store, subj0, opts={}){
   if(!s.sqft||!s.city) return {error:'Subject needs at least city and square footage.'};
   const ix=getIndex(store,{zip:s.zip, city:s.city, bt:s.bt, asOf});
   if(!ix) return {error:`Not enough ${typeLabel(s.bt)} sales loaded to value ${s.city}.`};
-  const el=Math.min(0.85, Math.max(0.45, ix.elasticity));
+  const el=o.elasticity!=null?o.elasticity:Math.min(0.85, Math.max(0.45, ix.elasticity));
   const nowIdx=indexAt(ix, asOf);
-  const minCd=Math.max(addMonths(asOf,-o.monthsBack), o.minCd!=null?o.minCd:-Infinity);
-  const maxCd=o.maxCd!=null?Math.min(asOf,o.maxCd+1):asOf;
+  const minCd=addMonths(asOf,-o.monthsBack), maxCd=asOf;
+  const perMin=o.minCd!=null?o.minCd:-Infinity, perMax=o.maxCd!=null?o.maxCd:Infinity;   // Period bar (not applied to neighborhood sales)
   // candidate universe: subject city + subject zip (+ extra cities for "Adjacent", or everything for "All")
   let uni;
   if(o.anyCity) uni=store.soldIdx('*|'+tg);
@@ -10068,7 +10073,7 @@ function value(store, subj0, opts={}){
   let band=o.sizeBand, pool=pool0.filter(c=>Math.abs(Math.log(c.sqft/s.sqft))<=Math.log(1+band));
   if(pool.length<o.k){ band=o.sizeBandWide; pool=pool0.filter(c=>Math.abs(Math.log(c.sqft/s.sqft))<=Math.log(1+band)); }
   if(pool.length<o.minPool) return {error:`Only ${pool.length} comparable ${typeLabel(s.bt)} sales within ±${Math.round(band*100)}% of ${s.sqft} sf in ${s.city} — load more data.`};
-  const scored=pool.map(c=>{
+  const scored=pool.filter(c=>{ if(c.cd>=perMin && c.cd<=perMax) return true; return communityMatch(s,c).level>=3; }).map(c=>{
     const months=(asOf-c.cd)/30.44;
     let d=(Math.log(c.sqft/s.sqft)/0.10)**2;
     if(s.yr&&c.yr) d+=((c.yr-s.yr)/10)**2;
@@ -10076,12 +10081,19 @@ function value(store, subj0, opts={}){
     if(s.br&&c.br) d+=((c.br-s.br)/1.5)**2;
     if(s.baths&&c.baths) d+=((c.baths-s.baths)/2)**2;
     if(tg==='ATT' && s.bt && c.bt!==s.bt) d+=1.5;          // condo vs townhome
-    d+=(months/12)**2;
-    const cm=communityMatch(s,c); d*=cm.factor;
+    const cm=communityMatch(s,c);
+    // proximity-first: nearby sales keep their weight even when older (price is time-adjusted anyway)
+    const near=cm.level>=3;
+    d+=(near&&o.nbhdTimeRelief? months/12/o.nbhdTimeRelief : months/12)**2;
+    d*= near&&o.nbhdFactor!=null ? o.nbhdFactor : cm.factor;
     if(c.city!==s.city && !(s.zip && c.zip===s.zip)) d*=1.25;          // other-city comps (Adjacent/All scope)
     return {c, dist:d, cm, months};
   }).sort((a,b)=>a.dist-b.dist);
-  const top=scored.slice(0,o.k);
+  let top;
+  if(o.nbhdFirst){ // literal proximity-first: every nearby sale in the size band, then fill with the closest others
+    const near=scored.filter(t=>t.cm.level>=3), far=scored.filter(t=>t.cm.level<3);
+    top=near.slice(0,o.nbhdMax||o.k+4).concat(far.slice(0,Math.max(0,o.k-near.length)));
+  } else top=scored.slice(0,o.k);
   let sw=0, swl=0;
   const comps=top.map(t=>{
     const c=t.c;
@@ -10171,6 +10183,28 @@ function rangeFor(v, cal){
   r.mdape = errs? med(errs.map(e=>Math.abs(Math.exp(e)-1))) : null;
   r.grade = width<=0.10 && v.dispersion<0.07 ? 'High' : width<=0.20 && v.dispersion<0.11 ? 'Medium' : 'Low';
   return r;
+}
+
+/* Expected sale price for a home that is already listed.
+   Out-of-sample test (1,002 sales): list price × local sale-to-original-list ratio misses by 3.1% (median);
+   the comps model alone misses by 6.3%. The model's disagreement with the list price carries a small,
+   measured weight (LIST_BETA): a model 10% above list moves the expected sale ~2% above the typical ratio. */
+const LIST_BETA=0.2;
+function listCalibration(store,{city,bt}){
+  const tg=typeGroup(bt), ck=`lcal|${city}|${tg}`; if(store._cache[ck]!==undefined) return store._cache[ck];
+  const asOf=store.asOf(city), from=addMonths(asOf,-6);
+  let rows=store.soldIdx('c|'+city+'|'+tg).filter(r=>r.olp&&r.cd>=from);
+  let scope=`${city} ${typeLabel(tg==='ATT'?'CO':tg).toLowerCase()} sales, last 6 months`;
+  if(rows.length<25){ rows=store.soldIdx('*|'+tg).filter(r=>r.olp&&r.cd>=from); scope='all loaded sales of this type, last 6 months'; }
+  if(rows.length<15) return store._cache[ck]=null;
+  const lr=rows.map(r=>Math.log(r.sp/r.olp)), m=med(lr), dev=lr.map(x=>x-m);
+  return store._cache[ck]={ratio:Math.exp(m), n:rows.length, scope, q10:quant(dev,.1), q25:quant(dev,.25), q75:quant(dev,.75), q90:quant(dev,.9), mdape:med(dev.map(x=>Math.abs(Math.exp(x)-1)))};
+}
+function expectedSale(store, subj, est){
+  const L=subj.olp||subj.lp; if(!L||!est) return null;
+  const cal=listCalibration(store,{city:subj.city,bt:subj.bt}); if(!cal) return null;
+  const x=Math.log(est/L), ex=L*cal.ratio*Math.exp(LIST_BETA*x);
+  return {expected:ex, list:L, ratio:cal.ratio, n:cal.n, scope:cal.scope, lo50:ex*Math.exp(cal.q25), hi50:ex*Math.exp(cal.q75), lo80:ex*Math.exp(cal.q10), hi80:ex*Math.exp(cal.q90), mdape:cal.mdape, modelGap:est/L-1};
 }
 
 /* ── 9. MARKET CONDITIONS ─────────────────────────────────────────────────── */
@@ -10283,7 +10317,7 @@ function fmtK(n){ if(n==null||!isFinite(n)) return '—'; return n>=1e6?'$'+(n/1
 return {DAY, dn, parseDay, fmtDay, isoDay, todayDay, addMonths, monthStart, qIndex, qLabel, dayToDate,
   num, parseRow, mapStatus, STATUS_MAP, Store, med, quant, mean, penalizedOLS,
   communityMatch, typeGroup, typeLabel, fitIndex, indexAt, getIndex, trendSummary,
-  value, subjectFrom, normSubject, backtest, summarize, calibration, rangeFor,
+  value, subjectFrom, normSubject, backtest, summarize, calibration, rangeFor, listCalibration, expectedSale, LIST_BETA,
   activeSpan, isUnsoldExit, windowStats, marketRead, priceBands, monthlySeries, RULES, scoreMetric, verdictFrom, fmtK, streetParts};
 })();
 if(typeof module!=='undefined') module.exports=TP;
@@ -10350,7 +10384,7 @@ function v2Row(r){ return {mls_no:r.id,status_raw:r.statusRaw,status:r.status,ad
   lp:r.lp,olp:r.olp,sp:r.sp,sqft:r.sqft||null,br:r.br,bth:r.bth,pb:r.pb,gar_sp:r.garSp,yr_blt:r.yr||null,lot_sqft:r.lot||null,
   hoa_raw:r.hoaRaw,hoa_freq:r.hoaFreq,hoa_mo:r.hoaMo,dom:r.dom,cdom:r.cdom,list_date:_iso(r.ld),pend_date:_iso(r.pend),off_mkt_date:_iso(r.offm),
   close_date:_iso(r.cd),coe_date:_iso(r.coe),stat_date:_iso(r.sd),updt_date:_iso(r.ud),num_offers:r.offers,how_sold:r.howSold,lat:r.lat,lng:r.lng,
-  subdivision:r.subdiv,source_file:r.src}; }
+  subdivision:r.subdiv,elem_school:r.elem||null,source_file:r.src}; }
 function v2From(x){
   const sp_=TP.streetParts(x.address||'');
   const mapped=TP.mapStatus(x.status_raw);
@@ -10358,7 +10392,7 @@ function v2From(x){
     city:(x.city||'').toUpperCase(),zip:(x.zip||'').slice(0,5),bt:x.bt||'',lp:x.lp!=null?+x.lp:null,olp:x.olp!=null?+x.olp:null,sp:x.sp!=null?+x.sp:null,
     sqft:+x.sqft||0,br:+x.br||0,bth:+x.bth||0,pb:+x.pb||0,garSp:+x.gar_sp||0,yr:+x.yr_blt||0,lot:+x.lot_sqft||0,hoaRaw:+x.hoa_raw||0,hoaFreq:x.hoa_freq||'',hoaMo:+x.hoa_mo||0,
     dom:+x.dom||0,cdom:+x.cdom||0,ld:TP.parseDay(x.list_date),pend:TP.parseDay(x.pend_date),offm:TP.parseDay(x.off_mkt_date),cd:TP.parseDay(x.close_date),coe:TP.parseDay(x.coe_date),
-    sd:TP.parseDay(x.stat_date),ud:TP.parseDay(x.updt_date),offers:x.num_offers,howSold:x.how_sold||'',lat:x.lat,lng:x.lng,subdiv:x.subdivision||null,src:x.source_file||'cloud',
+    sd:TP.parseDay(x.stat_date),ud:TP.parseDay(x.updt_date),offers:x.num_offers,howSold:x.how_sold||'',lat:x.lat,lng:x.lng,subdiv:x.subdivision||null,elem:x.elem_school||null,src:x.source_file||'cloud',
     street:sp_.street,hnum:sp_.hnum};
   r.gar=r.garSp>0; r.baths=r.bth+0.5*r.pb; r.pkey=`${r.zip||r.city}|${r.street}|${r.hnum||''}|${r.unit.toLowerCase()}`;
   return r;
@@ -10550,7 +10584,8 @@ function readSubjectV7(){
   const s={address:rec?rec.address:addr, unit:(v('s-unit')||'').trim()||(rec?rec.unit:''), city, bt:subjectType(),
     zip: rec?rec.zip:inferZip(addr,city), sqft:num('s-sqft'), br:num('s-br'), baths:num('s-bth'), yr:num('s-yr'), lot:num('s-lot'),
     hoaMo, hoaRaw: rec&&rec.hoaMo&&Math.abs(rec.hoaMo-hoaMo)<2?rec.hoaRaw:hoaMo, hoaFreq: rec&&rec.hoaMo&&Math.abs(rec.hoaMo-hoaMo)<2?rec.hoaFreq:(hoaMo?'M':''),
-    lp:num('s-lp')||null, lat:rec?rec.lat:null, lng:rec?rec.lng:null, subdiv:rec?rec.subdiv:null, id:rec?rec.id:null};
+    lp:num('s-lp')||null, lat:rec?rec.lat:null, lng:rec?rec.lng:null, subdiv:rec?rec.subdiv:null, elem:rec?rec.elem:null, id:rec?rec.id:null,
+    status:rec?rec.status:null, olp:rec&&(rec.status==='ACTIVE'||rec.status==='PENDING')?(rec.olp||rec.lp):null};
   return s;
 }
 function compFilterFn(){
@@ -10606,6 +10641,7 @@ function runCMA(keepExclusions){
   const sameArea=l=>s.zip?l.zip===s.zip:l.city===s.city;
   r.competition=store.all.filter(x=>(x.status==='ACTIVE'||x.status==='PENDING')&&TP.typeGroup(x.bt)===tg&&x.sqft>0&&Math.abs(Math.log(x.sqft/s.sqft))<=Math.log(1.3)&&sameArea(x)&&x.id!==s.id);
   r.nbhdSales=neighborhoodSales(s,asOf);
+  r.exp = s.olp ? TP.expectedSale(store,s,vres.est) : null;
   A.lastV7=r;
   computeValueV7(r);
   buildCompsV7(r);
@@ -10684,6 +10720,11 @@ function renderValuation(res){
       <div class="cons-range"><span class="cons-range-lo">${fmtK(rg.lo50)}</span><span class="cons-range-dash">—</span><span class="cons-range-hi">${fmtK(rg.hi50)}</span></div>
       <div class="cons-range-sub">Likely range (half of similar sales land here) · wide range ${fmtK(rg.lo80)}–${fmtK(rg.hi80)} · from ${rg.basis}</div>
       ${s.lp?`<div class="cons-delta" style="margin-bottom:8px">vs target ${fmt(s.lp)} (${((s.lp/r.est-1)*100).toFixed(1)}%)</div>`:''}
+      ${r.exp?`<div style="margin:6px 0 10px;padding:9px 11px;border:1px solid rgba(201,168,76,.45);border-radius:6px;background:rgba(201,168,76,.06)">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--gold)">Expected Sale Price · listed at ${fmt(r.exp.list)}</div>
+        <div style="font-family:var(--fm);font-size:24px;color:var(--txt);margin-top:2px">${fmt(Math.round(r.exp.expected/1000)*1000)}</div>
+        <div style="font-size:11px;color:var(--txt2)">likely ${fmtK(r.exp.lo50)}–${fmtK(r.exp.hi50)} · ${r.exp.scope}: sold at a median ${(r.exp.ratio*100).toFixed(1)}% of original list (${r.exp.n} sales); comps ${r.exp.modelGap>=0?'above':'below'} list by ${Math.abs(r.exp.modelGap*100).toFixed(1)}% nudge it ${r.exp.modelGap>=0?'up':'down'} slightly</div>
+        <div style="font-size:10px;color:var(--txt3);margin-top:3px">Once a home is listed, list price × the local sale-to-list ratio predicts the sale about twice as well as comps alone (3.1% vs 6.3% typical miss, back-tested).</div></div>`:''}
       <div class="conf-row"><div class="conf-bar"><div class="conf-fill ${cfCls}" style="width:${res.confPct}%"></div></div><span class="conf-txt ${cfTxt}">${res.conf} Confidence</span></div>
       <div style="font-size:10px;color:var(--txt3);margin-top:5px">${v.comps.length} comps used · ${v.poolN} candidates · typical miss for similar homes ${rg.mdape!=null?(rg.mdape*100).toFixed(1)+'%':'—'} · data through ${fmtDate(dayToLocal(r.asOf))}</div>
       <div class="cons-disclaimer">This figure is produced by an <strong>automated mathematical model</strong> applied to comparable MLS sales data. It is <strong>not an appraisal, not a formal opinion of value, and not a guarantee of sale price</strong>. Actual market value depends on property condition, market timing, buyer pool, and other factors the model does not capture.</div>
@@ -10702,7 +10743,8 @@ function explainV7(r){
   out.push(v.dispersion<0.06?`Comps agree closely (±${(v.dispersion*100).toFixed(0)}%) — historically that means smaller errors.`:v.dispersion<0.11?`Comps agree moderately (±${(v.dispersion*100).toFixed(0)}%).`:`Comps disagree (±${(v.dispersion*100).toFixed(0)}%) — condition, view and lot differences the MLS fields can't see probably matter. Inspect the comps before pricing.`);
   if(t&&t.oneYr) out.push(`Similar ${TP.typeLabel(s.bt).toLowerCase()} homes in ${t.level==='zip'?'zip '+t.key:toTitle(t.key)} are <strong>${pctS(t.oneYr.pct)}</strong> over 12 months and ${pctS(t.threeYr&&t.threeYr.pct)} over 3 years, holding size, age and lot constant.`);
   if(m&&m.score!=null) out.push(`Market (${r.mktLbl}, last 90 days): <strong>${m.verdict.label.toLowerCase()}</strong>${m.split?' with a split — well-priced homes sell at or above list while overpriced ones sit':''}.`);
-  if(s.lp){ const d=s.lp/r.est-1; out.push(`Target ${fmt(s.lp)} is <strong>${pctS(d)}</strong> vs the estimate — ${Math.abs(d)<0.03?'in line with the comps.':d>0?(s.lp>r.rg.hi50?'above the likely range; expect a price cut or long market time unless the home is clearly superior to the comps.':'inside the likely range, on the high side.'):(s.lp<r.rg.lo50?'below the likely range — priced to draw multiple offers.':'on the low side of the likely range.')}`); }
+  if(r.exp) out.push(`It's listed at ${fmt(r.exp.list)}: similar homes here sold at a median ${(r.exp.ratio*100).toFixed(1)}% of original list, so the <strong>expected sale price is ${fmt(Math.round(r.exp.expected/1000)*1000)}</strong> (likely ${fmtK(r.exp.lo50)}–${fmtK(r.exp.hi50)}).`);
+  if(s.lp && !r.exp){ const d=s.lp/r.est-1; out.push(`Target ${fmt(s.lp)} is <strong>${pctS(d)}</strong> vs the estimate — ${Math.abs(d)<0.03?'in line with the comps.':d>0?(s.lp>r.rg.hi50?'above the likely range; expect a price cut or long market time unless the home is clearly superior to the comps.':'inside the likely range, on the high side.'):(s.lp<r.rg.lo50?'below the likely range — priced to draw multiple offers.':'on the low side of the likely range.')}`); }
   return out;
 }
 function buildReconciliationCard(res){
@@ -10776,7 +10818,7 @@ function includeAll(){ A.excluded.clear(); reCalc(); }
 function excludeAll(){ toast('Excluding every comp leaves nothing to value — untick individual comps instead','err'); }
 function renderReport(res){
   const r=A.lastV7; if(!r||!res){ el('rpt-area').innerHTML='<div class="val-empty">Run CMA to generate your agent report.</div>'; return; }
-  const c=res.consensus, m=r.mkt, cls=m.verdict.cls, rg=r.rg;
+  const m=r.mkt, cls=m.verdict.cls, rg=r.rg; const c=r.exp?Math.round(r.exp.expected/1000)*1000:res.consensus;
   const R=x=>Math.round(x/1000)*1000;
   const sell={s2:[c,Math.max(c*1.03,rg.hi50)],s1:[c,c*1.025],b0:[c*0.99,c*1.02],u1:[c*0.97,c],u2:[c*0.95,c*0.98],na:[c*0.99,c*1.02]}[cls];
   const buy ={s2:[c,c*1.04],s1:[c*0.99,c*1.02],b0:[c*0.97,c],u1:[c*0.94,c*0.98],u2:[c*0.92,c*0.96],na:[c*0.97,c]}[cls];
@@ -10798,7 +10840,7 @@ function renderReport(res){
       </div>
     </div>
     <div class="rpt-col">
-      <div class="rpt-hd hd-buy">Buyer Strategy</div>
+      <div class="rpt-hd hd-buy">Buyer Strategy${r.exp?' · anchored on expected sale':''}</div>
       <div class="rpt-price">${fmt(c)}</div>
       <div class="rpt-range">Offer range: ${fmt(R(buy[0]))} – ${fmt(R(buy[1]))}</div>
       <div class="rpt-note">${buyNote}</div>
@@ -10956,10 +10998,12 @@ function valueOneListing(target, allListings, opts={}){
 function valueListingStrict(target, _pool, opts={}){
   const x=_valueRecord(target,opts); if(!x) return null;
   const {rec,v}=x;
-  const cal=TP.calibration(store,{city:rec.city,bt:rec.bt,sqft:rec.sqft}); const rg=TP.rangeFor(v,cal);
+  const cal=TP.calibration(store,{city:rec.city,bt:rec.bt,sqft:rec.sqft}); let rg=TP.rangeFor(v,cal);
+  const ex=TP.expectedSale(store,{city:rec.city,bt:rec.bt,olp:target.olp||rec.olp||rec.lp},v.est);
+  const estOut = ex? ex.expected : v.est; if(ex) rg={...rg,lo50:ex.lo50,hi50:ex.hi50};
   const gross=v.comps.map(c=>(Math.abs(c.timeAdj)+Math.abs(c.sizeAdj)+Math.abs(c.featAdj||0))/c.sp*100);
   const nb=v.comps.filter(c=>c.matchLevel>=3).length;
-  return {est:Math.round(v.est), lo:Math.round(rg.lo50), hi:Math.round(rg.hi50), engineUsed:'v7', biasApplied:0, biasSource:'none',
+  return {est:Math.round(estOut), compsValue:Math.round(v.est), lo:Math.round(rg.lo50), hi:Math.round(rg.hi50), engineUsed:'v7', biasApplied:0, biasSource:'none',
     n:v.comps.length, nInRadius:nb, sdPct:(v.dispersion*100).toFixed(1), medGrossAdj:(S.median(gross)||0).toFixed(0), relaxed:0,
     proximityProven: v.neighborhoodShare>=0.3, ppsf:Math.round(v.est/rec.sqft),
     comps:v.comps.slice(0,5).map(c=>({...(A._byId.get(c.id)||{}), _adj:c.indicated-c.sp, _adjPrice:c.indicated}))};
@@ -11143,6 +11187,7 @@ function renderClientReport(){
     <div class="rp-hero"><div class="rp-hero-lbl">Estimated Market Value</div><div class="rp-hero-price">${fmt(c)}</div>
       <div class="rp-hero-range">Likely Range: <b>${fmt(Math.round(rg.lo50/1000)*1000)}</b> — <b>${fmt(Math.round(rg.hi50/1000)*1000)}</b></div>
       <div class="rp-hero-conf ${confCls}">${res.conf} Confidence</div>
+      ${r.exp?`<div class="rp-hero-range" style="margin-top:8px">Listed at <b>${fmt(r.exp.list)}</b> · Expected sale price <b>${fmt(Math.round(r.exp.expected/1000)*1000)}</b> (similar homes sold at a median ${(r.exp.ratio*100).toFixed(1)}% of original list)</div>`:''}
       <div class="rp-hero-disclaimer">This figure is produced by an <strong>automated mathematical model</strong> applied to comparable sales data. It is <strong>not an appraisal and not a formal opinion of value</strong>. Actual market value may vary based on property condition, market timing, buyer pool, and factors not captured in this model.</div></div>
     <div class="rp-sec"><div class="rp-sec-h"><span class="rp-sec-h-num">1</span>Valuation Methodology</div><div class="rp-method-grid">${methodCards}</div>
       <div style="font-size:10px;color:#5F6577;margin-top:8px;line-height:1.7">The likely range reflects how closely this model's estimates have matched actual sale prices for similar homes in ${toTitle(subj.city)} over the past year. Comparable sales are drawn from the past three years and brought to present-day value using the local like-for-like price trend.</div></div>
