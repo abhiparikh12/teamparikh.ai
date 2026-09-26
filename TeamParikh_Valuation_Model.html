@@ -5835,7 +5835,7 @@ function renderMarketIntel(){
   const overDOM = avgDOMbucket(byBucket.over), fairDOM = avgDOMbucket(byBucket.fair), underDOM = avgDOMbucket(byBucket.under);
 
   const insights = [];
-  if(byBucket.over.length>=3 && byBucket.fair.length>=3){
+  if(false && byBucket.over.length>=3 && byBucket.fair.length>=3){  // v7: removed — compared stale active listings (survivorship bias)
     const ratio = fairDOM ? (overDOM/fairDOM) : 1;
     if(ratio > 1.2) insights.push(`Listings priced <strong>more than 5% above model value</strong> are sitting on the market about <strong>${ratio.toFixed(1)}× longer</strong> than fairly-priced ones (${Math.round(overDOM)} vs ${Math.round(fairDOM)} CDOM).`);
     else if(ratio < 0.95) insights.push(`Overpriced listings are clearing about as fast as fairly-priced ones — buyers are reaching for inventory. Consistent with a hot market (Absorption: ${absorption?absorption.toFixed(1)+'×':'n/a'}).`);
@@ -6049,19 +6049,15 @@ function renderMarketIntel(){
 
   // ── Reassign inventory velocity labels using CURRENT months-of-supply ──
   invVelLbl = monthsOfSupply_cur==null?'—'
-    :monthsOfSupply_cur<2?'Very Low Supply':monthsOfSupply_cur<3?'Low Supply'
-    :monthsOfSupply_cur<4?'Balanced':monthsOfSupply_cur<6?'Moderate Supply':'High Supply';
-  invVelCls = monthsOfSupply_cur==null?''
-    :monthsOfSupply_cur<2?'up':monthsOfSupply_cur<3?'up'
-    :monthsOfSupply_cur<5?'':monthsOfSupply_cur<7?'down':'down';
+    :monthsOfSupply_cur<=1.0?'Very Low Supply':monthsOfSupply_cur<=1.8?'Low Supply'
+    :monthsOfSupply_cur<=2.6?'Typical Supply':monthsOfSupply_cur<=3.5?'Elevated Supply':'High Supply';
+  invVelCls = monthsOfSupply_cur==null?'':monthsOfSupply_cur<=1.8?'up':monthsOfSupply_cur<=2.6?'':'down';
 
   // ── Refresh insights with current-window observations ──
   // (Strip the legacy months-of-supply insights to avoid contradicting the new ones)
   const filteredInsights = insights.filter(i => !i.includes('months of supply'));
   if(monthsOfSupply_cur!==null){
-    if(monthsOfSupply_cur<2) filteredInsights.push(`Only <strong>${monthsOfSupply_cur.toFixed(1)} months of supply</strong> at the last-90-day sales pace — strong seller conditions. Buyers should expect competition.`);
-    else if(monthsOfSupply_cur>6) filteredInsights.push(`<strong>${monthsOfSupply_cur.toFixed(1)} months of supply</strong> (recent pace) — inventory is building. Buyers have negotiating leverage; sellers should price aggressively.`);
-    else if(monthsOfSupply_cur>=3&&monthsOfSupply_cur<=5) filteredInsights.push(`<strong>${monthsOfSupply_cur.toFixed(1)} months of supply</strong> — balanced market conditions. Neither buyers nor sellers hold dominant leverage.`);
+    filteredInsights.push(`<strong>${monthsOfSupply_cur.toFixed(1)} months of supply</strong> at the last-90-day sales pace — ${monthsOfSupply_cur<=1.8?'tight by Bay Area standards (the 2021 boom ran under 1 month)':monthsOfSupply_cur<=2.6?'typical for the Bay Area recently':'high by Bay Area standards — the most since at least 2021'}. National rules of thumb (under 6 = seller's market) don't apply here; the verdict above uses Tri-Valley history.`);
   }
   if(pctOver30>=40 && activeAging.total>=10){
     filteredInsights.unshift(`<strong>${pctOver30.toFixed(0)}% of active inventory has been sitting 30+ days</strong> — a clear sign that demand is not keeping up with supply, regardless of what historical SP/LP ratios suggest. ${activeAging.veryStale>0?'Listings over 90 days are likely overpriced or have correctable issues; their continued presence drags absorption.':''}`);
@@ -6176,7 +6172,7 @@ function renderMarketIntel(){
             <div class="mi-stat-val ${monthsOfSupply_cur!=null&&monthsOfSupply_cur<3?'up':monthsOfSupply_cur!=null&&monthsOfSupply_cur>6?'down':''}">
               ${monthsOfSupply_cur!=null?monthsOfSupply_cur.toFixed(1)+'mo':'—'}
             </div>
-            <div class="mi-stat-sub">${monthsOfSupply_cur!=null?(monthsOfSupply_cur<3?"Seller's Market":monthsOfSupply_cur>6?"Buyer's Market":'Balanced Market'):'—'}<br><span style="font-size:9px;color:var(--txt3)">${soldPerMonth_cur.toFixed(0)} sales/mo (last 90d) · ${actv.length} active</span></div>
+            <div class="mi-stat-sub">${monthsOfSupply_cur!=null?(monthsOfSupply_cur<=1.8?'Tight for the Bay Area':monthsOfSupply_cur<=2.6?'Typical for the Bay Area':'High for the Bay Area'):'—'}<br><span style="font-size:9px;color:var(--txt3)">${soldPerMonth_cur.toFixed(0)} sales/mo (last 90d) · ${actv.length} active</span></div>
           </div>
         </div>
       </div>
@@ -6445,17 +6441,7 @@ function renderMarketIntel(){
     </div>
 
     <div class="mi-row mi-row-2">
-      <div class="mi-card" id="mi-liquidity">
-        <div class="mi-title">Liquidity vs Pricing Discipline ${tip('Shows how long overpriced, fairly-priced, and underpriced listings sit on the market. If overpriced homes take dramatically longer, pricing discipline is rewarded. If all bars are equal, buyers are absorbing everything.')}
-          <button class="mi-dl-btn" onclick="downloadMICard('mi-liquidity','Liquidity vs Pricing')">⬇ PNG</button>
-        </div>
-        ${byBucket.over.length+byBucket.fair.length+byBucket.under.length>=5 ? `
-          <div class="mi-bar-row"><div class="mi-bar-lbl">Overpriced (>5%)</div><div class="mi-bar-track"><div class="mi-bar-fill over" style="width:${Math.min(100,overDOM/Math.max(overDOM,fairDOM,underDOM,1)*100)}%"></div></div><div class="mi-bar-num">${Math.round(overDOM)} d</div></div>
-          <div class="mi-bar-row"><div class="mi-bar-lbl">Fair (±5%)</div><div class="mi-bar-track"><div class="mi-bar-fill fair" style="width:${Math.min(100,fairDOM/Math.max(overDOM,fairDOM,underDOM,1)*100)}%"></div></div><div class="mi-bar-num">${Math.round(fairDOM)} d</div></div>
-          <div class="mi-bar-row"><div class="mi-bar-lbl">Underpriced (<−5%)</div><div class="mi-bar-track"><div class="mi-bar-fill under" style="width:${Math.min(100,underDOM/Math.max(overDOM,fairDOM,underDOM,1)*100)}%"></div></div><div class="mi-bar-num">${Math.round(underDOM)} d</div></div>
-          <div class="expl-card" style="margin-top:8px"><strong>How to read</strong>Average CDOM by pricing band. Long bars on overpriced rows mean discipline matters; flat bars across all rows mean a hot market hides pricing mistakes.</div>
-        ` : `<div class="mi-empty" style="padding:30px 12px">Not enough valued active listings to compare DOM by pricing band.</div>`}
-      </div>
+      ${v7PricingOutcomeCard()}
       <div class="mi-card" id="mi-insights">
         <div class="mi-title">Market Insights
           <button class="mi-dl-btn" onclick="downloadMICard('mi-insights','Market Insights')">⬇ PNG</button>
@@ -6567,7 +6553,7 @@ const EXPORTABLE_CARDS = [
   {id:'mi-heatmap',     label:'Best Time to Buy Heatmap',   tag:'Monthly price seasonality'},
   {id:'mi-accuracy',    label:'Pricing Accuracy',           tag:'Active listings over/under priced'},
   {id:'mi-dist',        label:'$/SqFt Distribution',        tag:'Sold price/sqft histogram'},
-  {id:'mi-liquidity',   label:'Liquidity vs Pricing',       tag:'How DOM varies by pricing'},
+  {id:'mi-liquidity',   label:'Pricing vs Outcome',         tag:'What overpricing costs sellers'},
   {id:'mi-insights',    label:'Market Insights',            tag:'Narrative observations'},
 ];
 
@@ -9846,6 +9832,10 @@ function parseRow(row, src){
     street:sp_.street, hnum:sp_.hnum, src:src||null,
   };
   // Only SOLD records have a real close date; pendings carry a *scheduled* COE.
+  // guard against MLS data-entry errors (e.g. acreage typed as square feet): impossible values are dropped
+  if(!(r.lot>0 && r.lot<=20000000)) r.lot=0;          // > ~460 acres is not a residential lot
+  if(!(r.sqft>=150 && r.sqft<=40000)) r.sqft=0;
+  if(r.yr && (r.yr<1800 || r.yr>2100)) r.yr=0;
   if(r.status!=='SOLD'){ r.coe=r.cd; r.cd=null; }
   else if(r.cd==null) r.cd = r.sd; // rare: sold without explicit close date
   r.pkey = `${r.zip||r.city}|${r.street}|${r.hnum||''}|${r.unit.toLowerCase()}`;
@@ -10268,11 +10258,22 @@ function geoFilter(g){
   return r=> (!g.city || r.city===g.city) && (!g.zip || r.zip===g.zip) && (!g.tg || typeGroup(r.bt)===g.tg) && (!g.bt || r.bt===g.bt) &&
              (g.pmin==null || (r.sp||r.lp||0)>=g.pmin) && (g.pmax==null || (r.sp||r.lp||0)<g.pmax);
 }
+// The earliest listing of the same property in the prior 12 months: a withdraw-and-relist resets the MLS
+// "original price" and DOM, which hides price cuts and aging. These undo that.
+function trueOlp(store,r){ const sib=store.props().get(r.pkey)||[]; let m=r.olp||r.lp||0;
+  for(const x of sib){ if(x!==r && x.ld!=null && r.ld!=null && x.ld<=r.ld && x.ld>r.ld-365 && x.olp) m=Math.max(m,x.olp); } return m||null; }
+function firstListDay(store,r){ const sib=store.props().get(r.pkey)||[]; let m=r.ld;
+  for(const x of sib){ if(x!==r && x.ld!=null && r.ld!=null && x.ld<r.ld && x.ld>r.ld-365) m=Math.min(m,x.ld); } return m; }
+function daysToContract(r){ if(r.ld==null) return null; if(r.pend!=null) return r.pend-r.ld; if((r.status==='SOLD'||r.status==='PENDING')&&r.dom) return r.dom; return null; }
 function windowStats(store, g, from, to){
   const rows=store.all.filter(geoFilter(g));
   const sold=rows.filter(r=>r.status==='SOLD'&&r.cd!=null&&r.cd>from&&r.cd<=to&&r.sp);
-  const spOlp=sold.filter(r=>r.olp).map(r=>r.sp/r.olp), spLp=sold.filter(r=>r.lp).map(r=>r.sp/r.lp);
+  const spOlp=sold.filter(r=>r.olp).map(r=>r.sp/trueOlp(store,r)), spLp=sold.filter(r=>r.lp).map(r=>r.sp/r.lp);
   const inv=rows.filter(r=>{ const s=activeSpan(r); return s && s[0]<=to && s[1]>to; });
+  // new-listing sell-through: listings that came on 45–135 days before the window end — share under contract within 30 days
+  const coh=rows.filter(r=>r.ld!=null && r.ld>to-135 && r.ld<=to-45 && r.status!=='UNK');
+  const sellThrough = coh.length>=12 ? coh.filter(r=>{ const d=daysToContract(r); return d!=null && d<=30; }).length/coh.length : null;
+  const aged60 = inv.length>=8 ? inv.filter(r=>to-firstListDay(store,r)>60).length/inv.length : null;
   const exits=rows.filter(r=>r.status==='OFF' && (r.offm||r.sd)!=null && (r.offm||r.sd)>from && (r.offm||r.sd)<=to);
   const unsold=exits.filter(r=>isUnsoldExit(store,r));
   const months=(to-from)/30.44, pace=sold.length/months;
@@ -10284,16 +10285,20 @@ function windowStats(store, g, from, to){
     cdom: med(sold.map(r=>r.cdom||r.dom).filter(x=>x!=null)),
     exits:exits.length, unsoldExits:unsold.length,
     unsoldRate: (unsold.length+sold.length)? unsold.length/(unsold.length+sold.length) : null,
-    priceCutShare: inv.length? inv.filter(r=>r.olp&&r.lp&&r.lp<r.olp*0.995).length/inv.length : null,
+    priceCutShare: inv.length>=8? inv.filter(r=>{ const o=trueOlp(store,r); return o&&r.lp&&r.lp<o*0.995; }).length/inv.length : null,
+    sellThrough, aged60, cohortN:coh.length,
     medPrice: med(sold.map(r=>r.sp)), medPpsf: med(sold.filter(r=>r.sqft>0).map(r=>r.sp/r.sqft)),
   };
 }
 /* Scoring rules (documented in the UI).  Each metric scores −2 (buyer) … +2 (seller). */
 const RULES=[
-  {key:'moi',     label:'Months of inventory', fmt:'x', bands:[[2,2],[3,1],[5,0],[6.5,-1],[Infinity,-2]], lowIsSeller:true},
-  {key:'spOlp',   label:'Sale ÷ original list', fmt:'pct', bands:[[0.94,-2],[0.97,-1],[1.00,0],[1.03,1],[Infinity,2]]},
-  {key:'cdom',    label:'Median days on market', fmt:'d', bands:[[10,2],[21,1],[40,0],[60,-1],[Infinity,-2]], lowIsSeller:true},
-  {key:'unsoldRate', label:'Listings exiting unsold', fmt:'pct', bands:[[0.15,1],[0.30,0],[0.45,-1],[Infinity,-2]], lowIsSeller:true},
+  // Cutoffs set from 2021–2026 Tri-Valley history: 2021 boom ≈ +2 on every measure; the late-2022 correction ≈ −1.
+  {key:'sellThrough', label:'New listings under contract ≤30 days', fmt:'pct', bands:[[0.38,-2],[0.48,-1],[0.60,0],[0.75,1],[Infinity,2]]},
+  {key:'spOlp',       label:'Sale ÷ original list (incl. relists)', fmt:'pct', bands:[[0.965,-2],[0.985,-1],[1.005,0],[1.03,1],[Infinity,2]]},
+  {key:'aged60',      label:'Active listings over 60 days', fmt:'pct', bands:[[0.12,2],[0.20,1],[0.30,0],[0.45,-1],[Infinity,-2]], lowIsSeller:true},
+  {key:'priceCutShare', label:'Active listings with a price cut', fmt:'pct', bands:[[0.20,1],[0.35,0],[0.55,-1],[Infinity,-2]], lowIsSeller:true},  // only measurable for today's snapshot
+  {key:'moi',         label:'Months of inventory', fmt:'x', bands:[[1.0,2],[1.8,1],[2.6,0],[3.5,-1],[Infinity,-2]], lowIsSeller:true},
+  {key:'unsoldRate',  label:'Listings exiting unsold', fmt:'pct', bands:[[0.15,1],[0.30,0],[0.45,-1],[Infinity,-2]], lowIsSeller:true},
 ];
 function scoreMetric(rule, v){
   if(v==null||isNaN(v)) return null;
@@ -10317,10 +10322,12 @@ function marketRead(store, g, opts={}){
   for(const r of store.all){ if(!f(r)) continue; if(r.status==='OFF') offN++; else if(r.status==='SOLD' && r.cd>asOf-365) soldN++; }
   const noExitData = offN===0 && soldN>=10;
   if(noExitData){ for(const w of [cur,prev,ly]){ w.unsoldRate=null; w.exits=null; w.unsoldExits=null; } }
+  // a listing's price-cut status is only known as of the export date, so past windows can't be measured
+  prev.priceCutShare=null; ly.priceCutShare=null;
   const scores=RULES.map(rule=>({...rule, value:cur[rule.key], score:scoreMetric(rule,cur[rule.key]),
     prev:prev[rule.key], ly:ly[rule.key]}));
   const valid=scores.filter(x=>x.score!=null);
-  const score=(valid.length>=3 && cur.sold>=6)? mean(valid.map(x=>x.score)) : null;
+  const score=(valid.length>=4 && cur.sold>=6)? mean(valid.map(x=>x.score)) : null;
   const split = cur.overList!=null && cur.under98!=null && cur.overList>=0.30 && cur.under98>=0.30 && cur.sold>=10;
   return {asOf, windowDays:W, cur, prev, ly, scores, score, verdict:verdictFrom(score), split, noExitData,
     stale: todayDay()-asOf>21};
@@ -10420,9 +10427,9 @@ function sbToken(){ return 'open'; }  // no write token — table allows insert/
 function sbHdr(write){ return {'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'}; }
 const _iso=d=>TP.isoDay(d);
 function v2Row(r){ return {mls_no:r.id,status_raw:r.statusRaw,status:r.status,address:r.address,unit:r.unit,city:r.city,zip:r.zip,bt:r.bt,
-  lp:r.lp,olp:r.olp,sp:r.sp,sqft:r.sqft||null,br:r.br,bth:r.bth,pb:r.pb,gar_sp:r.garSp,yr_blt:r.yr||null,lot_sqft:r.lot||null,
-  hoa_raw:r.hoaRaw,hoa_freq:r.hoaFreq,hoa_mo:r.hoaMo,dom:r.dom,cdom:r.cdom,list_date:_iso(r.ld),pend_date:_iso(r.pend),off_mkt_date:_iso(r.offm),
-  close_date:_iso(r.cd),coe_date:_iso(r.coe),stat_date:_iso(r.sd),updt_date:_iso(r.ud),num_offers:r.offers,how_sold:r.howSold,lat:r.lat,lng:r.lng,
+  lp:r.lp,olp:r.olp,sp:r.sp,sqft:r.sqft?Math.round(r.sqft):null,br:r.br,bth:r.bth,pb:r.pb,gar_sp:r.garSp,yr_blt:r.yr?Math.round(r.yr):null,lot_sqft:(r.lot>0&&r.lot<=20000000)?Math.round(r.lot):null,
+  hoa_raw:r.hoaRaw,hoa_freq:r.hoaFreq,hoa_mo:r.hoaMo,dom:r.dom!=null?Math.round(r.dom):null,cdom:r.cdom!=null?Math.round(r.cdom):null,list_date:_iso(r.ld),pend_date:_iso(r.pend),off_mkt_date:_iso(r.offm),
+  close_date:_iso(r.cd),coe_date:_iso(r.coe),stat_date:_iso(r.sd),updt_date:_iso(r.ud),num_offers:r.offers!=null?Math.round(r.offers):null,how_sold:r.howSold,lat:r.lat,lng:r.lng,
   subdivision:r.subdiv,elem_school:r.elem||null,source_file:r.src}; }
 function v2From(x){
   const sp_=TP.streetParts(x.address||'');
@@ -11274,6 +11281,66 @@ async function init(){
   renderNbhdPanel(null);
 }
 init();
+
+/* ── PRICING vs OUTCOME (replaces "Liquidity vs Pricing Discipline") ────────
+   The old card averaged days-on-market of CURRENT actives by how they compare to
+   the model — a survivorship trap (fairly priced homes sell and vanish from the
+   active pool; the stuck ones remain). This measures listings from the last 18
+   months at the moment they LISTED, and what actually happened to them. */
+const _pvoCache={};
+function v7PricingOutcomeCard(){
+  const g=intelGeo(); const key=`${store.version}|${g.city||''}|${g.tg||''}|${g.bt||''}`;
+  setTimeout(()=>v7PricingOutcomeFill(g,key),80);
+  const tip=(t)=>`<span class="mi-tip" data-tip="${t}">ⓘ</span>`;
+  return `<div class="mi-card" id="mi-liquidity">
+    <div class="mi-title">Pricing vs Outcome ${tip('Every listing from the last 18 months is compared with what the comps supported on the day it listed, then grouped by how it was priced. Shows what actually happened: how fast it went under contract, what it sold for against its original price, and how often it was pulled without selling.')}
+      <button class="mi-dl-btn" onclick="downloadMICard('mi-liquidity','Pricing vs Outcome')">⬇ PNG</button></div>
+    <div id="mi-liquidity-body">${_pvoCache[key]?_pvoCache[key]:'<div class="mi-empty" style="padding:26px 12px;font-size:11px">Replaying listings from the last 18 months…</div>'}</div></div>`;
+}
+async function v7PricingOutcomeFill(g,key){
+  const box=()=>el('mi-liquidity-body');
+  if(_pvoCache[key]){ if(box()) box().innerHTML=_pvoCache[key]; return; }
+  const asOf=store.asOf(g.city||null), from=TP.addMonths(asOf,-18);
+  const tgOf=r=>TP.typeGroup(r.bt);
+  let pool=store.all.filter(r=>r.olp&&r.ld!=null&&r.ld>=from&&r.sqft>0&&(r.status==='SOLD'||r.status==='PENDING'||r.status==='OFF')&&
+    (!g.city||r.city===g.city)&&(!g.tg||tgOf(r)===g.tg)&&(!g.bt||r.bt===g.bt));
+  if(pool.length>600){ const step=pool.length/600; pool=pool.sort((a,b)=>a.ld-b.ld).filter((_,i)=>Math.floor(i/step)!==Math.floor((i-1)/step)); }
+  const B={a:[],b:[],c:[],d:[]};
+  for(let i=0;i<pool.length;i++){
+    const t=pool[i];
+    const v=TP.value(store,TP.subjectFrom(t),{asOf:t.ld-1,excludeId:t.id});
+    if(!v.error){ const gap=t.olp/v.est-1; const k=gap<-0.05?'a':gap<=0.05?'b':gap<=0.15?'c':'d';
+      const sold=t.status==='SOLD'||t.status==='PENDING';
+      B[k].push({sold, days: sold?(t.pend!=null?t.pend-t.ld:(t.dom||null)):null, ratio:t.status==='SOLD'&&t.sp?t.sp/t.olp:null, unsold:t.status==='OFF'&&TP.isUnsoldExit(store,t)}); }
+    if(i%40===39){ await new Promise(r=>setTimeout(r,0)); if(box()) box().innerHTML=`<div class="mi-empty" style="padding:26px 12px;font-size:11px">Replaying listings… ${i+1} of ${pool.length}</div>`; }
+  }
+  const med=a=>{a=a.filter(x=>x!=null).sort((x,y)=>x-y);return a.length?a[a.length>>1]:null};
+  const rows=[['a','Priced below comps (> 5% under)','under'],['b','In line with comps (± 5%)','fair'],['c','Above comps (5–15% over)','over'],['d','Well above comps (> 15% over)','over']].map(([k,l,cls])=>{
+    const a=B[k], s=a.filter(x=>x.sold);
+    return {l,cls,n:a.length,unsold:a.length?a.filter(x=>x.unsold).length/a.length:null,days:med(s.map(x=>x.days)),ratio:med(s.map(x=>x.ratio)),fast:s.length?s.filter(x=>x.days!=null&&x.days<=14).length/s.length:null};});
+  const valid=rows.filter(r=>r.n>=15);
+  let html;
+  if(valid.length<2) html='<div class="mi-empty" style="padding:26px 12px;font-size:11px">Not enough listings in this scope to compare pricing outcomes (need 15+ per group).</div>';
+  else {
+    const maxU=Math.max(...valid.map(r=>r.unsold||0),0.01);
+    const b=rows.find(r=>r.cls==='fair'), c=rows[2];
+    html=`<div style="display:grid;grid-template-columns:minmax(150px,1.4fr) 2fr 62px 70px 62px;gap:6px 10px;align-items:center;font-size:11px">
+      <div style="color:var(--txt3);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase">Priced at listing</div>
+      <div style="color:var(--txt3);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase">Pulled without selling</div>
+      <div style="color:var(--txt3);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;text-align:right">Days to contract</div>
+      <div style="color:var(--txt3);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;text-align:right">Sale ÷ orig. list</div>
+      <div style="color:var(--txt3);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;text-align:right">Listings</div>
+      ${rows.map(r=>r.n<15?`<div style="color:var(--txt2)">${r.l}</div><div style="color:var(--txt3);grid-column:span 3">too few listings</div><div style="text-align:right;font-family:var(--fm)">${r.n}</div>`:
+      `<div style="color:var(--txt)">${r.l}</div>
+       <div class="mi-bar-track" style="height:12px;position:relative"><div class="mi-bar-fill ${r.cls}" style="width:${Math.max(3,(r.unsold||0)/maxU*100)}%"></div><span style="position:absolute;right:6px;top:-1px;font-size:10px;font-family:var(--fm);color:var(--txt)">${Math.round((r.unsold||0)*100)}%</span></div>
+       <div style="text-align:right;font-family:var(--fm)">${r.days!=null?Math.round(r.days)+' d':'—'}</div>
+       <div style="text-align:right;font-family:var(--fm)">${r.ratio!=null?(r.ratio*100).toFixed(1)+'%':'—'}</div>
+       <div style="text-align:right;font-family:var(--fm);color:var(--txt2)">${r.n}</div>`).join('')}
+    </div>
+    <div class="expl-card" style="margin-top:10px"><strong>How to read</strong>Each listing is judged against what the comps supported on the day it listed — not against today's active pool, which only holds the homes that <em>haven't</em> sold.${b.n>=15&&c.n>=15?` Here, homes listed 5–15% above comps were pulled without selling ${Math.round((c.unsold||0)*100)}% of the time vs ${Math.round((b.unsold||0)*100)}% for well-priced ones, and sold at ${c.ratio?(c.ratio*100).toFixed(1):'—'}% of their original price vs ${b.ratio?(b.ratio*100).toFixed(1):'—'}%.`:''} Homes far above the comps often sell well anyway — usually remodels or views the comps can't see.</div>`;
+  }
+  _pvoCache[key]=html; if(box()) box().innerHTML=html;
+}
 
 </script>
 </body>
