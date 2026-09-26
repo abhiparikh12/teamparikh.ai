@@ -1863,6 +1863,13 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
   .mi-row>*,.val-grid>*,.mi-stat-grid>*{min-width:0}
   .mi-stat-grid{grid-template-columns:repeat(2,1fr)!important}
   .conf-row,.mi-title{flex-wrap:wrap}
+  .adj-tbl td.lf,.adj-tbl td.lf *{white-space:normal}
+  .mkt-hero-eyebrow{padding-right:74px}
+  /* Info tooltips: hidden until tapped, then shown as a panel pinned to the bottom of the screen */
+  .mi-tip{cursor:pointer}
+  .mi-tip::after{display:none}
+  .mi-tip:hover::after,.mi-tip:focus::after{display:block;opacity:1;position:fixed;left:16px;right:16px;bottom:24px;top:auto;width:auto;transform:none;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+  #app{overflow-x:clip}
   .mi-bar-lbl{width:90px}
 
   /* Wide tables scroll sideways inside their card */
