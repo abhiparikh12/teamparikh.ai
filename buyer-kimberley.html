@@ -218,6 +218,7 @@
 
 <div class="tab-bar">
   <button class="tab-btn active" onclick="showTab('overview', this)">📋 Overview</button>
+  <button class="tab-btn" onclick="showTab('redflags', this)">🚩 Red Flags</button>
   <button class="tab-btn" onclick="showTab('disclosures', this)">📄 Seller Disclosures</button>
   <button class="tab-btn" onclick="showTab('title', this)">📜 Title &amp; Easements</button>
   <button class="tab-btn" onclick="showTab('hoa', this)">🏛️ HOA</button>
@@ -243,6 +244,8 @@
     <div class="score-card red"><div class="count" style="font-size:26px;">~3%</div><div class="label">🔴 HOA Reserves Funded (YE2025)</div></div>
     <div class="score-card red"><div class="count" style="font-size:22px;">$3,261</div><div class="label">🔴 Special Assessment / Qtr</div></div>
   </div>
+
+  <div class="age-banner" style="cursor:pointer" onclick="showTab('redflags', [...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.indexOf('Red Flags')>-1))">🚩 <strong>Start with the Red Flags tab</strong>, a one-page summary of the five issues that matter most and what to do about each. <u>Open Red Flags →</u></div>
 
   <div class="age-banner">⚠️ <strong>How to read this package:</strong> Everything here was prepared by or for the seller side. The seller disclosures reflect the owners' honest knowledge — not an inspection. Weichert expressly states it has not verified any of it and that you may not rely on it in place of your own inspection. The absence of reported problems is <strong>not</strong> the same as the absence of problems; it means nobody has looked professionally yet. That is your job in the next 10 days.</div>
 
@@ -304,6 +307,77 @@
       <div class="finding-body">The board meets about quarterly, reviews financials under Civil Code §5500 at each meeting, and competitively bid the road work. The association carries a $10 million umbrella policy on top of $1M/$2M general liability. Under the CC&amp;Rs, dues increases above 20% a year and special assessments above 5% of the budget require an owner vote.</div>
     </div>
   </div>
+</div>
+</div>
+
+<!-- TAB: RED FLAGS -->
+<div id="tab-redflags" class="tab-content">
+<div class="wrapper">
+  <div class="exec-summary">
+    <h2>Red Flags — What You Need to Know Before You Commit</h2>
+    <p>This page pulls the most important issues from every document in this package onto one screen, ranked by how much they could cost you or how soon you have to act. The other tabs have the detail and the source for each one.</p>
+    <p><strong>The short version:</strong> the house itself has a clean seller disclosure, but <strong>nobody has inspected it</strong>, and you have only <strong>10 days</strong> to do so. The bigger long-term risk is the <strong>homeowners association</strong>. Its savings are nearly empty, its board has said dues are too low, and your own street's repaving has been put on hold with no funding plan.</p>
+  </div>
+
+  <div class="scorecard">
+    <div class="score-card red"><div class="count">5</div><div class="label">🔴 Red Flags</div></div>
+    <div class="score-card amber"><div class="count">5</div><div class="label">🟡 Watch Items</div></div>
+    <div class="score-card red"><div class="count">10</div><div class="label">🔴 Days to Inspect</div></div>
+    <div class="score-card amber"><div class="count" style="font-size:22px;">~$6.5K</div><div class="label">🟡 Assessment to Negotiate</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-red">🚩</div><div><h2>Red Flags</h2><div class="subtitle">Issues that could cost you significant money or end your ability to back out</div></div></div>
+
+    <div class="finding-card critical">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-red">1 · Deadline</span><span class="finding-title">No inspections exist, you have 10 days, and silence means you accept the house as-is</span></div>
+      <div class="finding-body">No home, termite, roof or pool report has ever been done, and the sellers know of none. The Weichert addendum gives you <strong>10 calendar days</strong> from the addendum date to inspect. If you don't give written notice of a material defect in that time, <strong>you accept the property as-is</strong>. If you do give notice, <strong>Weichert may cancel the sale rather than repair</strong>. There is no built-in right to a credit.
+        <div class="action-note">Book the general, termite, roof and pool inspections on day one. Decide before day 10 whether any finding is worth risking the deal over.</div>
+      </div>
+    </div>
+
+    <div class="finding-card critical">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-red">2 · HOA Savings</span><span class="finding-title">HOA reserves were about 3% funded; the operating account was overdrawn</span></div>
+      <div class="finding-body">At the end of 2025 the association had <strong>$43,058 saved against about $1,574,000</strong> of expected repair and replacement costs. Its day-to-day account ran deficits in 2024 and 2025 and ended 2025 <strong>$98,349 in the red with a $65,308 bank overdraft</strong>. About <strong>$1.0 million</strong> of common-area work comes due within three years, led by a <strong>$405,000 retaining wall</strong> that was only partly repaired. Funding all of it through a special assessment would be on the order of <strong>$19,000 per home</strong>. That is an illustration, not a forecast, and any large assessment requires a vote of the owners.
+        <div class="action-note">Price this risk into your offer. Ask the HOA whether any assessment, loan or dues increase is being discussed.</div>
+      </div>
+    </div>
+
+    <div class="finding-card critical">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-red">3 · Dues</span><span class="finding-title">The board has said in writing, two years running, that dues are not enough</span></div>
+      <div class="finding-body">Dues are <strong>$1,628 per quarter</strong> in 2026, up about 5% a year. Both budget votes state the increase "is not enough." For 2026 the board rejected a 9% increase because owners were already paying the road special assessment, and it set reserve savings below management's recommendation. That assessment ends in <strong>April 2027</strong>.
+        <div class="action-note">Budget for dues noticeably above $1,628 per quarter starting in 2027.</div>
+      </div>
+    </div>
+
+    <div class="finding-card critical">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-red">4 · Your Street</span><span class="finding-title">Repaving Kimberley Place was put on hold in May 2026 — no funding identified</span></div>
+      <div class="finding-body">The board approved $526,170 of repaving for upper Alamo Springs Drive, paid from the existing special assessment. It <strong>tabled</strong> the "Kimberly Pl 4-inch grind &amp; pave" at the same meeting. Nothing in the documents says when your street will be repaved or who will pay for it.
+        <div class="action-note">Look at the pavement condition on Kimberley Place. Ask the HOA what the bid was and how it will be paid for.</div>
+      </div>
+    </div>
+
+    <div class="finding-card critical">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-red">5 · Seller Terms</span><span class="finding-title">Relocation seller: no warranties, as-is, and a 2%-per-month penalty if you delay closing</span></div>
+      <div class="finding-body">Weichert has never lived in the home, makes <strong>no warranties</strong>, and has not verified the disclosures. Its obligations end at closing, so there is no recourse afterward. If <strong>you</strong> cause a delay in closing, Weichert can charge <strong>2% of the price per month</strong>, prorated daily. On a home of this value that is well over $2,000 a day.
+        <div class="action-note">Keep your lender on schedule. Raise every issue before closing, because nothing survives it.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-amber">⚠️</div><div><h2>Watch Items</h2><div class="subtitle">Real costs or unknowns to resolve, but not deal-breakers on what we know today</div></div></div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;"><table class="doc-table">
+      <tr><th>Item</th><th>Why it matters</th><th>What to do</th></tr>
+      <tr><td><strong>Road special assessment</strong></td><td>About two installments of $3,261 (~$6,522) would fall to you in January and April 2027.</td><td class="priority-med">Ask the seller to pay it off at closing</td></tr>
+      <tr><td><strong>Roof age unknown</strong></td><td>Concrete tile roof, age "Don't know." The owner, not the HOA, maintains the roof.</td><td class="priority-med">Tile-roof specialist inspection</td></tr>
+      <tr><td><strong>Property tax reset</strong></td><td>The seller pays $38,504 a year on a $3.3M assessed value. Yours resets to about 1.1–1.2% of your price, plus a supplemental bill after closing.</td><td class="priority-med">Budget from your purchase price</td></tr>
+      <tr><td><strong>Road construction this fall</strong></td><td>Phase 2 repaving on upper Alamo Springs Drive was scheduled for completion around Oct. 1, 2026 and may overlap your closing or move-in.</td><td class="priority-med">Get the current schedule from the HOA</td></tr>
+      <tr><td><strong>Insurance &amp; missing reports</strong></td><td>The HOA insures common areas only. The Natural Hazard Disclosure (fire zone), agent visual inspection (AVID) and Weichert disclosure are not in this package.</td><td class="priority-med">Get HO-3 insurance quotes and request the missing reports now</td></tr>
+    </table></div>
+  </div>
+
+  <div class="info-banner">ℹ️ <strong>What looks good:</strong> The seller disclosure is clean and specific, with no known defects, water, mold, claims or disputes. Title is routine for a planned community. The main road rebuild is largely paid for by current owners. The association carries a $10M liability umbrella, and large assessments need an owner vote.</div>
 </div>
 </div>
 
