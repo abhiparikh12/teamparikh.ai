@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buyer Disclosure Review — 28 Kimberley Place, Alamo CA 94507</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0f2540; --gold: #c9963a; --gold-light: #f5e6c8;
+    --red: #b5302a; --red-light: #fdf0ef;
+    --amber: #b5721a; --amber-light: #fef6e4;
+    --green: #1f6b3a; --green-light: #edf7f1;
+    --slate: #f4f5f7; --text: #1a1e2e; --muted: #5c6278;
+    --border: #dde1ea; --white: #ffffff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Source Sans 3', sans-serif; color: var(--text); background: #f0f2f6; font-size: 15px; line-height: 1.7; }
+  .report-header { background: #111214; color: white; padding: 48px 60px 40px; position: relative; overflow: hidden; }
+  .report-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gold); }
+  .report-header::after { content: ''; position: absolute; bottom: -60px; right: -60px; width: 200px; height: 200px; border-radius: 50%; border: 40px solid rgba(201,150,58,0.12); }
+  .tag { display: inline-block; background: var(--gold); color: var(--navy); font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 4px 12px; border-radius: 2px; margin-bottom: 16px; }
+  .report-header h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; margin-bottom: 6px; line-height: 1.2; }
+  .report-header .address { font-size: 18px; color: rgba(255,255,255,0.75); margin-bottom: 24px; }
+  .header-meta { display: flex; gap: 32px; flex-wrap: wrap; }
+  .meta-item { font-size: 13px; color: rgba(255,255,255,0.6); }
+  .meta-item strong { display: block; color: rgba(255,255,255,0.9); font-weight: 600; font-size: 14px; }
+  .tab-bar { background: #111214; border-top: 1px solid rgba(255,255,255,0.1); display: flex; padding: 0 60px; overflow-x: auto; }
+  .tab-btn { padding: 14px 18px; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.5); cursor: pointer; border: none; background: none; border-bottom: 3px solid transparent; white-space: nowrap; transition: all 0.2s; font-family: 'Source Sans 3', sans-serif; }
+  .tab-btn:hover { color: rgba(255,255,255,0.8); }
+  .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .wrapper { max-width: 980px; margin: 0 auto; padding: 40px 20px 80px; }
+  .exec-summary { background: #111214; color: white; border-radius: 8px; padding: 28px 32px; margin-bottom: 36px; border-left: 4px solid var(--gold); }
+  .exec-summary h2 { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--gold); margin-bottom: 12px; }
+  .exec-summary p { font-size: 14px; line-height: 1.75; color: rgba(255,255,255,0.85); }
+  .exec-summary p + p { margin-top: 10px; }
+  .scorecard { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 36px; }
+  .score-card { background: white; border-radius: 8px; padding: 20px 18px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border-top: 3px solid transparent; }
+  .score-card.red { border-top-color: var(--red); }
+  .score-card.amber { border-top-color: var(--amber); }
+  .score-card.green { border-top-color: var(--green); }
+  .score-card .count { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; line-height: 1; margin-bottom: 6px; }
+  .score-card.red .count { color: var(--red); }
+  .score-card.amber .count { color: var(--amber); }
+  .score-card.green .count { color: var(--green); }
+  .score-card .label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+  .section { margin-bottom: 40px; }
+  .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--border); }
+  .section-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .icon-red { background: var(--red-light); }
+  .icon-amber { background: var(--amber-light); }
+  .icon-green { background: var(--green-light); }
+  .icon-navy { background: rgba(15,37,64,0.08); }
+  .section-header h2 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 600; color: var(--navy); }
+  .section-header .subtitle { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .finding-card { background: white; border-radius: 8px; margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); overflow: hidden; border-left: 4px solid var(--border); }
+  .finding-card.critical { border-left-color: var(--red); }
+  .finding-card.caution { border-left-color: var(--amber); }
+  .finding-card.ok { border-left-color: var(--green); }
+  .finding-header { padding: 14px 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; user-select: none; }
+  .finding-header:hover { background: #fafbfd; }
+  .badge { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; white-space: nowrap; }
+  .badge-red { background: var(--red-light); color: var(--red); }
+  .badge-amber { background: var(--amber-light); color: var(--amber); }
+  .badge-green { background: var(--green-light); color: var(--green); }
+  .badge-navy { background: rgba(15,37,64,0.08); color: var(--navy); }
+  .finding-title { font-weight: 600; font-size: 14px; flex: 1; }
+  .finding-body { padding: 0 20px 16px 44px; font-size: 14px; color: var(--muted); line-height: 1.75; display: none; }
+  .finding-body.open { display: block; }
+  .finding-body ul { padding-left: 20px; margin-top: 8px; }
+  .finding-body li { margin-bottom: 4px; }
+  .chevron { font-size: 12px; color: var(--muted); transition: transform 0.2s; }
+  .chevron.open { transform: rotate(90deg); }
+  .action-note { background: var(--gold-light); border-left: 3px solid var(--gold); padding: 10px 14px; border-radius: 4px; margin-top: 12px; font-size: 13px; color: #6b4c14; font-weight: 600; }
+  .buyer-note { background: var(--green-light); border-left: 3px solid var(--green); padding: 10px 14px; border-radius: 4px; margin-top: 12px; font-size: 13px; color: #1f5230; font-weight: 600; }
+  .specs-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 28px; }
+  .spec-item { background: white; border-radius: 6px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+  .spec-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 4px; }
+  .spec-value { font-size: 14px; font-weight: 600; color: var(--text); }
+  .doc-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.05); font-size: 13.5px; }
+  .doc-table th { background: #111214; color: white; padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+  .doc-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .doc-table tr:last-child td { border-bottom: none; }
+  .doc-table tr:nth-child(even) td { background: #fafbfd; }
+  .priority-high { color: var(--red); font-weight: 600; }
+  .priority-med { color: var(--amber); font-weight: 600; }
+  .priority-ok { color: var(--green); font-weight: 600; }
+  .age-banner { background: #fff8ed; border: 1px solid #f5d9a0; border-left: 4px solid var(--amber); border-radius: 6px; padding: 16px 20px; margin-bottom: 28px; font-size: 14px; color: #6b4c14; line-height: 1.65; }
+  .info-banner { background: #f0f4fa; border: 1px solid #c5d3e8; border-left: 4px solid var(--navy); border-radius: 6px; padding: 16px 20px; margin-bottom: 28px; font-size: 14px; color: #2a3a52; line-height: 1.65; }
+  .pest-cost-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.05); font-size: 14px; margin-bottom: 24px; }
+  .pest-cost-table th { background: #111214; color: white; padding: 10px 16px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .pest-cost-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .pest-cost-table tr:last-child td { border-bottom: none; }
+  .pest-cost-table .cost { font-weight: 700; color: var(--red); white-space: nowrap; }
+  .pest-cost-table .section1 { background: #fdf0ef; }
+  .pest-cost-table .section2 { background: #fef6e4; }
+  .pest-cost-table .fi { background: #f4f5f7; }
+  .total-row td { font-weight: 700; background: var(--slate); }
+  /* COMP */
+  .comp-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; margin-bottom: 32px; }
+  .comp-card { background: white; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
+  .comp-card-header { padding: 14px 18px 10px; border-bottom: 1px solid var(--border); }
+  .comp-address { font-weight: 700; font-size: 15px; color: var(--navy); }
+  .comp-sold-date { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .comp-price { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: var(--navy); margin-top: 6px; }
+  .comp-card-body { padding: 12px 18px 16px; }
+  .comp-stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 10px; }
+  .comp-stat .cs-label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .comp-stat .cs-val { font-weight: 600; font-size: 13px; }
+  .comp-psf { color: var(--amber); }
+  .comp-tag { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; margin-top: 6px; }
+  .comp-tag-green { background: var(--green-light); color: var(--green); }
+  .comp-tag-amber { background: var(--amber-light); color: var(--amber); }
+  .comp-tag-red { background: var(--red-light); color: var(--red); }
+  .comp-tag-navy { background: rgba(15,37,64,0.08); color: var(--navy); }
+  .comp-adjust { font-size: 12.5px; color: var(--muted); margin-top: 10px; line-height: 1.6; }
+  .comp-bar-row { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+  .comp-bar-label { font-size: 12px; color: var(--muted); width: 75px; flex-shrink: 0; }
+  .comp-bar-track { flex: 1; background: #e8ecf3; border-radius: 4px; height: 6px; }
+  .comp-bar-fill { height: 6px; border-radius: 4px; background: var(--gold); }
+  .subject-card { background: #111214; color: white; border-radius: 8px; padding: 24px 28px; margin-bottom: 28px; border-left: 4px solid var(--gold); }
+  .subject-card h3 { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 16px; margin-bottom: 12px; }
+  .val-range { display: flex; gap: 16px; margin-top: 14px; flex-wrap: wrap; }
+  .val-box { background: rgba(255,255,255,0.07); border-radius: 6px; padding: 12px 16px; flex: 1; min-width: 140px; }
+  .val-box .vb-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.5); margin-bottom: 4px; }
+  .val-box .vb-val { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: white; }
+  .val-box .vb-sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 3px; }
+  /* TIER BOXES */
+  .tier-box { background: white; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); overflow: hidden; }
+  .tier-header { padding: 14px 20px; font-weight: 700; font-size: 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .tier-header.t-seller { background: #fdf3f3; color: var(--red); border-left: 4px solid var(--red); }
+  .tier-header.t-negotiate { background: #fef9f0; color: var(--amber); border-left: 4px solid var(--amber); }
+  .tier-header.t-buyer { background: #f0f8f4; color: var(--green); border-left: 4px solid var(--green); }
+  .tier-row { display: grid; grid-template-columns: 1fr 130px 160px; gap: 12px; padding: 10px 20px; border-bottom: 1px solid #f3f5f8; font-size: 13.5px; align-items: start; }
+  .tier-row:last-child { border-bottom: none; }
+  .tr-cost { font-weight: 700; color: var(--muted); text-align: right; }
+  .tr-source { font-size: 12px; color: var(--muted); font-style: italic; }
+  .tier-total { display: grid; grid-template-columns: 1fr 130px 160px; gap: 12px; padding: 12px 20px; background: var(--slate); font-weight: 700; font-size: 14px; }
+  .report-footer { background: #111214; color: rgba(255,255,255,0.55); text-align: center; padding: 24px 40px; font-size: 12px; line-height: 1.7; }
+  @media (max-width: 700px) {
+    .report-header { padding: 32px 24px 28px; }
+    .tab-bar { padding: 0 12px; }
+    .scorecard { grid-template-columns: repeat(2,1fr); }
+    .specs-grid { grid-template-columns: repeat(2,1fr); }
+    .comp-grid { grid-template-columns: 1fr; }
+    .tier-row, .tier-total { grid-template-columns: 1fr; }
+  }
+
+  /* AGENT TOPBAR */
+  .agent-topbar { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; }
+  .agent-topbar-photo { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; object-position: center 15%; border: 2px solid var(--gold); flex-shrink: 0; }
+  .agent-topbar-text { flex: 1; }
+  .agent-topbar-name { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 600; color: white; line-height: 1.2; }
+  .agent-topbar-title { font-size: 11px; color: rgba(255,255,255,0.55); margin-top: 2px; letter-spacing: 0.3px; }
+  .agent-topbar-logo { height: 54px; width: auto; flex-shrink: 0; }
+  .agent-topbar-sep { width: 1px; height: 40px; background: rgba(201,150,58,0.35); flex-shrink: 0; }
+  /* TEAM PARIKH LABEL */
+  .team-parikh-label { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+  .team-parikh-label-name { font-family: 'Source Sans 3', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--gold); }
+  .team-parikh-label-pipe { color: rgba(201,150,58,0.5); font-size: 18px; font-weight: 300; line-height: 1; }
+  .team-parikh-label-brokerage { font-family: 'Source Sans 3', sans-serif; font-size: 13px; font-weight: 400; color: rgba(255,255,255,0.75); letter-spacing: 0.3px; }
+
+  /* --- Disclaimer modal (additive) --- */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(8,12,22,0.82); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.hidden { display: none; }
+  .modal-box { background: var(--white); max-width: 640px; width: 100%; border-radius: 8px; border-top: 5px solid var(--gold); padding: 32px 34px 26px; box-shadow: 0 24px 60px rgba(0,0,0,0.45); max-height: 90vh; overflow-y: auto; }
+  .modal-box h2 { font-family: 'Playfair Display', serif; font-size: 21px; color: var(--navy); margin-bottom: 14px; }
+  .modal-box p { font-size: 14px; line-height: 1.75; color: var(--text); margin-bottom: 12px; }
+  .modal-box .modal-key { background: var(--gold-light); border-left: 3px solid var(--gold); padding: 12px 14px; border-radius: 3px; font-size: 13.5px; line-height: 1.7; margin-bottom: 14px; }
+  .modal-btn { display: block; width: 100%; margin-top: 6px; background: var(--navy); color: var(--white); border: none; padding: 13px; border-radius: 4px; font-family: 'Source Sans 3', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; letter-spacing: 0.3px; }
+  .modal-btn:hover { background: #1b3a63; }
+</style>
+</head>
+<body>
+
+<div class="modal-overlay" id="disclaimerModal">
+  <div class="modal-box">
+    <h2>Please Read Before Continuing</h2>
+    <div class="modal-key">This advisory is <strong>not a substitute for, and is not provided in lieu of, the seller's disclosure package, the Weichert disclosure documents, the preliminary title report, or the HOA document package.</strong> It is a convenience summary prepared for ease of reference only.</div>
+    <p>This property is being sold by <strong>Weichert Workforce Mobility Inc.</strong>, a relocation company that has never lived in the home and makes <strong>no warranties or representations</strong> about its condition. The property is sold in its present condition, and <strong>no inspection reports have been provided</strong>. Buyer is responsible for performing their own inspections within the inspection period set by the Weichert Addendum.</p>
+    <p>Buyer is responsible for independently reviewing the complete Transfer Disclosure Statement, Seller Property Questionnaire, Weichert Addendum and disclosures, preliminary title report and every recorded document it references, and the full set of association documents in their original form. Where this summary and any source document differ, <strong>the source document governs</strong>.</p>
+    <p>Nothing here constitutes an appraisal, legal advice, tax advice, or an inspection. Buyer should engage qualified independent professionals before the inspection period expires.</p>
+    <button class="modal-btn" onclick="closeModal()">I Understand — Continue to the Advisory</button>
+  </div>
+</div>
+
+<div class="report-header">
+  <div class="agent-topbar">
+    <img class="agent-topbar-photo" src="data:image/jpeg;base64,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" alt="Abhishek Parikh">
+    <div class="agent-topbar-text">
+      <div class="agent-topbar-name">Abhishek Parikh</div>
+      <div class="agent-topbar-title">Realtor® &nbsp;·&nbsp; Team Parikh at Keller Williams Luxury</div>
+    </div>
+    <div class="agent-topbar-sep"></div>
+    <img class="agent-topbar-logo" src="data:image/png;base64,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" alt="Team Parikh">
+  </div>
+
+  <div class="team-parikh-label">
+    <span class="team-parikh-label-name">Team Parikh</span>
+    <span class="team-parikh-label-pipe">|</span>
+    <span class="team-parikh-label-brokerage">Keller Williams</span>
+  </div>
+
+  <div class="tag">Buyer Disclosure Review</div>
+  <h1>Disclosure, Title, HOA &amp; Seller Terms Analysis</h1>
+  <div class="address">28 Kimberley Place, Alamo, CA 94507</div>
+  <div class="header-meta">
+    <div class="meta-item"><strong>Prepared</strong>September 25, 2026</div>
+    <div class="meta-item"><strong>Seller</strong>Weichert Workforce Mobility Inc.</div>
+    <div class="meta-item"><strong>Disclosures</strong>TDS &amp; SPQ — Signed Sept. 12, 2026</div>
+    <div class="meta-item"><strong>Preliminary Title</strong>Chicago Title — Effective Aug. 5, 2026</div>
+    <div class="meta-item"><strong>HOA Records</strong>FY2025 Financials · July 2026 Balance Sheet · Minutes Oct. 2024–May 2026 · CC&amp;Rs · Insurance</div>
+    <div class="meta-item"><strong>Inspections</strong>Buyer to Perform — Not Yet Received</div>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="showTab('overview', this)">📋 Overview</button>
+  <button class="tab-btn" onclick="showTab('disclosures', this)">📄 Seller Disclosures</button>
+  <button class="tab-btn" onclick="showTab('title', this)">📜 Title &amp; Easements</button>
+  <button class="tab-btn" onclick="showTab('hoa', this)">🏛️ HOA</button>
+  <button class="tab-btn" onclick="showTab('ccrs', this)">📘 CC&amp;Rs &amp; Insurance</button>
+  <button class="tab-btn" onclick="showTab('weichert', this)">🤝 Weichert Terms</button>
+  <button class="tab-btn" onclick="showTab('inspection', this)">🔍 Inspections — Coming Soon</button>
+  <button class="tab-btn" onclick="showTab('checklist', this)">✅ Checklist</button>
+</div>
+
+<!-- TAB 1: OVERVIEW -->
+<div id="tab-overview" class="tab-content active">
+<div class="wrapper">
+  <div class="exec-summary">
+    <h2>Executive Summary</h2>
+    <p>28 Kimberley Place is a <strong>single-family residence within a planned unit development</strong> — Lot 19 of Subdivision 7452, part of the <strong>Alamo Springs Owners' Association</strong>, a 52-home gated community in unincorporated Contra Costa County. The recorded owners are Wayne P. and Stacie A. Borduin, Trustees of The Borduin Family Trust. Because this is a corporate relocation, the property is being sold by <strong>Weichert Workforce Mobility Inc.</strong>, which contracts with the owners and their employer and will deliver title at closing.</p>
+    <p>The seller's own disclosures are <strong>clean and short</strong>. The owners, who live in the home, report no known defects, no water intrusion, no mold, no insurance claims in five years, no neighbor disputes and no systems out of operating condition. They disclose a backyard landscaping project, new hardwood floors, upgraded appliances, pool equipment and lighting, a fresh pre-listing paint job, a leased Bay Alarm monitoring system, a solar tube system that supplements pool heating, and two outdoor cats. The preliminary title report shows <strong>routine exceptions for a planned community</strong>: CC&amp;Rs, a utility easement, a private road access easement, recorded HOA agreements, a deep subsurface mineral reservation with no surface entry, and the seller's existing loan, which is paid off from the sale.</p>
+    <p>Two things deserve most of your attention. <strong>First, there are no inspection reports.</strong> The sellers answered "No" to every question about existing reports, so you are buying a home with a pool, spa, sauna, four fireplaces and a concrete tile roof of unknown age with only the owners' opinion to go on. Weichert's addendum gives you <strong>10 days</strong> to inspect, and if you do not raise defects in writing inside that window you are deemed to accept the property as-is. <strong>Second, the HOA is financially thin.</strong> At year-end 2025 its reserve fund held about <strong>$43,058 against an estimated $1,574,000 liability, roughly 3% funded</strong>, and its operating fund was in deficit with a bank overdraft. The road rebuild is on track. A <strong>$39,132-per-home special assessment</strong>, still billed at $3,261 per quarter through April 2027, paid for Phase 1 and is funding Phase 2 on upper Alamo Springs Drive this fall. But <strong>repaving of Kimberley Place itself was tabled</strong> in May 2026. The board has also stated in writing, two years running, that <strong>dues are not high enough</strong>, and about <strong>$1.0 million of other common-area components</strong> come due within three years. Expect meaningful dues increases after the special assessment ends, and possibly another assessment. The CC&amp;Rs require an owner vote for any large one.</p>
+  </div>
+
+  <div class="scorecard">
+    <div class="score-card amber"><div class="count">0</div><div class="label">🟡 Inspection Reports Provided</div></div>
+    <div class="score-card amber"><div class="count">10</div><div class="label">🟡 Day Inspection Window</div></div>
+    <div class="score-card red"><div class="count" style="font-size:26px;">~3%</div><div class="label">🔴 HOA Reserves Funded (YE2025)</div></div>
+    <div class="score-card red"><div class="count" style="font-size:22px;">$3,261</div><div class="label">🔴 Special Assessment / Qtr</div></div>
+  </div>
+
+  <div class="age-banner">⚠️ <strong>How to read this package:</strong> Everything here was prepared by or for the seller side. The seller disclosures reflect the owners' honest knowledge — not an inspection. Weichert expressly states it has not verified any of it and that you may not rely on it in place of your own inspection. The absence of reported problems is <strong>not</strong> the same as the absence of problems; it means nobody has looked professionally yet. That is your job in the next 10 days.</div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">🏠</div><div><h2>Property Snapshot</h2><div class="subtitle">As documented by the disclosure package and preliminary title report</div></div></div>
+    <div class="specs-grid">
+      <div class="spec-item"><div class="spec-label">Type</div><div class="spec-value">Single-Family Home in a PUD</div></div>
+      <div class="spec-item"><div class="spec-label">APN</div><div class="spec-value">197-440-007-7</div></div>
+      <div class="spec-item"><div class="spec-label">Legal</div><div class="spec-value">Lot 19, Subdivision 7452</div></div>
+      <div class="spec-item"><div class="spec-label">Jurisdiction</div><div class="spec-value">Unincorporated Contra Costa County</div></div>
+      <div class="spec-item"><div class="spec-label">Era</div><div class="spec-value">Late 1990s or newer (tract recorded 1997)</div></div>
+      <div class="spec-item"><div class="spec-label">Association</div><div class="spec-value">Alamo Springs — 52 homes, gated</div></div>
+      <div class="spec-item"><div class="spec-label">Roof</div><div class="spec-value">Concrete tile — age unknown</div></div>
+      <div class="spec-item"><div class="spec-label">Garage</div><div class="spec-value">Attached — 3 remotes</div></div>
+      <div class="spec-item"><div class="spec-label">Fireplaces</div><div class="spec-value">3 indoor, 1 outdoor</div></div>
+      <div class="spec-item"><div class="spec-label">Pool / Spa</div><div class="spec-value">Pool, spa &amp; sauna — gas heat + solar assist</div></div>
+      <div class="spec-item"><div class="spec-label">Water / Sewer</div><div class="spec-value">City water · Public sewer</div></div>
+      <div class="spec-item"><div class="spec-label">Heating / Cooling</div><div class="spec-value">Central heat &amp; central AC</div></div>
+      <div class="spec-item"><div class="spec-label">Water Heater</div><div class="spec-value">Gas</div></div>
+      <div class="spec-item"><div class="spec-label">Security</div><div class="spec-value">Leased Bay Alarm monitoring</div></div>
+      <div class="spec-item"><div class="spec-label">Occupancy</div><div class="spec-value">Owner-occupied — never rented</div></div>
+      <div class="spec-item"><div class="spec-label">2025–26 Assessed Value</div><div class="spec-value">$3,299,701 (not market value)</div></div>
+    </div>
+    <div class="info-banner">ℹ️ Square footage, bedroom and bathroom count, lot size and exact year built do not appear in any of the documents in this package. Use the MLS listing and the county assessor record for those figures.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">💲</div><div><h2>Carrying Costs to Plan For</h2><div class="subtitle">Figures from the source documents; your actual amounts will differ</div></div></div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;"><table class="pest-cost-table">
+      <tr><th>Item</th><th>What the documents show</th><th>What it means for you</th><th>Amount</th></tr>
+      <tr class="fi"><td><strong>Property tax</strong></td><td>Seller's 2025–26 bill: two installments of $19,252.20, paid in full, on a $3,299,701 assessed value</td><td>Your bill resets to your purchase price under Prop 13 — roughly 1.1–1.2% of price plus direct charges. Expect a supplemental bill after closing.</td><td class="cost">$38,504 / yr (seller's)</td></tr>
+      <tr class="section2"><td><strong>HOA regular dues</strong></td><td>$1,628 per quarter for 2026, approved Oct. 29, 2025 (was $1,550 in 2025, $1,475 in 2024)</td><td>The board has said the increases are "not enough." Budget for larger increases starting in 2027.</td><td class="cost">$1,628 / qtr (~$543 / mo)</td></tr>
+      <tr class="section1"><td><strong>Road special assessment</strong></td><td>$39,132 per home approved in 2024, billed $3,261 per quarter from July 1, 2024 — 12 installments</td><td>Final installments fall in January and April 2027. At a closing on or before mid-November 2026, about <strong>two installments</strong> remain.</td><td class="cost">~$6,522 remaining</td></tr>
+      <tr class="section1"><td><strong>Possible future assessment</strong></td><td>Reserves ~3% funded at year-end 2025. ~$1.0M of components due within three years, outside the funded road work. Kimberley Place repaving tabled.</td><td>Not proposed in any document provided. Any assessment above 5% of the budget requires an owner vote. See the HOA tab.</td><td class="cost">Unknown</td></tr>
+      <tr class="fi"><td><strong>Alarm monitoring</strong></td><td>Bay Alarm system is leased (SPQ 8.D)</td><td>Leased equipment does not transfer automatically. Decide whether to assume or start a new contract.</td><td class="cost">Per contract</td></tr>
+    </table></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-green">🟢</div><div><h2>Positives Worth Noting</h2></div></div>
+    <div class="finding-card ok">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-green">Clean</span><span class="finding-title">Owner-occupied home with a clean, specific seller disclosure</span></div>
+      <div class="finding-body">Unlike many relocation sales, the owners actually live here and completed the TDS and SPQ themselves. They report no known defects in any structural or mechanical system, no water intrusion or mold, no soil or drainage problems, no fire or earthquake damage, no insurance claims in five years, no neighbor disputes, no lawsuits and nothing out of operating condition. Their "Yes" answers are specific and explained, which is a good sign of a careful disclosure.</div>
+    </div>
+    <div class="finding-card ok">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-green">Clean</span><span class="finding-title">Recent investment in the property</span></div>
+      <div class="finding-body">The owners disclose a backyard improvement by Genesis Landscaping, hardwood flooring by CV Floors, replaced or upgraded appliances, pool equipment and lighting, and a pre-listing repaint by PaintMasters. They also maintain the home on a regular schedule — lawn care, tree trimming, solar service and pool service.</div>
+    </div>
+    <div class="finding-card ok">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-green">Clean</span><span class="finding-title">Title looks routine — no conveyances in 24 months, CLTA 116 endorsement available</span></div>
+      <div class="finding-body">Chicago Title reports no conveyances of the property in the last 24 months and is prepared to issue a CLTA 116 endorsement identifying the land as a single-family residence within a planned unit development. The only monetary lien is the seller's 2021 Wells Fargo deed of trust, which is paid off through escrow. The mineral reservation is limited to substances more than 500 feet below the surface, with no right to enter the surface.</div>
+    </div>
+    <div class="finding-card ok">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-green">Clean</span><span class="finding-title">Main road rebuild is largely paid for by the current owners</span></div>
+      <div class="finding-body">Phase 1, the lower Alamo Springs Drive rebuild, was completed around the turn of 2026 at about $1.25 million. Phase 2, a 3-inch remove-and-replace on upper Alamo Springs Drive for $526,170, was approved in May 2026 for completion around October 1, 2026. Both are funded by the 2024 special assessment, of which only about two installments ($6,522) remain after a fall 2026 closing. The rebuilt sections carry a 20-year life in the reserve study.</div>
+    </div>
+    <div class="finding-card ok">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-green">Clean</span><span class="finding-title">Active board, strong liability coverage, owner vote required for large assessments</span></div>
+      <div class="finding-body">The board meets about quarterly, reviews financials under Civil Code §5500 at each meeting, and competitively bid the road work. The association carries a $10 million umbrella policy on top of $1M/$2M general liability. Under the CC&amp;Rs, dues increases above 20% a year and special assessments above 5% of the budget require an owner vote.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- TAB 2: DISCLOSURES -->
+<div id="tab-disclosures" class="tab-content">
+<div class="wrapper">
+  <div class="exec-summary">
+    <h2>Seller Disclosures — TDS, SPQ &amp; Text Overflow Addendum</h2>
+    <p>The Real Estate Transfer Disclosure Statement is dated September 9, 2026 and was signed by Stacie and Wayne Borduin on September 12, 2026. The Seller Property Questionnaire and Text Overflow Addendum No. 1 were signed the same day. The listing agent, MJ St. Jean of Compass, completed the agent inspection section by reference to an Agent Visual Inspection Disclosure (AVID) — <strong>the AVID itself is not in this package</strong>. You acknowledged receipt of all three documents on September 19, 2026.</p>
+  </div>
+
+  <div class="info-banner">ℹ️ <strong>How to read these disclosures:</strong> A seller disclosure tells you what the owners <em>know</em>, not what an inspector would find. These owners live in the home and answered carefully, but they are not inspectors. Treat every "No" as "not aware of," and let your own inspections tell you the rest.</div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-amber">🔎</div><div><h2>Items to Verify</h2><div class="subtitle">Answers that are incomplete, unusual, or worth confirming</div></div></div>
+
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Verify</span><span class="finding-title">No inspection reports or documents of any kind — SPQ ¶5 answered "No" three times</span></div>
+      <div class="finding-body">The sellers say they are not aware of any reports, inspections, warranties, estimates or surveys prepared before or during their ownership, or obtained by prior buyers. That means no home inspection, no termite report, no roof report and no pool report at all. It also means no warranty paperwork for the new floors, appliances or pool equipment has been identified.
+        <div class="action-note">This is the single biggest gap in the package. See the Inspections tab — order inspections immediately.</div>
+      </div>
+    </div>
+
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Verify</span><span class="finding-title">TDS lists exhaust fans "None" and 220-volt wiring "None"</span></div>
+      <div class="finding-body">A home with central air, a pool and spa, a sauna and a three-car garage would ordinarily have bathroom exhaust fans and at least one 220-volt circuit (air conditioner, dryer or sauna). These answers are most likely form entries rather than facts, but they should be checked, especially the bathroom exhaust fans, which matter for moisture.
+        <div class="buyer-note">Ask your home inspector to confirm the bathroom ventilation and the electrical service. No action with the seller unless the inspection finds a problem.</div>
+      </div>
+    </div>
+
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Verify</span><span class="finding-title">Concrete tile roof — age listed as "Don't know"</span></div>
+      <div class="finding-body">Concrete tile itself is long-lived, but the underlayment beneath it typically is not, and an unknown age is a common place for expensive surprises. Unlike some planned communities, <strong>nothing in the documents provided indicates the HOA maintains roofs</strong> — assume the roof is yours.
+        <div class="action-note">Include a roof inspection by a tile-roof specialist in your inspection plan.</div>
+      </div>
+    </div>
+
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Verify</span><span class="finding-title">Leased Bay Alarm monitoring system and solar pool heating — confirm what transfers</span></div>
+      <div class="finding-body">SPQ 8.D discloses a leased alarm monitoring system through Bay Alarm. SPQ 8.B discloses a solar tube system that supplements pool heating, and the TOA mentions "solar service" as ordinary maintenance. The disclosures do not say whether the solar pool system is owned or leased. A solar <em>thermal</em> pool system is different from a solar electric system, and nothing indicates solar panels that produce electricity.
+        <div class="buyer-note">Ask the seller side for the Bay Alarm contract terms and confirmation that the solar pool system is owned outright with no lien or lease. The title report shows no PACE lien or solar filing, which is reassuring.</div>
+      </div>
+    </div>
+
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Note</span><span class="finding-title">Permit history not addressed in the disclosures</span></div>
+      <div class="finding-body">The TDS answers "No" to alterations made without permits. The SPQ's detailed permit questions (7.F) apply only to owners who bought within 18 months of selling, so the sellers were not asked to list contractors or permits. Of the disclosed work, the pool equipment replacement is the item most likely to have involved a permit.
+        <div class="buyer-note">Request the permit history from Contra Costa County Building. The sellers state that no improvements were made without required HOA approval (SPQ 14.F(2) = No), and nothing in the board minutes suggests otherwise.</div>
+      </div>
+    </div>
+
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Note</span><span class="finding-title">Spa listed without a locking safety cover</span></div>
+      <div class="finding-body">The TDS checks the pool's child-resistant barrier but does not check a locking safety cover for the hot tub/spa. California's pool safety law applies drowning-prevention requirements when a permit is issued for a new pool or spa or for remodeling one; it is not automatically triggered by a sale. It is still worth knowing if young children will live in or visit the home.</div>
+    </div>
+
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Note</span><span class="finding-title">Two outdoor cats</span></div>
+      <div class="finding-body">SPQ 11.A discloses two outdoor cats. The sellers report no odors, stains or damage from pets. Relevant mainly if anyone in your household has allergies. The CC&amp;Rs allow up to three dogs, cats or birds combined per home (§5.15.2).</div>
+    </div>
+
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Note</span><span class="finding-title">Disclosures signed individually; title held in a trust</span></div>
+      <div class="finding-body">Title is vested in Wayne and Stacie Borduin as Trustees of The Borduin Family Trust dated March 6, 2015, while the disclosures were signed by them individually. This does not affect the substance of what they disclosed. Title will require a trust certification at closing, and Weichert — not the Borduins — is the seller on your contract.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">📄</div><div><h2>What the Sellers Disclosed — "Yes" Answers</h2></div></div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;"><table class="doc-table">
+      <tr><th>Question</th><th>Seller's Explanation</th></tr>
+      <tr><td><strong>SPQ 6.G / 14.A–D · TDS C.12–14</strong> — HOA, CC&amp;Rs, common area</td><td>Property is in the Alamo Springs HOA, subject to CC&amp;Rs, with common areas.</td></tr>
+      <tr><td><strong>SPQ 14.E</strong> — Pending assessments or dues increases</td><td><strong>"Special assessment for road improvement."</strong> See the HOA tab — about two quarterly installments of $3,261 remain.</td></tr>
+      <tr><td><strong>SPQ 14.F</strong> — HOA approval over improvements</td><td>"HOA has a review board." No improvements made without required approval.</td></tr>
+      <tr><td><strong>SPQ 7.A</strong> — Alterations and repairs</td><td>Backyard improvement (Genesis Landscaping); hardwood floors (CV Floors); various replacements and upgrades including appliances, pool equipment and lighting.</td></tr>
+      <tr><td><strong>SPQ 7.C</strong> — Ongoing maintenance</td><td>Lawn care, tree trimming, solar service, pool service.</td></tr>
+      <tr><td><strong>SPQ 7.D</strong> — Painted within 12 months</td><td>Refreshed paint before listing (PaintMasters). Fresh paint can conceal minor staining or cracks — another reason to inspect.</td></tr>
+      <tr><td><strong>SPQ 8.B</strong> — Solar system</td><td>Solar tube system providing supplemental heat to the pool.</td></tr>
+      <tr><td><strong>SPQ 8.D</strong> — Leased equipment</td><td>Monitoring alarm system through Bay Alarm.</td></tr>
+      <tr><td><strong>SPQ 11.A</strong> — Pets</td><td>Two outdoor cats.</td></tr>
+      <tr><td><strong>SPQ 13.B–D</strong> — Sprinklers, pool and spa heaters</td><td>Automatic sprinklers covering all planted areas; pool heater and spa heater both operational; no past or present pool, spa or sprinkler problems.</td></tr>
+      <tr><td><strong>TDS C.2</strong> — Shared features</td><td>A backyard fence along the boundary with the neighbor.</td></tr>
+    </table></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-green">🟢</div><div><h2>What the Sellers Report Not Being Aware Of</h2></div></div>
+    <div class="finding-card ok">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-green">Clean</span><span class="finding-title">No defects, water, mold, soil, damage, claims or legal matters</span></div>
+      <div class="finding-body">No significant defects in walls, ceilings, floors, roof, windows, doors, foundation, slab, driveways, fences, electrical or plumbing; no environmental hazards; no fill, settling, sliding, flooding or drainage problems; no fire, earthquake or flood damage; no water intrusion or mold; no insurance claims in five years; no disaster assistance; no zoning violations or citations; no lawsuits, liens or bankruptcy; no boundary disputes or encroachments; no neighborhood nuisances; no death on the property in three years; no methamphetamine, cannabis cultivation or smoking; no gas-appliance replacement restrictions; not a manufactured home; never tenant-occupied.</div>
+    </div>
+    <div class="finding-card ok">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-green">Clean</span><span class="finding-title">Not built before 1978 — lead-based paint rules do not apply</span></div>
+      <div class="finding-body">The sellers answered that the home was not built before 1978, which is consistent with the 1997 subdivision map and 1998 CC&amp;Rs.</div>
+    </div>
+    <div class="finding-card ok">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-green">Clean</span><span class="finding-title">Everything listed on the TDS is reported as operating</span></div>
+      <div class="finding-body">The sellers report that none of the listed features is out of operating condition, and they certify the home will have compliant smoke detectors and a braced water heater at closing.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">✍️</div><div><h2>Your Right to Rescind</h2></div></div>
+    <div class="info-banner">ℹ️ California Civil Code §1102.3, printed on page 3 of the TDS, gives a buyer the right to rescind a purchase contract for at least three days after delivery of the TDS if it is delivered after the offer is signed. You acknowledged the TDS on September 19, 2026. Separately, your contractual protection runs through the Weichert Addendum's 10-day inspection period — see the Weichert Terms tab.</div>
+  </div>
+</div>
+</div>
+
+<!-- TAB 3: TITLE -->
+<div id="tab-title" class="tab-content">
+<div class="wrapper">
+  <div class="exec-summary">
+    <h2>Preliminary Title Report — Chicago Title Company, Effective August 5, 2026</h2>
+    <p>Title No. FWAC-5852601448PJ (Title Officer Paul Jacobson; Escrow Officer Sean Loftus, Oakland). The report covers <strong>Parcel One</strong>, the fee ownership of Lot 19, and <strong>Parcel Two</strong>, a non-exclusive access easement over Parcel D of the subdivision — the private road you will use to reach the home. Title is vested in Wayne P. Borduin and Stacie A. Borduin, Trustees of The Borduin Family Trust dated March 6, 2015. There are eleven listed exceptions, all of a type that is ordinary for a home in a planned community.</p>
+  </div>
+
+  <div class="info-banner">ℹ️ <strong>Read the underlying documents.</strong> The Compass Buyer PTR Advisory you received asks you to review every recorded document the report references and to request any you have not received. <strong>Real estate agents cannot advise on the legal meaning or effect of these documents</strong> — the title officer can explain them, and a California real estate attorney can advise you. The recorded documents themselves are not included in this package.</div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">📜</div><div><h2>Exceptions — Plain-Language Summary</h2></div></div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;"><table class="doc-table">
+      <tr><th>#</th><th>Exception</th><th>What it means</th></tr>
+      <tr><td>1–3</td><td>Property taxes for 2026–27, supplemental assessments, and future taxes</td><td class="priority-ok">Standard. Taxes are prorated through escrow; your purchase triggers a supplemental reassessment.</td></tr>
+      <tr><td>4</td><td>Water rights</td><td class="priority-ok">Standard boilerplate.</td></tr>
+      <tr><td>5</td><td>East Bay Regional Park District Resolution No. 1980-12-331 (recorded 1981)</td><td class="priority-med">Predates the subdivision; likely relates to park or trail arrangements with the original developer. Request a copy.</td></tr>
+      <tr><td>6</td><td>Public utility easement along the northerly 5 feet of the lot</td><td class="priority-ok">Typical. Avoid permanent structures in that strip.</td></tr>
+      <tr><td>7</td><td>CC&amp;Rs recorded July 22, 1998 (Doc. 98-0170094)</td><td class="priority-med">The HOA's governing rules. Liens for assessments are payable to Alamo Springs Owners' Association. Contains a mortgagee protection clause and no reversionary clause. An <strong>Amended and Restated Declaration</strong> was provided but does not appear on this report. Ask the title officer whether it was recorded; see the CC&amp;Rs tab.</td></tr>
+      <tr><td>8</td><td>Grant of Easements, Joint Contribution, Maintenance and Use Agreement (recorded Nov. 18, 1998)</td><td class="priority-med">Between the developer and the HOA. Likely governs shared road and access maintenance — possibly including the adjacent owner who pays the HOA for road access. Request a copy.</td></tr>
+      <tr><td>9</td><td>Joint Exercise of Powers Agreement — Contra Costa County and Town of Danville (recorded Feb. 25, 1999)</td><td class="priority-med">Governs how public services are provided to Alamo Springs. Useful to understand which agency handles what. Request a copy.</td></tr>
+      <tr><td>10</td><td>Deed of trust — $1,325,000, Wells Fargo Bank, recorded March 31, 2021</td><td class="priority-ok">The seller's loan. Paid off and reconveyed through escrow.</td></tr>
+      <tr><td>11</td><td>Trust validity — trust certification required</td><td class="priority-ok">Standard requirement when the owner is a trust. A seller-side item.</td></tr>
+    </table></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">⛏️</div><div><h2>Legal Description Notes</h2></div></div>
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Note</span><span class="finding-title">Mineral rights below 500 feet are reserved to others — no surface entry</span></div>
+      <div class="finding-body">Oil, gas and mineral rights more than 500 feet below the surface are excepted, including a 1965 reservation of 60% of those rights to prior owners. Both reservations expressly exclude any right to enter the surface or the first 500 feet. This is common in the East Bay hills and has no practical effect on residential use.</div>
+    </div>
+    <div class="finding-card ok">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-green">Clean</span><span class="finding-title">Road access is an insured, recorded easement (Parcel Two)</span></div>
+      <div class="finding-body">Your access over the private road, Parcel D, is a recorded easement appurtenant to your lot and is included in the insured estate. It passes automatically with title.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">📝</div><div><h2>Report Notes</h2></div></div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;"><table class="doc-table">
+      <tr><th>Note</th><th>Detail</th></tr>
+      <tr><td><strong>Buyer names</strong></td><td>No buyer names were furnished when the report was ordered. Provide your exact vesting name to escrow promptly.</td></tr>
+      <tr><td><strong>2025–26 taxes</strong></td><td>Paid in full — two installments of $19,252.20. Land $1,024,044; improvements $2,275,657; $7,000 homeowner's exemption; tax rate area 66018.</td></tr>
+      <tr><td><strong>CLTA 116</strong></td><td>Available — identifies a single-family residence within a planned unit development at 28 Kimberley Place.</td></tr>
+      <tr><td><strong>Recent transfers</strong></td><td>None recorded within 24 months.</td></tr>
+      <tr><td><strong>Signing</strong></td><td>Documents must be signed before an authorized title or escrow employee, lender employee, or approved notary service.</td></tr>
+      <tr><td><strong>Wire fraud</strong></td><td>Never rely on emailed wire instructions. Verify by phone using a number you already know — Chicago Title Oakland escrow is (510) 987-7177.</td></tr>
+    </table></div>
+  </div>
+</div>
+</div>
+
+<!-- TAB 4: HOA -->
+<div id="tab-hoa" class="tab-content">
+<div class="wrapper">
+  <div class="exec-summary">
+    <h2>Alamo Springs Owners' Association — Finances, Road Projects &amp; Board Record</h2>
+    <p>Alamo Springs is a <strong>52-home gated community</strong> organized as a nonprofit mutual-benefit corporation in June 1998. Membership is mandatory and assessments are billed quarterly. The association is managed by Property Management &amp; Accounting, Inc. (PM&amp;A), 563 Leisure Street, Livermore, (925) 454-1987, hoamgmt@pmahoa.com. The five-member board meets about quarterly by Zoom.</p>
+    <p>This review covers the <strong>reviewed 2025 and 2024 financial statements</strong> (Levy, Erlanger &amp; Company LLP, February 19, 2026), the <strong>reserve study summary</strong> (John D. Beatty &amp; Company, November 2025), the <strong>July 2026 balance sheet</strong>, and <strong>eight sets of board and annual meeting minutes from October 2024 through May 2026</strong>. Together they show an association that is in the middle of a planned, member-funded road rebuild. The road work is being paid for as agreed. Regular dues and reserves are a different story. The board itself has said in writing, two years running, that dues are too low.</p>
+  </div>
+
+  <div class="scorecard">
+    <div class="score-card red"><div class="count" style="font-size:24px;">~3%</div><div class="label">🔴 Reserves Funded — Dec. 2025</div></div>
+    <div class="score-card amber"><div class="count" style="font-size:22px;">$1,628</div><div class="label">🟡 2026 Regular Dues / Qtr</div></div>
+    <div class="score-card red"><div class="count" style="font-size:20px;">($98,349)</div><div class="label">🔴 Operating Fund — Dec. 2025</div></div>
+    <div class="score-card red"><div class="count" style="font-size:20px;">~$1.0M</div><div class="label">🔴 Other Components Due ≤ 3 Yrs</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-amber">🛣️</div><div><h2>The Road Project — Where It Stands</h2><div class="subtitle">From the board minutes, October 2024 – May 2026</div></div></div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;"><table class="doc-table">
+      <tr><th>Phase</th><th>Scope</th><th>Status</th><th>Funding</th></tr>
+      <tr><td><strong>Phase 1</strong></td><td>Lower Alamo Springs Drive, Sections 1–5. Ghilotti contract awarded Aug. 13, 2025 at $1,210,727, plus PM&amp;A administration ($25,000–$35,000) and Ken Ferrone project management</td><td class="priority-ok">Completed. Reported under way Oct. 2025 and complete by the Jan. 8, 2026 meeting. Entry lanes re-striped.</td><td>2024 road special assessment</td></tr>
+      <tr><td><strong>Interim</strong></td><td>Sealcoat with hot crack-fill and re-striping (American Asphalt, $35,200) and entry re-striping (Ghilotti, $6,330)</td><td class="priority-ok">Approved Oct. 29, 2025</td><td>Not stated</td></tr>
+      <tr><td><strong>Phase 2</strong></td><td>Remove and replace 3 inches of asphalt on upper Alamo Springs Drive, including a permanent second speed bump at no added cost. Ghilotti proposal dated April 1, 2026</td><td class="priority-med">Approved May 13, 2026 at <strong>$526,170</strong>, scheduled for completion around <strong>October 1, 2026</strong></td><td>Described in the Jan. 2026 minutes as "per the Special Assessment"</td></tr>
+      <tr><td><strong>Kimberley Place</strong></td><td>"Kimberly Pl (4&Prime; Grind &amp; Pave)"</td><td class="priority-high"><strong>Tabled</strong> May 13, 2026</td><td>None identified</td></tr>
+      <tr><td><strong>Entry pavers</strong></td><td>Paver replacement at the gate entrance, possibly relocating the ButterflyMX gate unit</td><td class="priority-high">Tabled May 13, 2026</td><td>None identified</td></tr>
+    </table></div>
+    <div class="info-banner" style="margin-top:16px;">ℹ️ The 2024 special assessment raised $2,034,864. Phase 1 (~$1.25 million recognized in 2025) plus Phase 2 ($526,170) come to about $1.78 million before administration and management fees. That is consistent with the minutes' statement that Phase 2 is being paid for from the existing assessment. The minutes do not include a reconciliation of what will be left over, if anything, so ask PM&amp;A to confirm that Phase 2 is fully funded.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-red">💰</div><div><h2>Key Findings</h2></div></div>
+
+    <div class="finding-card critical">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-red">Your Street</span><span class="finding-title">Repaving Kimberley Place — the street this home is on — was tabled in May 2026</span></div>
+      <div class="finding-body">The May 13, 2026 minutes list "Kimberly Pl (4&Prime; Grind &amp; Pave)" under Tabled Business. At the same meeting the board approved Phase 2 for upper Alamo Springs Drive only. Nothing in the documents provided says when, or how, Kimberley Place will be repaved or where the money will come from.
+        <div class="action-note">Drive Kimberley Place and look at the pavement condition. Ask PM&amp;A three questions: is Kimberley Place part of the reserve study's "Upper Area" or "Remaining" asphalt sections; what did the grind-and-pave bid cost; and is it expected to be paid from reserves, leftover special assessment money, or a new assessment?</div>
+      </div>
+    </div>
+
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Timing</span><span class="finding-title">Phase 2 road construction is scheduled for fall 2026 — around your closing and move-in</span></div>
+      <div class="finding-body">The Phase 2 contract on upper Alamo Springs Drive was set to be completed around October 1, 2026. Road work of this kind usually brings lane closures, traffic control and restricted access hours. If the schedule has slipped, construction could overlap your final walk-through, closing or move-in.
+        <div class="buyer-note">Ask PM&amp;A for the current Phase 2 schedule and whether any access restrictions will affect Kimberley Place. Share the dates with your mover.</div>
+      </div>
+    </div>
+
+    <div class="finding-card critical">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-red">Significant</span><span class="finding-title">The board has said in writing — two years in a row — that dues are not enough</span></div>
+      <div class="finding-body">Quarterly dues rose from <strong>$1,475 to $1,550 for 2025</strong> and from <strong>$1,550 to $1,628 for 2026</strong>, about 5% each year. Both budget motions contain the same statement: "the board acknowledges that the increase is not enough as previous management company did not properly set the operating assessment to properly fund the association and cost out assets as well as their life expectancies." For 2026, the board reviewed a <strong>9% increase and rejected it as too high given the concurrent special assessment</strong>. The board also set the 2026 reserve contribution at <strong>$80,000</strong>, while noting that management had recommended a higher amount to catch up on reserve funding. The board said it would take a "deeper dive" into reserve funding during 2026.
+        <div class="action-note">Once the special assessment ends in April 2027, expect meaningfully larger dues increases. The board's own record points that way. Budget for dues well above today's $1,628 per quarter, and ask whether the 2027 budget has been drafted.</div>
+      </div>
+    </div>
+
+    <div class="finding-card critical">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-red">Significant</span><span class="finding-title">Reserves were about 3% funded at year-end 2025</span></div>
+      <div class="finding-body">Replacement fund cash and investments totaled <strong>$43,058</strong> on December 31, 2025, against an estimated liability for major repairs and replacements of about <strong>$1,574,000</strong>. That is roughly <strong>2.7% funded</strong>. Industry practice generally treats reserves below 30% funded as carrying a high risk of special assessments.
+        <div class="action-note">Low reserves mean major repairs are more likely to be paid through special assessments or sharp dues increases than from savings.</div>
+      </div>
+    </div>
+
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Earmarked</span><span class="finding-title">The July 2026 balance sheet looks healthier, but most of that cash is committed to Phase 2</span></div>
+      <div class="finding-body">The July 2026 balance sheet shows $211,128 in the operating account, $32,409 in the Fremont Bank reserve account and $180,526 in the Flourish account. That is a total of <strong>$212,935 labeled "Reserves"</strong>, plus $79,900 in members' receivables. The minutes explain these balances. The Flourish account was opened for the road project and "will be depleted upon the Road Repair Project" (Aug. 2025). In May 2026 the board discussed moving another $170,000 from operating into Flourish, the same month it approved the $526,170 Phase 2 contract.
+        <div class="buyer-note">Once Phase 2 is paid, the reserves actually available for other components are likely to be modest again. Ask PM&amp;A for the reserve balance <em>net of</em> Phase 2 commitments.</div>
+      </div>
+    </div>
+
+    <div class="finding-card critical">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-red">Significant</span><span class="finding-title">About $1.0 million of other reserve components come due within three years</span></div>
+      <div class="finding-body">The reserve study lists roughly $1.5 million of components with three years or less of remaining life. The largest, <strong>Upper Area asphalt ($498,400)</strong>, is being handled by Phase 2 under the existing special assessment. That leaves about <strong>$1.0 million</strong>, including:
+        <ul>
+          <li><strong>Retaining wall, I-beam &amp; timber — $404,873, 3 years.</strong> The August 2025 minutes say repairs were "partially completed" and the remaining areas were tabled.</li>
+          <li>Landscape fund (2026) — $112,351, 2 years. The board noted a "high spend rate" on landscaping reserves in August 2025.</li>
+          <li>Light pole &amp; fixture replacement — $87,418, 1 year</li>
+          <li>Entry pavers reset — $75,003, 1 year. Tabled May 2026.</li>
+          <li>Asphalt sealcoat ($58,800) and striping ($54,360), 2 years. Partly addressed by the $35,200 sealcoat contract approved October 2025.</li>
+          <li>Chain link fence repair ($34,292), gate repairs ($21,855) and smaller items</li>
+        </ul>
+        If all of that were funded by special assessment, it would be <strong>on the order of $19,000 per home</strong>. The Kimberley Place grind-and-pave would come on top if it is not already in these figures.
+        <div class="action-note">That per-home figure illustrates the scale; it is not a forecast. Boards routinely phase, defer or re-scope work. Under the CC&amp;Rs, a special assessment above 5% of the annual budget needs a vote of the owners (see the CC&amp;Rs tab).</div>
+      </div>
+    </div>
+
+    <div class="finding-card critical">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-red">Significant</span><span class="finding-title">Operating fund ran deficits two years running — overdrawn at year-end 2025</span></div>
+      <div class="finding-body">Operating expenses exceeded revenues by <strong>$166,248 in 2025</strong> and $99,007 in 2024. The operating fund ended 2025 at <strong>negative $98,349</strong>, with a <strong>$65,308 bank overdraft</strong>. The main drivers were a new $55,191 engineering expense, landscape maintenance rising from $79,196 to $106,194, $19,501 of lighting costs, and gate costs of $51,465. The minutes add some context. Management reported about $22,000 of project-management time on the ButterflyMX entry system, and the gate system had repeated overheating outages during 2025.
+        <div class="buyer-note">The August 2025 annual meeting resolved to roll any 2025 excess operating income into reserves. With a 2025 deficit, there was no excess to roll over.</div>
+      </div>
+    </div>
+
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Negotiate</span><span class="finding-title">Road special assessment — about two installments of $3,261 remain</span></div>
+      <div class="finding-body">In 2024 the members approved a <strong>$2,034,864 special assessment — $39,132 per home</strong> — for road repairs, billed at $3,261 per quarter starting July 1, 2024. That is 12 installments, ending with the April 2027 billing. The receivable of $1,025,793 at year-end 2025 is consistent with about six installments remaining then. With a closing on or before mid-November 2026, the <strong>January and April 2027 installments — about $6,522 — would fall to you</strong>. Those installments help pay for Phase 2, which you will benefit from.
+        <div class="action-note">Ask that the seller pay off the remaining balance at closing, or that it be credited. Weichert's addendum does not address this, so it has to be written into the purchase agreement. Confirm the exact amount on the HOA demand.</div>
+      </div>
+    </div>
+
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Bookkeeping</span><span class="finding-title">$30,384 of transactions "whose source(s) are unknown" — prior-period restatement</span></div>
+      <div class="finding-body">Note 5 of the financial statements restates opening fund balances by $30,384 for "certain net transaction(s) whose source(s) are unknown." The board minutes attribute the association's underfunding to the <em>previous</em> management company, and the board does approve financial reviews under Civil Code §5500 at each meeting.
+        <div class="buyer-note">Ask whether the source of the $30,384 has since been identified.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">🗂️</div><div><h2>Board Meeting Record</h2><div class="subtitle">Minutes provided: Oct. 23, 2024 · Jan. 29, 2025 · Apr. 16, 2025 · Aug. 13, 2025 (annual and regular) · Oct. 29, 2025 · Jan. 8, 2026 · May 13, 2026</div></div></div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;"><table class="doc-table">
+      <tr><th>Meeting</th><th>What happened</th></tr>
+      <tr><td><strong>Oct. 23, 2024</strong></td><td>Treasurer resigned; Hans Gill appointed. 2025 dues raised to $1,550 per quarter, with the board noting it was "not enough." Board discussed building reserves over time and a 30-year plan once the road is complete. 2025 management contract approved.</td></tr>
+      <tr><td><strong>Jan. 29, 2025</strong></td><td>ButterflyMX entry system installed. Tailgating complaints led to a barrier-arm assessment. Tree work approved ($11,090). Goats considered for Parcel A weed abatement.</td></tr>
+      <tr><td><strong>Apr. 16, 2025</strong></td><td>Board moved funds toward a higher-yield account (Flourish). Gopher-damaged turf replaced. A homeowner raised weeds on regional park land, which the HOA does not maintain. Hedge replacement tabled.</td></tr>
+      <tr><td><strong>Aug. 13, 2025</strong></td><td>Uncontested election. Phase 1 awarded to Ghilotti ($1,210,727); a competing bid ran 10–15% higher. Retaining wall repair partly done, rest tabled. Landscaping reserve spend flagged as high. Gate unit overheating outages.</td></tr>
+      <tr><td><strong>Oct. 29, 2025</strong></td><td>2026 dues raised to $1,628 per quarter, again noted as "not enough"; a 9% option was rejected. 2026 reserve funding set at $80,000, below management's recommendation. Fine policy amended for AB 130. Camera surveillance policy adopted. Sealcoat ($35,200) and re-striping ($6,330) approved. Board asked how long the upper roads could be deferred.</td></tr>
+      <tr><td><strong>Jan. 8, 2026</strong></td><td>Phase 1 complete. Temporary speed hump planned. Phase 2 (3&Prime; remove and replace on upper Alamo Springs Drive "per the Special Assessment") set for spring planning.</td></tr>
+      <tr><td><strong>May 13, 2026</strong></td><td>Phase 2 approved ($526,170, completion around Oct. 1, 2026). <strong>Kimberley Place grind-and-pave and entry pavers tabled.</strong> $170,000 transfer to Flourish discussed. Homeowner concerns about fence upkeep along the DG trail, with letters to owners as needed, and about a neighboring construction project. Remote gate monitoring and EVA security under consideration.</td></tr>
+    </table></div>
+    <div class="info-banner" style="margin-top:16px;">ℹ️ The January and May 2026 minutes were approved on <strong>August 24, 2026</strong>, which suggests the board met again in summer 2026. Those more recent minutes are not in this package and are the most likely place to find the current reserve plan, the Phase 2 status and any 2027 budget discussion. Request them.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">📊</div><div><h2>2025 Financial Summary</h2><div class="subtitle">Reviewed statements — Levy, Erlanger &amp; Company LLP</div></div></div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;"><table class="doc-table">
+      <tr><th>Item</th><th>2025</th><th>2024</th></tr>
+      <tr><td>Regular assessments (operations)</td><td>$223,400</td><td>$184,300</td></tr>
+      <tr><td>Special assessment revenue recognized</td><td>$1,251,396</td><td>—</td></tr>
+      <tr><td>Easement income (adjacent owner paying for road access)</td><td>$6,200</td><td>$5,900</td></tr>
+      <tr><td>Administration expense</td><td>$88,448</td><td>$94,318</td></tr>
+      <tr><td>Maintenance &amp; operations expense</td><td>$268,248</td><td>$167,318</td></tr>
+      <tr><td>Utilities</td><td>$38,875</td><td>$33,074</td></tr>
+      <tr><td>Road construction project</td><td>$1,251,396</td><td>—</td></tr>
+      <tr><td><strong>Operating excess (deficiency)</strong></td><td class="priority-high">($166,248)</td><td class="priority-high">($99,007)</td></tr>
+      <tr><td><strong>Fund balance, end of year</strong></td><td class="priority-high">($98,349)</td><td>$63,130</td></tr>
+      <tr><td>Replacement fund cash &amp; investments</td><td class="priority-high">$43,058</td><td>$597,710</td></tr>
+      <tr><td>Special assessments receivable</td><td>$1,025,793</td><td>$1,702,242</td></tr>
+      <tr><td>Cash in excess of FDIC limits</td><td>$0</td><td>—</td></tr>
+    </table></div>
+    <div class="info-banner" style="margin-top:16px;">ℹ️ The accountants found <strong>no material modifications needed</strong> to the statements. Note that this is a <strong>review, not an audit</strong>, and the reserve study information is expressly unaudited and was not reviewed — standard for an association of this size.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-amber">🛣️</div><div><h2>Reserve Study — What the Association Maintains</h2><div class="subtitle">John D. Beatty &amp; Company, November 2025 · 3% inflation · 4.2% after-tax interest · Total components $3,415,475</div></div></div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;"><table class="doc-table">
+      <tr><th>Category</th><th>Components</th><th>Near-term items</th></tr>
+      <tr><td><strong>Gates</strong></td><td>Entry and trail wrought iron gates, operators, loops</td><td>Gate paint and repairs — 2 years</td></tr>
+      <tr><td><strong>Fencing &amp; walls</strong></td><td>Chain link, metal &amp; wire, wrought iron fences; masonry columns; retaining walls</td><td class="priority-high">I-beam &amp; timber retaining wall $404,873 — 3 years</td></tr>
+      <tr><td><strong>Landscaping</strong></td><td>Irrigation, controllers, backflow devices, plants, trees, landscape funds</td><td>Landscape fund $112,351 — 2 years</td></tr>
+      <tr><td><strong>Lighting</strong></td><td>Poles, fixtures, up-lights</td><td class="priority-high">Pole &amp; fixture replacement $87,418 — 1 year</td></tr>
+      <tr><td><strong>Paved surfaces</strong></td><td>Private road asphalt, sealcoat, striping, walkways, entry pavers, V-ditch</td><td class="priority-high">Upper Area resurfacing $498,400 — 1 year (now Phase 2, funded by the special assessment); entry pavers $75,003 — 1 year (tabled)</td></tr>
+      <tr><td><strong>Security</strong></td><td>Cameras, entry access system</td><td>Cameras — 5 years</td></tr>
+      <tr><td><strong>Trail / EVA</strong></td><td>Emergency vehicle access, trail maintenance</td><td>2 years</td></tr>
+      <tr><td><strong>Other</strong></td><td>Drainage, electrical, signs, reserve study updates</td><td>Drainage repairs — 2 years</td></tr>
+    </table></div>
+    <div class="info-banner" style="margin-top:16px;">ℹ️ <strong>The HOA maintains common areas — not your house.</strong> The reserve study covers gates, roads, walls, fencing, landscaping and lighting. The CC&amp;Rs (Article 9) confirm the association does not maintain residences or lots. The CC&amp;Rs confirm this. See the CC&amp;Rs &amp; Insurance tab.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-amber">🏛️</div><div><h2>Architectural Control</h2></div></div>
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Important</span><span class="finding-title">Any exterior or landscape change requires HOA approval first — allow up to 45 days</span></div>
+      <div class="finding-body">The association's cover memo asks owners to submit an application for <strong>any</strong> modification to landscaping or the exterior. The application covers structural additions, decks, patios, pools, solar panels, windows and doors, garage doors, fences, retaining walls, painting, tree removal and more. Work may not begin without written approval, the committee may take up to <strong>45 days</strong>, neighbors may be consulted, and unapproved improvements are subject to removal at the owner's expense. The application references Section 42 of the <strong>Alamo Springs Residential Design Guidelines</strong>, which are still not in this package. County permits are separate and do not substitute for HOA approval.
+        <div class="action-note">If you plan changes after closing, request the Design Guidelines now and factor the 45-day review into your timeline.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-red">⚠️</div><div><h2>Still Not in This Package — Request Before Your Inspection Period Ends</h2></div></div>
+    <div class="info-banner">ℹ️ Request these from PM&amp;A, (925) 454-1987:
+      <ul style="margin:8px 0 0 18px;">
+        <li>The <strong>remaining special assessment balance</strong> for Lot 19, and confirmation of 2026 dues</li>
+        <li>The <strong>2026 pro forma budget and reserve funding disclosure</strong> (Civil Code §5300)</li>
+        <li>The <strong>full reserve study</strong></li>
+        <li><strong>Bylaws, operating rules, the fine schedule, the Architectural Rules and the Residential Design Guidelines</strong></li>
+        <li><strong>Board minutes after May 13, 2026</strong></li>
+        <li>The standard resale disclosure package, which includes any notice of violation on Lot 19 (Civil Code §4528)</li>
+        <li>The <strong>Phase 2 schedule</strong> and the <strong>plan for Kimberley Place paving</strong></li>
+      </ul>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- TAB 5: CC&Rs & INSURANCE -->
+<div id="tab-ccrs" class="tab-content">
+<div class="wrapper">
+  <div class="exec-summary">
+    <h2>Amended and Restated CC&amp;Rs &amp; Association Insurance</h2>
+    <p>The <strong>Amended and Restated Declaration of Covenants, Conditions and Restrictions for Alamo Springs</strong> (83 pages, prepared by Berding &amp; Weil LLP) replaces the original 1998 CC&amp;Rs but keeps their exhibits. The exhibits are the Fencing Plan Program, the Slope and Drainage Improvement Maintenance Plan, the Plan of Control and the Tree Preservation Plan. The CC&amp;Rs are the rulebook you agree to by taking title. The provisions most likely to affect you are summarized below.</p>
+    <p>Two points matter most. First, <strong>the HOA does not maintain your house or lot</strong>. Your home, roof, yard, slopes, drainage ditches, perimeter fences and termite repairs are all yours. Second, a new owner takes the lot as it is, including any architectural issues a prior owner left unresolved (§9.10). This is a standard provision, and nothing in this package indicates such an issue here.</p>
+  </div>
+
+  <div class="info-banner">ℹ️ <strong>Recording check.</strong> The preliminary title report lists only the <em>original</em> 1998 CC&amp;Rs (Doc. 98-0170094) as an exception. It does not show this Amended and Restated Declaration, and the copy provided carries no recording stamp. Ask the title officer, Paul Jacobson, to confirm whether the amended version was recorded. If it was, ask that it be added to the exception list.</div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">🏡</div><div><h2>Who Maintains What</h2><div class="subtitle">CC&amp;Rs Article 9</div></div></div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;"><table class="doc-table">
+      <tr><th>Item</th><th>Responsible</th><th>Section</th></tr>
+      <tr><td>Your house, roof, exterior and systems</td><td class="priority-high"><strong>You</strong></td><td>§9.2, §9.6.1</td></tr>
+      <tr><td>Your yard, landscaping, and slopes within your lot, including erosion control</td><td class="priority-high"><strong>You</strong></td><td>§9.6.1, §9.7</td></tr>
+      <tr><td>Perimeter fences around your lot</td><td class="priority-high"><strong>You</strong>. Shared fences are split with the neighbor under Civil Code §841, following the Fencing Plan Program.</td><td>§9.1, §9.6.2</td></tr>
+      <tr><td>Drainage ditches on your lot, kept clear and free-flowing</td><td class="priority-high"><strong>You</strong>. The HOA can do the work and bill you if you don't.</td><td>§9.6.3</td></tr>
+      <tr><td>Termites, dry rot, mold and decay</td><td class="priority-high"><strong>You</strong></td><td>§9.8</td></tr>
+      <tr><td>Weed abatement and fuel management on your lot, per the San Ramon Valley Fire Protection District program</td><td class="priority-high"><strong>You</strong>. The HOA can do the work after notice and a hearing and bill you.</td><td>§5.6, §9.5</td></tr>
+      <tr><td>Private streets, gates, common landscaping, common walls, lighting</td><td class="priority-ok">HOA</td><td>§9.1</td></tr>
+      <tr><td>Emergency vehicle access routes and the local trail easement</td><td class="priority-ok">HOA</td><td>§9.3</td></tr>
+      <tr><td>Geologic hazards on common Parcels A, C and D</td><td class="priority-ok">HOA</td><td>§9.4</td></tr>
+    </table></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-amber">📘</div><div><h2>Provisions Worth Knowing</h2></div></div>
+
+    <div class="finding-card ok">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-green">Standard</span><span class="finding-title">A new owner takes the lot as-is, including any prior architectural issues (§9.10)</span></div>
+      <div class="finding-body">This is common CC&amp;R language: by accepting the deed, an owner accepts the lot's condition, including any architectural violations a prior owner left unresolved, whether or not they were disclosed. Nothing in this package points to one here. The sellers state that no improvements were made without required HOA approval (SPQ 14.F(2)). The board minutes show no violations or architectural concerns involving this lot; the committee reported "no concerns" in January 2025 and "no open applications" in October 2025.
+        <div class="buyer-note">This is routine. The HOA's resale disclosure package normally includes any notice of violation on the lot (Civil Code §4528), which will confirm it.</div>
+      </div>
+    </div>
+
+    <div class="finding-card ok">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-green">Protection</span><span class="finding-title">Large dues increases and special assessments require an owner vote (§8.7.6, §8.9.2)</span></div>
+      <div class="finding-body">Following Civil Code §5605, the board cannot raise regular dues by more than <strong>20% in a year</strong>, or levy special assessments totaling more than <strong>5% of the year's budgeted expenses</strong>, without a majority vote of the owners with a quorum of more than 50%. Emergencies under Civil Code §5610 are the exception. On a budget of roughly $340,000, the 5% limit is about $17,000 in total, or roughly $325 per home. Anything larger, such as a future paving or retaining-wall assessment, would go to an owner vote in which you would participate. Owners must be notified 30–60 days before any increase or special assessment is due.</div>
+    </div>
+
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Approval</span><span class="finding-title">Architectural approval is required for nearly everything outside — and you may owe a street-damage deposit</span></div>
+      <div class="finding-body">No building, fence, hedge, wall, patio cover, awning, outdoor lighting, antenna, landscaping or exterior change may begin, and nothing may be painted, without written approval from the Architectural Committee (§7.1). If you plan construction, the HOA may require a <strong>deposit against damage to the private streets</strong>, set after an engineer's pre-construction assessment. You are liable for any damage beyond the deposit (§7.13). Rooftop solar and EV chargers are protected by state law and cannot be prohibited, but they are subject to reasonable rules (§7.4.3–7.4.4).</div>
+    </div>
+
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Limits</span><span class="finding-title">Building envelope: two stories / 35 feet; 3,500 sq ft minimum home size (§5.7)</span></div>
+      <div class="finding-body">Homes are limited to two stories and 35 feet above average finished grade, and major roof lines may not exceed 30 feet. The primary residence must have at least <strong>3,500 square feet</strong> of usable space, excluding garages. Lot 19 is not one of the exempt lots (28, 31, 41, 42 and 43). These limits matter if you plan an addition or ever rebuild.</div>
+    </div>
+
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Rules</span><span class="finding-title">Vehicles, pets, rentals and use</span></div>
+      <div class="finding-body">
+        <ul>
+          <li><strong>Vehicles (§5.19):</strong> The garage is the primary parking place and must hold the number of cars it was designed for. <strong>Boats, trailers, campers, RVs and anything too large for the garage</strong> may stay only 4 hours in any 48 for loading. No car may sit on the street more than 72 hours. Commercial vehicles cannot stay overnight unless kept in the garage or driveway. No car washing on common area. Violators can be towed.</li>
+          <li><strong>Pets (§5.15):</strong> Up to three dogs, cats or birds combined. Pets must be leashed on common areas, and outdoor feeding of wildlife is not allowed.</li>
+          <li><strong>Rentals (§6.1):</strong> Allowed only for the whole home, with a written lease of <strong>at least 30 days</strong> and notice to the board. Short-term rentals are effectively prohibited.</li>
+          <li><strong>Use (§5.6, §5.8):</strong> Residential only, with limited home businesses allowed. Qualified family day care and residential care homes are permitted by law.</li>
+          <li><strong>Signs (§5.17):</strong> One for-sale or for-rent sign is allowed, and noncommercial signs up to 9 sq ft. Political signs may go up no more than 30 days before an election.</li>
+          <li><strong>Noise and neighbors (§5.12):</strong> The HOA is not obligated to step into disputes that are solely between neighbors. Complaints must be made in writing after informal efforts to resolve them.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Easement</span><span class="finding-title">The private road carries a public pedestrian and bicycle trail easement (§4.4.8)</span></div>
+      <div class="finding-body">Contra Costa County, the Town of Danville and members of the public have a non-exclusive easement to walk and bike over Parcel D, the private street. The HOA maintains it, not the county or town. An adjoining owner also has recorded road-access rights and pays the association $6,200 a year. A gated community here does not mean the road is closed to the public on foot or bicycle.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">🛡️</div><div><h2>Association Insurance — 2025–2026</h2><div class="subtitle">State Farm, Ken Bullock Agency, Oakland · Insurance Disclosure Form</div></div></div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;"><table class="doc-table">
+      <tr><th>Coverage</th><th>Policy</th><th>Term</th><th>Limit</th></tr>
+      <tr><td>General liability &amp; property</td><td>97-D3-4647-6</td><td>11/18/2025 – 11/18/2026</td><td>$1,000,000 per occurrence / $2,000,000 aggregate</td></tr>
+      <tr><td>Common-area building coverage</td><td>same</td><td>same</td><td>$680,100 · $1,000 deductible</td></tr>
+      <tr><td>Trees and plants</td><td>same</td><td>same</td><td>$75,000</td></tr>
+      <tr><td>Medical payments</td><td>same</td><td>same</td><td>$5,000 per person</td></tr>
+      <tr><td>Directors &amp; officers</td><td>same</td><td>same</td><td>$1,000,000</td></tr>
+      <tr><td>Umbrella liability</td><td>97-BU-K506-6</td><td>11/18/2025 – 11/18/2026</td><td class="priority-ok">$10,000,000</td></tr>
+      <tr><td>Fidelity bond (theft by board or staff)</td><td>97-Q5-9338-4</td><td>01/29/2026 – 01/29/2027</td><td>$350,000</td></tr>
+    </table></div>
+
+    <div class="finding-card caution" style="margin-top:16px;">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Important</span><span class="finding-title">The HOA policy does not insure your house — you need your own full homeowner's policy</span></div>
+      <div class="finding-body">The association's property coverage insures common-area improvements only: gates, walls, lighting and similar items. The CC&amp;Rs limit the association's property insurance to common-area improvements (§10.3.1), and they make each owner responsible for liability insurance on their lot and for their personal property (§10.2.10). Plan on a full HO-3 homeowner's policy, not the "walls-in" HO-6 policy used for condos. <strong>No earthquake coverage</strong> appears on the association's disclosure. The HOA's liability and property policies renew <strong>November 18, 2026</strong>, near your likely closing, so premium changes there feed into future dues.
+        <div class="action-note">Get homeowner's insurance quotes during the inspection period. Tell your agent the home is in a hillside community with a fuel-management program run by the San Ramon Valley Fire Protection District.</div>
+      </div>
+    </div>
+
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Verify</span><span class="finding-title">Fidelity bond — meets the CC&amp;Rs; worth confirming against current state law</span></div>
+      <div class="finding-body">The $350,000 fidelity bond easily meets the CC&amp;Rs' own minimum, which is one-fourth of the annual operating and reserve budget (§10.3.4). California law (Civil Code §5806) separately calls for fidelity coverage at least equal to the association's reserves plus three months of assessments. In 2026, with special-assessment installments of about $170,000 per quarter on top of regular dues of about $85,000 per quarter, that benchmark may be higher than $350,000 at times. This is a question for PM&amp;A or the insurance agent, not a deal issue.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- TAB 6: WEICHERT TERMS -->
+<div id="tab-weichert" class="tab-content">
+<div class="wrapper">
+  <div class="exec-summary">
+    <h2>Weichert Addendum &amp; Offer Requirements</h2>
+    <p>This is a relocation sale. <strong>Weichert Workforce Mobility Inc.</strong> is the seller on your contract, acting under agreements with the owners and their employer (Weichert Property ID M-C-92965-2). Weichert's addendum <strong>overrides any conflicting terms</strong> in the California purchase agreement, and the offer instructions require the standard contingency and cancellation provisions to be struck. The practical effect is that the addendum — not the usual C.A.R. contingency timeline — controls your inspection rights, your remedies, and your closing.</p>
+  </div>
+
+  <div class="age-banner">⚠️ <strong>The one rule to understand:</strong> Under ¶7 of the addendum, you must complete inspections within <strong>10 calendar days</strong> of the addendum date — and never later than 5 days before closing. If you notify Weichert in writing of a <strong>material</strong> defect, Weichert has 20 days to either fix it <strong>or cancel the contract</strong>. If you say nothing within the 10 days, you are deemed to accept the property as-is. There is no provision for credits or price reductions — those can only be negotiated separately.</div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">📑</div><div><h2>Addendum — Paragraph by Paragraph</h2></div></div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;"><table class="doc-table">
+      <tr><th>¶</th><th>Provision</th><th>What it means for you</th></tr>
+      <tr><td>Intro</td><td>Weichert is a contract vendee; it may deliver title by deed from the owners or from itself</td><td>You look only to Weichert for performance — not the Borduins.</td></tr>
+      <tr><td>1</td><td>Closing prorations</td><td>Taxes, HOA dues and other charges prorated as of the day of closing and <strong>final</strong>. Your closing representative must agree figures with Weichert's at least 4 business days before closing or closing may be delayed.</td></tr>
+      <tr><td>2</td><td>Commission</td><td>Earned only at closing, paid as Weichert directs.</td></tr>
+      <tr><td>3</td><td>Condition</td><td>Property and included items are not new and are delivered in their current condition, less reasonable wear.</td></tr>
+      <tr><td>4</td><td>Disclaimer of warranties</td><td>Weichert has not lived in the home, makes <strong>no warranties or representations</strong>, has not verified any disclosure, and says you may not rely on the disclosures instead of inspecting.</td></tr>
+      <tr><td>5</td><td>Survey</td><td>Weichert provides any existing survey only, without warranty. None has been identified.</td></tr>
+      <tr><td>6</td><td>No survival</td><td>Accepting the deed discharges every obligation in the contract, except those meant to be performed after closing. Raise issues <strong>before</strong> closing.</td></tr>
+      <tr><td>7a</td><td>Right to inspect</td><td>At your expense, within 10 calendar days of the addendum date, and no later than 5 days before closing.</td></tr>
+      <tr><td>7b</td><td>Limitation of remedies</td><td>Written notice of substantial or material defects only — not personal preference or taste. Weichert has 20 days to correct <strong>or cancel</strong>; if a late notice leaves fewer than 20 days, closing is pushed back. If not cured, you may cancel. On cancellation, deposits are refunded.</td></tr>
+      <tr><td>7c</td><td>Waiver</td><td>No notice within the period = acceptance as-is.</td></tr>
+      <tr><td>7d</td><td>Pre-closing walk-through</td><td>Between 72 and 48 hours before closing, to confirm condition has not changed.</td></tr>
+      <tr><td>8</td><td>Winterization</td><td>Applies to vacant homes only. The owners occupy this home, so it is unlikely to apply.</td></tr>
+      <tr><td>10</td><td>Conditional acceptance</td><td>Weichert's acceptance depends on receiving your signed offer and all addenda, approving your financing or proof of funds, and receiving what it needs from the owners.</td></tr>
+      <tr><td>11</td><td>Closing</td><td><strong>Chicago Title Company</strong>, 6211 Medau Place Suite 200, Oakland — Sean Loftus, (510) 987-7177, sean.loftus@ctt.com.</td></tr>
+      <tr><td>11</td><td class="priority-high">Delay charge</td><td>If <strong>you</strong> cause a delay, Weichert may charge <strong>2% of the price per month</strong>, prorated daily. On a home of this value that can exceed $2,000 per day. Keep your lender on schedule.</td></tr>
+      <tr><td>11</td><td>Deed</td><td>Weichert may deliver a general warranty, special warranty or bargain and sale deed. Your owner's title insurance policy is your main protection.</td></tr>
+      <tr><td>11</td><td>Possession</td><td>At closing or funding, whichever is later.</td></tr>
+    </table></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">📋</div><div><h2>Offer Instructions — Required Terms</h2></div></div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;"><table class="doc-table">
+      <tr><th>Requirement</th><th>Detail</th></tr>
+      <tr><td><strong>Seller name</strong></td><td>Weichert Workforce Mobility Inc. only. The owners' names cannot appear anywhere in the contract.</td></tr>
+      <tr><td><strong>Title / escrow</strong></td><td>Chicago Title (Weichert's assigned company).</td></tr>
+      <tr><td><strong>Special provision</strong></td><td>Must state: "See the attached Weichert Addendum, Weichert and Seller Disclosure Statements, and SRED which hereby become part of this contract."</td></tr>
+      <tr><td><strong>Termination / option period</strong></td><td>Must be struck — replaced by the addendum's 10-day inspection period.</td></tr>
+      <tr><td><strong>Closing</strong></td><td>60 days or less.</td></tr>
+      <tr><td><strong>Leaseback</strong></td><td>Any rent-back to the owners must be a separate agreement, never referenced in the contract.</td></tr>
+      <tr><td><strong>Financing proof</strong></td><td>Pre-approval stating credit, income and assets have been verified, or proof of funds.</td></tr>
+      <tr><td><strong>Buyer signs</strong></td><td>Weichert Addendum; Weichert No Representation Disclosure; Local No Representation Disclosure; SRED, initialed to confirm receipt of the Weichert Seller Disclosure, state disclosures, and any inspections or repair receipts.</td></tr>
+      <tr><td><strong>Acceptance process</strong></td><td>The owners may accept verbally; the paperwork then goes to Weichert for formal acceptance, which takes a couple of days.</td></tr>
+    </table></div>
+  </div>
+
+  <div class="tier-box">
+    <div class="tier-header t-seller">🔴 During the 10-Day Inspection Period — Strategy</div>
+    <div class="tier-row"><div>Order all inspections on day one. Ten calendar days includes weekends; specialist inspectors book out.</div><div class="tr-cost">Day 1</div><div class="tr-source">Addendum ¶7a</div></div>
+    <div class="tier-row"><div>Send written notice only for <strong>material</strong> defects you would walk away over, or that you need fixed. Any notice gives Weichert the right to cancel.</div><div class="tr-cost">By Day 10</div><div class="tr-source">Addendum ¶7b</div></div>
+    <div class="tier-row"><div>If you want a credit rather than a repair, negotiate it separately and put it in a signed amendment before the period ends — the addendum does not provide for credits.</div><div class="tr-cost">By Day 10</div><div class="tr-source">Negotiated</div></div>
+    <div class="tier-total"><div>If no notice is sent, you accept the property as-is</div><div class="tr-cost">Day 10</div><div></div></div>
+  </div>
+
+  <div class="tier-box">
+    <div class="tier-header t-negotiate">🟡 Write Into the Contract</div>
+    <div class="tier-row"><div>Seller to pay off the remaining road special assessment at closing — about two installments of $3,261.</div><div class="tr-cost">~$6,522</div><div class="tr-source">SPQ 14.E · HOA Note 6</div></div>
+    <div class="tier-row"><div>Delivery of HOA documents and the Bay Alarm lease terms within a set number of days.</div><div class="tr-cost">Docs</div><div class="tr-source">Civil Code §4525</div></div>
+  </div>
+
+  <div class="tier-box">
+    <div class="tier-header t-buyer">🟢 Before Closing</div>
+    <div class="tier-row"><div>Agree closing figures with Weichert's closing representative at least 4 business days before closing.</div><div class="tr-cost">Close −4</div><div class="tr-source">Addendum ¶1</div></div>
+    <div class="tier-row"><div>Final walk-through between 72 and 48 hours before closing; report any change in condition in writing.</div><div class="tr-cost">Close −3/−2</div><div class="tr-source">Addendum ¶7d</div></div>
+    <div class="tier-row"><div>Keep financing on schedule to avoid the 2%-per-month delay charge.</div><div class="tr-cost">Ongoing</div><div class="tr-source">Addendum ¶11</div></div>
+  </div>
+</div>
+</div>
+
+<!-- TAB 7: INSPECTIONS COMING SOON -->
+<div id="tab-inspection" class="tab-content">
+<div class="wrapper">
+  <div class="exec-summary">
+    <h2>Inspections — Coming Soon</h2>
+    <p><strong>No inspection reports have been provided for this property.</strong> The sellers disclosed no existing reports, and Weichert has not commissioned any. <strong>The buyer is to perform their own inspections.</strong> This tab will be updated with findings once your inspection reports are received.</p>
+    <p>Under the Weichert Addendum, inspections must be <strong>completed within 10 calendar days</strong> of the addendum date, and any material defects must be reported to Weichert in writing before that period ends. Weichert states you may not rely on the seller disclosures as a substitute for your own thorough inspection.</p>
+  </div>
+
+  <div class="age-banner">⏳ <strong>Coming soon.</strong> Once your inspections are complete, this section will summarize each report's findings, flag anything material enough to raise with Weichert, and separate those from ordinary maintenance — in the same format used elsewhere in this advisory.</div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">🧰</div><div><h2>Recommended Inspections</h2><div class="subtitle">Based on what the disclosures say the home contains</div></div></div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;"><table class="doc-table">
+      <tr><th>Inspection</th><th>Why</th><th>Priority</th></tr>
+      <tr><td><strong>General home inspection</strong></td><td>Structure, electrical, plumbing, heating and air conditioning, water heater, appliances; confirm bathroom exhaust fans and 220V circuits listed as "None."</td><td class="priority-high">Essential</td></tr>
+      <tr><td><strong>Wood-destroying pest (termite)</strong></td><td>No pest report exists. Fresh paint can conceal damage.</td><td class="priority-high">Essential</td></tr>
+      <tr><td><strong>Roof — tile specialist</strong></td><td>Concrete tile roof of unknown age; the underlayment is the usual concern.</td><td class="priority-high">Essential</td></tr>
+      <tr><td><strong>Pool, spa &amp; equipment</strong></td><td>Pool, spa, gas heater, solar assist, recently replaced equipment.</td><td class="priority-high">Essential</td></tr>
+      <tr><td><strong>Chimney / fireplace</strong></td><td>Three indoor and one outdoor fireplace.</td><td class="priority-med">Recommended</td></tr>
+      <tr><td><strong>Sewer lateral video</strong></td><td>Public sewer connection with mature landscaping.</td><td class="priority-med">Recommended</td></tr>
+      <tr><td><strong>Drainage, slopes &amp; fences</strong></td><td>Under the CC&amp;Rs you maintain your own slopes, drainage ditches and perimeter fences (§9.6–9.7). Hillside community with retaining walls.</td><td class="priority-med">Recommended</td></tr>
+      <tr><td><strong>Sauna</strong></td><td>Electrical supply and heater condition.</td><td class="priority-med">Recommended</td></tr>
+    </table></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">🔥</div><div><h2>Also Verify</h2></div></div>
+    <div class="info-banner">ℹ️ The Natural Hazard Disclosure report is not in this package. Obtain it early — fire hazard zone status in the Alamo hills can affect insurance availability and cost. Get homeowner's insurance quotes during the inspection period, not after.</div>
+  </div>
+</div>
+</div>
+
+<!-- TAB 8: CHECKLIST -->
+<div id="tab-checklist" class="tab-content">
+<div class="wrapper">
+  <div class="exec-summary">
+    <h2>Action Checklist</h2>
+    <p>A working list for your 10-day inspection period and through closing. The priorities: inspect immediately, get the missing HOA documents, and settle who pays the remaining special assessment.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-red">⚑</div><div><h2>Immediately</h2></div></div>
+    <div class="finding-card critical">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-red">Do</span><span class="finding-title">Calendar the 10-day inspection deadline and book all inspections</span></div>
+      <div class="finding-body">Count 10 calendar days from the date on the signed Weichert Addendum. Book the general, pest, roof and pool inspections first. See the Inspections tab.</div>
+    </div>
+    <div class="finding-card critical">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-red">Do</span><span class="finding-title">Request the full HOA document package and board minutes</span></div>
+      <div class="finding-body">From Property Management &amp; Accounting, (925) 454-1987: remaining special assessment balance for Lot 19; 2026 budget and reserve funding disclosure; full reserve study; bylaws, rules, fine schedule, Architectural Rules and Residential Design Guidelines; board minutes after May 13, 2026. Ask directly about three things: the plan and funding for the tabled Kimberley Place grind-and-pave, the current Phase 2 construction schedule, and whether a 2027 dues increase or new assessment is being considered.</div>
+    </div>
+    <div class="finding-card critical">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-red">Do</span><span class="finding-title">Sign the outstanding acknowledgments</span></div>
+      <div class="finding-body">Weichert Addendum; Weichert No Representation Disclosure; Local No Representation Disclosure; SRED initials; the Compass Buyer PTR Advisory; and the "Received" acknowledgment stamps on the preliminary title report, 2025 financials and July 2026 balance sheet.</div>
+    </div>
+    <div class="finding-card critical">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-red">Do</span><span class="finding-title">Ask for the special assessment payoff at closing</span></div>
+      <div class="finding-body">About two installments of $3,261 — roughly $6,522 — would otherwise fall to you in January and April 2027.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-amber">🔎</div><div><h2>During the Inspection Period</h2></div></div>
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Request</span><span class="finding-title">Missing seller-side documents</span></div>
+      <div class="finding-body">Natural Hazard Disclosure report; the AVID referenced on the TDS; the Weichert Seller Disclosure and SRED; confirmation of whether the Amended and Restated CC&amp;Rs were recorded; copies of the Grant of Easements agreement, Joint Powers Agreement and East Bay Regional Park District resolution; warranties for the new floors, appliances and pool equipment; Bay Alarm lease terms; confirmation the solar pool system is owned.</div>
+    </div>
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Verify</span><span class="finding-title">Permit history for the pool equipment and other work</span></div>
+      <div class="finding-body">Pull the Contra Costa County permit history for the property. It is routine due diligence for a home with a pool, spa and recent equipment upgrades.</div>
+    </div>
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Verify</span><span class="finding-title">Homeowner's insurance quotes</span></div>
+      <div class="finding-body">Obtain quotes for a full HO-3 policy before the inspection period ends. The HOA's policy covers common areas only. Availability and cost in the East Bay hills can be a deciding factor.</div>
+    </div>
+    <div class="finding-card caution">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Decide</span><span class="finding-title">Send a written defect notice — or accept as-is</span></div>
+      <div class="finding-body">Only for material defects, and only if you are prepared for Weichert to cancel rather than repair. Silence by day 10 means acceptance.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-green">🟢</div><div><h2>Before Closing</h2></div></div>
+    <div class="finding-card ok">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-green">Do</span><span class="finding-title">Give escrow your vesting and keep the lender on schedule</span></div>
+      <div class="finding-body">Title was ordered without buyer names. A buyer-caused delay can cost 2% of the price per month.</div>
+    </div>
+    <div class="finding-card ok">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-green">Do</span><span class="finding-title">Final walk-through 72–48 hours before closing; verify wire instructions by phone</span></div>
+      <div class="finding-body">Report any change in condition to Weichert in writing. Confirm wire instructions only by calling Chicago Title at (510) 987-7177 — never from an email.</div>
+    </div>
+    <div class="finding-card ok">
+      <div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-green">Plan</span><span class="finding-title">Budget for the property tax reset and HOA increases</span></div>
+      <div class="finding-body">Expect a supplemental tax bill and a new annual tax based on your purchase price. Dues are $1,628 per quarter in 2026, and the board has said that is not enough, so plan for increases once the special assessment ends in April 2027. Another assessment, which would need an owner vote if large, is possible.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="report-footer">
+  <strong>28 Kimberley Place, Alamo, CA 94507 &nbsp;·&nbsp; APN 197-440-007-7 &nbsp;·&nbsp; Lot 19, Subdivision 7452 &nbsp;·&nbsp; Alamo Springs Owners' Association</strong><br>
+  Prepared September 25, 2026 &nbsp;·&nbsp; Sources: Weichert Offer Instructions for 28 Kimberley Place; Weichert Addendum to Purchase &amp; Sale Agreement (Property ID M-C-92965-2); Real Estate Transfer Disclosure Statement (dated 09/09/2026, signed 09/12/2026); Seller Property Questionnaire and Text Overflow Addendum No. 1 (signed 09/12/2026); Compass Buyer Preliminary Title Report Advisory; Chicago Title Company Preliminary Report No. FWAC-5852601448PJ (effective 08/05/2026); Alamo Springs Owners' Association Financial Statements and Independent Accountant's Review Report, years ended 12/31/2025 and 12/31/2024 (Levy, Erlanger &amp; Company LLP, 02/19/2026), including reserve study information by John D. Beatty &amp; Company (November 2025); Alamo Springs Owners Association Balance Sheet, July 2026; Alamo Springs Architectural Application (rev. 09/18/2024); Amended and Restated Declaration of CC&amp;Rs for Alamo Springs (Berding &amp; Weil LLP); State Farm Insurance Disclosure Form, 2025–2026 renewal; Alamo Springs board meeting minutes of 10/23/2024, 01/29/2025, 04/16/2025, 08/13/2025 (regular and annual), 10/29/2025, 01/08/2026 and 05/13/2026.<br><br>
+  <strong>This advisory is not a substitute for, and is not provided in lieu of, the seller's disclosure package, the Weichert disclosure documents, the preliminary title report, or the HOA document package.</strong> It is a convenience summary prepared for ease of reference only. Buyer is responsible for independently reviewing all source documents in their original form. Where this summary and any source document differ, the source document governs. Remaining special assessment, carrying cost and reserve shortfall figures are estimates derived from the source documents and are not quoted amounts. This advisory does not constitute an appraisal, legal advice, tax advice, or an inspection. Buyer should engage qualified independent professionals and complete inspections within the Weichert inspection period.
+</div>
+
+<script>
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({top: document.querySelector('.tab-bar').offsetTop, behavior: 'smooth'});
+}
+function toggle(header) {
+  header.nextElementSibling.classList.toggle('open');
+  header.querySelector('.chevron').classList.toggle('open');
+}
+function closeModal() {
+  document.getElementById('disclaimerModal').classList.add('hidden');
+}
+</script>
+</body>
+</html>
