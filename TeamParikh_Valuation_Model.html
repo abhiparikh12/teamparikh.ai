@@ -1919,6 +1919,178 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
   .report-toolbar{flex-direction:column;align-items:stretch}
   .rt-controls{flex-wrap:wrap;gap:6px}
 }
+/* ══ CLIENT CMA REPORT v7.2 ══ */
+#report-paper.rq{width:8.5in;min-height:0;height:auto;align-self:flex-start;flex-shrink:0;padding:0;background:transparent;box-shadow:none;display:flex;flex-direction:column;gap:22px}
+.rq-page{flex-shrink:0;width:8.5in;height:11in;box-sizing:border-box;position:relative;overflow:hidden;background:#FBF9F4;color:#1A1F2C;
+  padding:.42in .55in .6in;font-family:'Outfit',Helvetica,Arial,sans-serif;font-size:11px;line-height:1.5;
+  box-shadow:0 8px 30px rgba(0,0,0,.45),0 2px 8px rgba(0,0,0,.3);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.rq-page *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.rq-svg{display:block;width:100%;height:auto;overflow:visible}
+.rq-stage{position:fixed;top:0;left:0;width:816px;z-index:1;pointer-events:none}
+.rq-stage .rq-page{box-shadow:none}
+/* cover */
+.rq-cover{padding:0}
+.rq-band{background:#1A1F2C;color:#FBF9F4;padding:.36in .55in .3in;position:relative;border-bottom:3px solid #C9A84C}
+.rq-band-top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
+.rq-brand{font-family:'Cormorant Garamond',Georgia,serif;font-size:30px;font-weight:600;line-height:1;letter-spacing:.5px;color:#FBF9F4}
+.rq-brand em{font-style:normal;color:#C9A84C;font-weight:500}
+.rq-brand small{display:block;font-family:'Outfit',sans-serif;font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;color:#C9A84C;margin-top:7px;font-weight:500}
+.rq-band-meta{text-align:right;font-size:10px;line-height:1.7;color:#C8CEDB;white-space:nowrap}
+.rq-band-meta b{color:#FBF9F4;font-weight:600}
+.rq-band-eyebrow{margin-top:26px;font-size:9.5px;letter-spacing:.32em;text-transform:uppercase;color:#C9A84C;font-weight:600}
+.rq-band-addr{font-family:'Cormorant Garamond',Georgia,serif;font-size:36px;font-weight:600;line-height:1.08;margin-top:6px;color:#FBF9F4}
+.rq-band-city{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#C8CEDB;margin-top:4px}
+.rq-body{padding:.2in .55in 0}
+.rq-attrs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));border:1px solid #D9CFB7;border-radius:6px;background:#F2EDE2;overflow:hidden}
+.rq-attrs>div{padding:8px 6px;text-align:center;border-left:1px solid #D9CFB7;min-width:0}
+.rq-attrs>div:first-child{border-left:none}
+.rq-attrs b{display:block;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500;color:#1A1F2C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rq-attrs i{display:block;font-style:normal;font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:#806B30;margin-top:2px}
+.rq-hero{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin-top:14px}
+.rq-hero.two{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.rq-hv{border:1px solid #D9CFB7;border-top:3px solid #806B30;border-radius:6px;background:#FFFFFF;padding:12px 16px 12px;text-align:center}
+.rq-hv-exp{border-top-color:#1F6B47}
+.rq-hv-lbl{font-size:9.5px;letter-spacing:.28em;text-transform:uppercase;color:#806B30;font-weight:700}
+.rq-hv-exp .rq-hv-lbl{color:#1F6B47}
+.rq-hv-price{font-family:'Cormorant Garamond',Georgia,serif;font-size:40px;font-weight:600;line-height:1.05;color:#1A1F2C;margin:4px 0 4px;white-space:nowrap}
+.rq-hv-sub{font-size:10.5px;color:#3A4258;line-height:1.55}
+.rq-hv-sub b{font-family:'JetBrains Mono',monospace;font-weight:600;color:#1A1F2C;font-size:10.5px;white-space:nowrap}
+.rq-conf{display:inline-block;margin-top:7px;padding:3px 11px;font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;border-radius:20px;font-weight:700;color:#FBF9F4}
+.rq-conf.hi{background:#1F6B47}.rq-conf.med{background:#A56B19}.rq-conf.lo{background:#9A3530}.rq-conf.nt{background:#3A4258}
+.rq-range{margin-top:12px;border:1px solid #D9CFB7;border-radius:6px;background:#FFFFFF;padding:9px 14px 8px}
+.rq-range-h,.rq-range-f{display:flex;justify-content:space-between;gap:12px;font-size:9px;color:#5F6577;flex-wrap:wrap}
+.rq-range-h>span:first-child{font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:#806B30;font-weight:700}
+.rq-range-f{font-family:'JetBrains Mono',monospace;color:#3A4258;margin-top:4px;font-size:8.5px;align-items:center}
+.rq-marks{display:flex;gap:12px;flex-wrap:wrap;font-family:'Outfit',sans-serif;font-size:9.5px;color:#1A1F2C}
+.rq-marks i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+.rq-marks b{font-family:'JetBrains Mono',monospace;font-weight:600}
+.sw{display:inline-block;width:14px;height:8px;border-radius:2px;vertical-align:0;margin-right:4px}
+.sw.s50{background:#C9A84C}.sw.s80{background:#D9CFB7}.sw.s80b{background:rgba(201,168,76,.3)}
+.ln{display:inline-block;width:16px;height:0;border-top:2.4px solid #806B30;vertical-align:3px;margin:0 4px 0 8px}
+.ln.blue{border-top:2px dashed #3A6FA8}
+.rq-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:12px}
+.rq-kpis>div{background:#F2EDE2;border:1px solid #D9CFB7;border-radius:5px;padding:8px 6px;text-align:center;min-width:0}
+.rq-kpis b{display:block;font-family:'Cormorant Garamond',Georgia,serif;font-size:19px;font-weight:600;line-height:1.1;color:#1A1F2C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rq-kpis b.up{color:#1F6B47}.rq-kpis b.down{color:#9A3530}
+.rq-kpis i{display:block;font-style:normal;font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:#806B30;margin-top:3px;line-height:1.3}
+.rq-sec-mini{margin-top:14px;font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;font-weight:600;color:#1A1F2C;padding-bottom:3px;border-bottom:1px solid #D9CFB7}
+.rq-drivers{margin:7px 0 0;padding:0;list-style:none}
+.rq-drivers li{position:relative;padding:0 0 0 24px;margin:0 0 6px;font-size:10.5px;line-height:1.55;color:#1A1F2C}
+.rq-drivers li>u{text-decoration:none;position:absolute;left:0;top:1px;width:16px;height:16px;border-radius:50%;background:#806B30;color:#FBF9F4;font-size:9px;font-weight:700;text-align:center;line-height:16px}
+.rq-drivers b{color:#1A1F2C;font-weight:600}
+.rq-team{position:absolute;left:.55in;right:.55in;bottom:.52in;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.rq-agent{border:1px solid #806B30;border-radius:4px;background:#FFFFFF;padding:9px 10px;text-align:center;position:relative}
+.rq-agent::before{content:'';position:absolute;top:3px;left:3px;right:3px;bottom:3px;border:1px solid #E8E0CC;border-radius:2px;pointer-events:none}
+.rq-agent-kw{background:#1A1F2C;border-color:#1A1F2C}
+.rq-agent-kw::before{border-color:rgba(201,168,76,.35)}
+.rq-agent-kw .rq-ag-name{color:#FBF9F4}.rq-agent-kw .rq-ag-line{color:#C8CEDB}.rq-agent-kw .rq-ag-dre{color:#C9A84C}
+.rq-ag-name{font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;font-weight:600;color:#1A1F2C;line-height:1.1}
+.rq-ag-name em{font-style:normal;color:#806B30}
+.rq-agent-kw .rq-ag-name em{color:#C9A84C}
+.rq-ag-dre{font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:#806B30;margin:3px 0 3px;font-weight:600}
+.rq-ag-line{font-size:9.5px;color:#3A4258;line-height:1.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* inner pages */
+.rq-ph{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding-bottom:7px;border-bottom:2px solid #1A1F2C}
+.rq-ph-brand{font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;font-weight:600;white-space:nowrap}
+.rq-ph-brand em{font-style:normal;color:#806B30}
+.rq-ph-meta{font-size:9px;color:#5F6577;letter-spacing:.06em;text-transform:uppercase;text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rq-title{margin:14px 0 6px}
+.rq-eyebrow{font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:#806B30;font-weight:700}
+.rq-title h2{font-family:'Cormorant Garamond',Georgia,serif;font-size:28px;font-weight:600;line-height:1.1;margin:2px 0 0;color:#1A1F2C}
+.rq-lead{font-size:10.5px;color:#3A4258;line-height:1.6;margin:0 0 10px}
+.rq-lead b{color:#1A1F2C}
+.rq-key{display:inline-block;width:9px;height:9px;border-radius:50%;background:#806B30;vertical-align:-1px}
+.rq-card{border:1px solid #D9CFB7;border-radius:6px;background:#FFFFFF;padding:9px 12px 8px;margin-bottom:12px}
+.rq-card-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#806B30;font-weight:700;margin-bottom:4px}
+.rq-card-h span{font-size:9px;letter-spacing:0;text-transform:none;color:#5F6577;font-weight:400}
+.rq-tw{width:100%}
+.rq-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:9.5px}
+.rq-table th{background:#1A1F2C;color:#FBF9F4;font-weight:500;font-size:8px;letter-spacing:.07em;text-transform:uppercase;padding:6px 5px;text-align:left;line-height:1.25;vertical-align:bottom}
+.rq-table td{padding:5px 5px;border-bottom:1px solid #E4DCC4;vertical-align:middle;color:#1A1F2C;line-height:1.35}
+.rq-table tbody tr:nth-child(even) td{background:#F6F1E6}
+.rq-table .num{text-align:right;font-family:'JetBrains Mono',monospace;font-size:9px;white-space:nowrap}
+.rq-table th.num{font-family:'Outfit',sans-serif;font-size:8px;white-space:normal}
+.rq-table .strong{font-weight:700}
+.rq-table .pos{color:#1F6B47}.rq-table .neg{color:#9A3530}
+.rq-addr b{display:block;font-weight:600;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rq-addr span{display:block;font-size:8.5px;color:#5F6577;line-height:1.35;margin-top:1px}
+.rq-addr1{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rq-n{text-align:center}
+.rq-dot{display:inline-block;width:17px;height:17px;border-radius:50%;background:#5F6577;color:#FFFFFF;font-size:9px;font-weight:700;line-height:17px;text-align:center}
+.rq-dot.nb{background:#806B30}
+.rq-wbar{height:4px;background:#E8E0CC;border-radius:2px;margin:0 0 3px auto;width:100%;overflow:hidden}
+.rq-wbar i{display:block;height:100%;background:#806B30;margin-left:auto}
+.rq-note{font-size:9px;color:#5F6577;margin:5px 0 8px;font-style:italic}
+.rq-3col{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+.rq-3col>div{background:#F2EDE2;border:1px solid #D9CFB7;border-radius:5px;padding:8px 10px}
+.rq-3col h4{margin:0 0 3px;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#806B30;font-weight:700}
+.rq-3col p{margin:0;font-size:9.5px;line-height:1.5;color:#3A4258}
+.rq-conf-box{margin-top:14px;padding:9px 12px;border-radius:5px;border-left:4px solid #1F6B47;background:#FFFFFF;border-top:1px solid #D9CFB7;border-right:1px solid #D9CFB7;border-bottom:1px solid #D9CFB7;font-size:10px;line-height:1.55;color:#3A4258}
+.rq-conf-box.med{border-left-color:#A56B19}.rq-conf-box.lo{border-left-color:#9A3530}
+.rq-conf-box b{color:#1A1F2C}
+.rq-stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:4px 0 12px}
+.rq-stats>div{background:#F2EDE2;border:1px solid #D9CFB7;border-radius:5px;padding:7px 8px;text-align:center;min-width:0}
+.rq-stats i{display:block;font-style:normal;font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:#806B30;font-weight:600}
+.rq-stats b{display:block;font-family:'Cormorant Garamond',Georgia,serif;font-size:21px;font-weight:600;line-height:1.15;color:#1A1F2C;white-space:nowrap}
+.rq-stats b.sm{font-size:16px;line-height:1.45}
+.rq-stats b.up{color:#1F6B47}.rq-stats b.down{color:#9A3530}
+.rq-stats small{display:block;font-size:8.5px;color:#5F6577;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rq-sub-h{font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;font-weight:600;color:#1A1F2C;margin:12px 0 6px;padding-bottom:3px;border-bottom:1px solid #D9CFB7;display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.rq-sub-h span{font-family:'Outfit',sans-serif;font-size:9px;font-weight:400;color:#5F6577}
+.rq-empty{font-size:10px;color:#5F6577;padding:12px;border:1px dashed #D9CFB7;border-radius:5px;text-align:center}
+.rq-verdict{display:grid;grid-template-columns:minmax(0,235px) minmax(0,1fr);gap:18px;align-items:center;border:1px solid #D9CFB7;border-radius:6px;background:#FFFFFF;padding:10px 14px}
+.rq-verdict-l i{display:block;font-style:normal;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:#806B30;font-weight:600;line-height:1.4}
+.rq-verdict-l b{display:block;font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;font-weight:600;line-height:1.1;margin-top:3px}
+.rq-verdict-l small{display:block;font-family:'Outfit',sans-serif;font-size:9.5px;color:#A56B19;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-top:3px}
+.rq-mkt td:first-child{white-space:normal}
+.rq-read{display:inline-block;padding:2px 8px;border-radius:10px;font-size:8.5px;font-weight:600;white-space:nowrap}
+.rq-read.s{background:rgba(154,53,48,.12);color:#9A3530}.rq-read.b{background:rgba(58,111,168,.13);color:#2E5A8A}.rq-read.n{background:rgba(128,107,48,.14);color:#6B5A28}.rq-read.na{background:#EEE;color:#5F6577}
+.rq-st{display:inline-block;padding:1px 7px;border-radius:9px;font-size:8.5px;font-weight:600}
+.rq-st.a{background:rgba(31,107,71,.12);color:#1F6B47}.rq-st.p{background:rgba(165,107,25,.14);color:#8A5A14}
+.rq-disc{position:absolute;left:.55in;right:.55in;bottom:.5in;font-size:8.5px;line-height:1.55;color:#5F6577;border-top:1px solid #D9CFB7;padding-top:7px;text-align:justify}
+.rq-disc b{color:#1A1F2C}
+.rq-pf{position:absolute;left:.55in;right:.55in;bottom:.22in;display:flex;justify-content:space-between;gap:10px;font-size:8px;color:#806B30;letter-spacing:.06em;border-top:1px solid #D9CFB7;padding-top:5px;white-space:nowrap}
+@media print{
+  @page{size:letter;margin:0}
+  html,body{margin:0!important;padding:0!important}
+  #report-paper.rq{width:8.5in!important;padding:0!important;margin:0!important;gap:0!important;display:block!important;background:none!important}
+  #report-paper.rq .rq-page{box-shadow:none!important;margin:0!important;break-after:page;page-break-after:always;max-width:none!important}
+  #report-paper.rq .rq-page:last-child{break-after:auto;page-break-after:auto}
+  #report-paper.rq .rq-svg{max-width:none!important}
+}
+@media screen and (max-width:760px){
+  #report-paper.rq{width:100%!important;padding:0!important;gap:12px}
+  #report-paper .rq-page{width:100%;height:auto;overflow:visible;padding:16px 14px 44px;font-size:12px}
+  #report-paper .rq-cover{padding:0 0 44px}
+  #report-paper .rq-band{padding:18px 16px 16px}
+  #report-paper .rq-band-top{flex-direction:column;gap:10px}
+  #report-paper .rq-band-meta{text-align:left;white-space:normal}
+  #report-paper .rq-band-addr{font-size:28px}
+  #report-paper .rq-body{padding:14px 14px 0}
+  #report-paper .rq-attrs{grid-template-columns:repeat(3,minmax(0,1fr))}
+  #report-paper .rq-attrs>div:nth-child(4){border-left:none}
+  #report-paper .rq-attrs>div:nth-child(n+4){border-top:1px solid #D9CFB7}
+  #report-paper .rq-hero.two{grid-template-columns:minmax(0,1fr)}
+  #report-paper .rq-hv-price{font-size:34px}
+  #report-paper .rq-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #report-paper .rq-kpis>div:last-child{grid-column:1/-1}
+  #report-paper .rq-team,#report-paper .rq-disc{position:static;margin-top:14px}
+  #report-paper .rq-team{grid-template-columns:minmax(0,1fr)}
+  #report-paper .rq-ph{flex-direction:column;align-items:flex-start;gap:2px}
+  #report-paper .rq-ph-meta{text-align:left;white-space:normal}
+  #report-paper .rq-3col,#report-paper .rq-verdict{grid-template-columns:minmax(0,1fr)}
+  #report-paper .rq-stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+  #report-paper .rq-tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  #report-paper .rq-tw .rq-table{min-width:640px}
+  #report-paper .rq-pf{left:14px;right:14px;bottom:12px;flex-wrap:wrap;white-space:normal;justify-content:center;gap:2px 10px;text-align:center}
+  #report-paper .rq-pf span:nth-child(2){display:none}
+  .report-toolbar{padding:8px 10px!important;gap:6px!important}
+  .rt-title{display:none}
+  .rt-controls{display:grid!important;grid-template-columns:1fr 1fr;gap:6px!important;width:100%}
+  .rt-input-lbl{flex-direction:column;align-items:stretch!important;gap:2px!important;font-size:10px!important}
+  .rt-input-lbl input{width:100%!important;font-size:16px!important;padding:4px 8px!important}
+  .rt-controls .btn{font-size:12px;padding:8px 6px;justify-content:center;white-space:nowrap}
+}
 </style>
 </head>
 <body>
@@ -2491,12 +2663,12 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
 <!-- ══════════════════════════════════════════════════════════════ -->
 <div class="report-overlay hidden" id="report-overlay">
   <div class="report-toolbar">
-    <div class="rt-title">Client Report Preview</div>
+    <div class="rt-title">Client CMA Report</div>
     <div class="rt-controls">
       <label class="rt-input-lbl">Prepared for: <input type="text" id="rt-client" placeholder="Client name" oninput="updateClientReportFields()"></label>
       <label class="rt-input-lbl">Prepared by: <input type="text" id="rt-preparer" value="Team Parikh" oninput="updateClientReportFields()"></label>
       <button class="btn btn-g" onclick="closeClientReport()">✕ Close</button>
-      <button class="btn btn-gold" onclick="printClientReport()">🖨 Print / Save PDF</button>
+      <button class="btn btn-g" onclick="saveReportImage('summary')">🖼 Summary Image</button><button class="btn btn-g" onclick="saveReportImage('full')">🖼 Full Report Image</button><button class="btn btn-gold" onclick="printClientReport()">🖨 Print / Save PDF</button>
     </div>
   </div>
   <div class="report-scroll">
@@ -10584,7 +10756,7 @@ function tryAutoFill(){
   if(!r){ if(afMsg) afMsg.style.display='none'; A.subjectRecId=null; return; }
   if(A.subjectRecId===r.id) return;
   A.subjectRecId=r.id;
-  const set=(id,val)=>{ const e=el(id); if(e&&(val||val===0)){ e.value=val; e.classList.add('autofill-glow'); setTimeout(()=>e.classList.remove('autofill-glow'),900); } };
+  const set=(id,val)=>{ const e=el(id); if(!e) return; e.value=(val||val===0)?val:''; if(val||val===0){ e.classList.add('autofill-glow'); setTimeout(()=>e.classList.remove('autofill-glow'),900); } };  // blank fields the record lacks, so a previous subject's HOA/unit/lot never carries over
   set('s-sqft',r.sqft||''); set('s-br',r.br||''); set('s-bth',r.baths||r.bth||''); set('s-yr',r.yr||''); set('s-lot',r.lot||'');
   set('s-hoa',r.hoaMo?Math.round(r.hoaMo):''); set('s-unit',r.unit||'');
   const isLive=r.status==='ACTIVE'||r.status==='PENDING';
@@ -11340,6 +11512,328 @@ async function v7PricingOutcomeFill(g,key){
     <div class="expl-card" style="margin-top:10px"><strong>How to read</strong>Each listing is judged against what the comps supported on the day it listed — not against today's active pool, which only holds the homes that <em>haven't</em> sold.${b.n>=15&&c.n>=15?` Here, homes listed 5–15% above comps were pulled without selling ${Math.round((c.unsold||0)*100)}% of the time vs ${Math.round((b.unsold||0)*100)}% for well-priced ones, and sold at ${c.ratio?(c.ratio*100).toFixed(1):'—'}% of their original price vs ${b.ratio?(b.ratio*100).toFixed(1):'—'}%.`:''} Homes far above the comps often sell well anyway — usually remodels or views the comps can't see.</div>`;
   }
   _pvoCache[key]=html; if(box()) box().innerHTML=html;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   CLIENT CMA REPORT (v7.2) — four Letter pages, print-exact, image export.
+   Each page is a fixed 8.5×11in sheet so the PDF paginates exactly as shown;
+   all charts are inline SVG (vector in the PDF, no Chart.js dependency).
+   ══════════════════════════════════════════════════════════════════════════ */
+const rqDir=x=>!x||Math.abs(x.pct)<0.0005?'':x.pct>0?'up':'down';
+const RQC={navy:'#1A1F2C',gold:'#806B30',gold2:'#C9A84C',cream:'#FBF9F4',sand:'#F2EDE2',line:'#D9CFB7',line2:'#E8E0CC',
+  grn:'#1F6B47',red:'#9A3530',blue:'#3A6FA8',org:'#A56B19',t2:'#3A4258',t3:'#5F6577'};
+function rqE(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function rqM(n){ if(n==null||!isFinite(n)) return '—'; return n>=1e6?'$'+(n/1e6).toFixed(2)+'M':'$'+Math.round(n/1000)+'K'; }
+function rqR(n,step){ return Math.round(n/(step||1000))*(step||1000); }
+function rqD(day){ const d=dayToLocal(day); return d?d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—'; }
+function rqLot(sf){ if(!sf) return '—'; return sf>=10890?(sf/43560).toFixed(2)+' ac':fmtN(sf)+' sf'; }
+function rqBa(b){ if(!b) return '—'; return Number.isInteger(b)?String(b):b.toFixed(1); }
+function rqPct(x,d){ if(x==null||!isFinite(x)) return '—'; const dd=d==null?1:d, s=Math.abs(x*100).toFixed(dd); return (+s===0?'':x>0?'+':'−')+s+'%'; }
+function rqTicks(lo,hi,n){
+  const span=hi-lo; if(!(span>0)) return [lo];
+  const raw=span/(n||5), p=Math.pow(10,Math.floor(Math.log10(raw)));
+  const step=[1,2,2.5,5,10].map(m=>m*p).find(s=>s>=raw)||10*p;
+  const out=[]; for(let v=Math.ceil(lo/step)*step; v<=hi+1e-9; v+=step) out.push(v); return out;
+}
+function rqAddrShort(a){ a=String(a||''); return a===a.toUpperCase()?toTitle(a):a; }  // MLS all-caps entries → title case; mixed case left as typed
+
+/* ── SVG: value range strip with list / expected markers ── */
+function rqRangeMarks(r){
+  const m=[{v:r.est,lbl:'Comparable-sales value',c:RQC.navy}];
+  if(r.exp){ m.push({v:r.exp.expected,lbl:'Expected sale',c:RQC.grn}); m.push({v:r.exp.list,lbl:'List price',c:RQC.red}); }
+  return m;
+}
+function rqRangeSvg(r){
+  const W=700,H=40, rg=r.rg, marks=rqRangeMarks(r);
+  const vals=[rg.lo80,rg.hi80,...marks.map(m=>m.v)], lo=Math.min(...vals), hi=Math.max(...vals), pad=(hi-lo)*0.05||lo*0.03;
+  const x0=lo-pad, x1=hi+pad, X=v=>8+(W-16)*(v-x0)/(x1-x0), ty=12, th=14;
+  const ticks=rqTicks(x0,x1,6);
+  return `<svg class="rq-svg" viewBox="0 0 ${W} ${H}" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Outfit,Helvetica,Arial,sans-serif">
+    <rect x="${X(x0)}" y="${ty}" width="${X(x1)-X(x0)}" height="${th}" rx="3" fill="${RQC.sand}"/>
+    <rect x="${X(rg.lo80)}" y="${ty}" width="${X(rg.hi80)-X(rg.lo80)}" height="${th}" fill="${RQC.line}"/>
+    <rect x="${X(rg.lo50)}" y="${ty}" width="${X(rg.hi50)-X(rg.lo50)}" height="${th}" fill="${RQC.gold2}"/>
+    ${marks.map((m,i)=>`<line x1="${X(m.v)}" y1="${ty-4}" x2="${X(m.v)}" y2="${ty+th+4}" stroke="${m.c}" stroke-width="2.4"/><path d="M${X(m.v)-5},${ty-10+i*0} L${X(m.v)+5},${ty-10} L${X(m.v)},${ty-4} Z" fill="${m.c}"/>`).join('')}
+    ${ticks.map(v=>`<text x="${X(v)}" y="${H-1}" text-anchor="middle" font-size="8.5" fill="${RQC.t3}">${rqM(v)}</text>`).join('')}
+  </svg>`;
+}
+
+/* ── SVG: where each comparable points (dot size = weight) ── */
+function rqCompPlot(r, comps){
+  const W=700, H=134, L=16, R=16, top=24, bot=24;
+  const vals=[...comps.map(c=>c.final||c.indicated), r.rg.lo50, r.rg.hi50, r.est];
+  let lo=Math.min(...vals), hi=Math.max(...vals); const pad=(hi-lo)*0.07||lo*0.04; lo-=pad; hi+=pad;
+  const X=v=>L+(W-L-R)*(v-lo)/(hi-lo), maxW=Math.max(...comps.map(c=>c.wPct));
+  const lanes=[]; const dots=comps.map((c,i)=>{ const rr=6+9*Math.sqrt(c.wPct/maxW); return {i:i+1,x:X(c.final||c.indicated),rr,c}; });
+  const laneY=[top+18,top+44,top+70,top+6,top+82].map(y=>Math.min(y,H-bot-10));
+  dots.slice().sort((a,b)=>b.rr-a.rr).forEach(d=>{ let k=0; for(;k<laneY.length;k++){ if(!(lanes[k]||[]).some(o=>Math.abs(o.x-d.x)<o.rr+d.rr+2)) break; } if(k>=laneY.length) k=0; (lanes[k]=lanes[k]||[]).push(d); d.y=laneY[k]; });
+  const ticks=rqTicks(lo,hi,6);
+  return `<svg class="rq-svg" viewBox="0 0 ${W} ${H}" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Outfit,Helvetica,Arial,sans-serif">
+    <rect x="${X(r.rg.lo50)}" y="${top}" width="${X(r.rg.hi50)-X(r.rg.lo50)}" height="${H-top-bot}" fill="${RQC.gold2}" opacity=".16"/>
+    <line x1="${L}" y1="${H-bot}" x2="${W-R}" y2="${H-bot}" stroke="${RQC.line}"/>
+    ${ticks.map(t=>`<line x1="${X(t)}" y1="${H-bot}" x2="${X(t)}" y2="${H-bot+4}" stroke="${RQC.t3}"/><text x="${X(t)}" y="${H-bot+16}" text-anchor="middle" font-size="9.5" fill="${RQC.t3}">${rqM(t)}</text>`).join('')}
+    <line x1="${X(r.est)}" y1="${top-4}" x2="${X(r.est)}" y2="${H-bot}" stroke="${RQC.navy}" stroke-width="1.6" stroke-dasharray="4 3"/>
+    <text x="${Math.min(W-R-4,Math.max(L+4,X(r.est)))}" y="${top-9}" text-anchor="middle" font-size="10.5" font-weight="600" fill="${RQC.navy}">Value ${rqM(r.est)}</text>
+    ${dots.map(d=>`<g data-ci="${d.i}"><circle cx="${d.x}" cy="${d.y}" r="${d.rr}" fill="${d.c.matchLevel>=3?RQC.gold:RQC.t3}" fill-opacity=".88" stroke="#fff" stroke-width="1.2"/><text x="${d.x}" y="${d.y+3.4}" text-anchor="middle" font-size="${d.rr>9?10:8.5}" font-weight="700" fill="#fff">${d.i}</text></g>`).join('')}
+  </svg>`;
+}
+
+/* ── SVG: 3-year like-for-like trend, expressed as this home's value ── */
+function rqTrendSvg(r){
+  const ix=r.v.index, est=r.est, now=TP.indexAt(ix,r.asOf);
+  const qs=ix.quarters.filter(q=>!q.partial||q.n>=3); if(qs.length<3) return '';
+  const W=700,H=236,L=58,R=14,T=12,B=30;
+  const main=qs.map(q=>est*Math.exp(q.idx-now)), up=qs.map(q=>est*Math.exp(q.idx+1.96*q.se-now)), dn=qs.map(q=>est*Math.exp(q.idx-1.96*q.se-now));
+  let city=null; if(r.cityIx){ const cn=TP.indexAt(r.cityIx,r.asOf); city=qs.map(q=>{ const c=r.cityIx.quarters.find(x=>x.qi===q.qi); return c?est*Math.exp(c.idx-cn):null; }); }
+  const all=[...up,...dn,...(city||[]).filter(x=>x!=null)]; let lo=Math.min(...all), hi=Math.max(...all); const p=(hi-lo)*0.08; lo-=p; hi+=p;
+  const X=i=>L+(W-L-R)*(qs.length===1?0.5:i/(qs.length-1)), Y=v=>T+(H-T-B)*(1-(v-lo)/(hi-lo));
+  const path=a=>a.map((v,i)=>v==null?'':`${i&&a[i-1]!=null?'L':'M'}${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join('');
+  const band=`M${up.map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join('L')}L${dn.map((v,i)=>[i,v]).reverse().map(([i,v])=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join('L')}Z`;
+  const ticks=rqTicks(lo,hi,5), every=qs.length>13?3:qs.length>8?2:1;
+  return `<svg class="rq-svg" viewBox="0 0 ${W} ${H}" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Outfit,Helvetica,Arial,sans-serif">
+    ${ticks.map(t=>`<line x1="${L}" y1="${Y(t)}" x2="${W-R}" y2="${Y(t)}" stroke="${RQC.line2}"/><text x="${L-7}" y="${Y(t)+3.5}" text-anchor="end" font-size="9.5" fill="${RQC.t3}">${rqM(t)}</text>`).join('')}
+    <path d="${band}" fill="${RQC.gold2}" opacity=".18"/>
+    ${city?`<path d="${path(city)}" fill="none" stroke="${RQC.blue}" stroke-width="1.6" stroke-dasharray="5 4"/>`:''}
+    <path d="${path(main)}" fill="none" stroke="${RQC.gold}" stroke-width="2.4" stroke-linejoin="round"/>
+    ${main.map((v,i)=>`<circle cx="${X(i)}" cy="${Y(v)}" r="2.8" fill="${RQC.gold}"/>`).join('')}
+    <circle cx="${X(qs.length-1)}" cy="${Y(main[main.length-1])}" r="4.5" fill="${RQC.navy}" stroke="#fff" stroke-width="1.5"/>
+    ${qs.map((q,i)=>(i%every===0||i===qs.length-1)&&!(i!==qs.length-1&&qs.length-1-i<every)?`<text x="${X(i)}" y="${H-B+15}" text-anchor="middle" font-size="9.5" fill="${RQC.t3}">${q.label.replace(' ',' ')}${q.partial?'*':''}</text>`:'').join('')}
+    <line x1="${L}" y1="${H-B}" x2="${W-R}" y2="${H-B}" stroke="${RQC.line}"/>
+  </svg>`;
+}
+
+/* ── SVG: buyer ↔ seller gauge ── */
+function rqGauge(score){
+  const W=700,H=54,segs=[["Strong buyer's",'#2E5A8A'],["Buyer's",'#6F94BE'],['Balanced','#B59A55'],["Seller's",'#C47A6E'],["Strong seller's",'#9A3530']];
+  const sw=W/5, active=score==null?-1:score>=1.25?4:score>=0.5?3:score>-0.5?2:score>-1.25?1:0;
+  const mx=score==null?null:Math.max(8,Math.min(W-8,W*(Math.max(-2.5,Math.min(2.5,score))+2.5)/5));
+  return `<svg class="rq-svg" viewBox="0 0 ${W} ${H}" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Outfit,Helvetica,Arial,sans-serif">
+    ${segs.map(([l,c],i)=>`<rect x="${i*sw+1}" y="14" width="${sw-2}" height="14" rx="2" fill="${c}" opacity="${i===active?1:.28}"/><text x="${i*sw+sw/2}" y="45" text-anchor="middle" font-size="10.5" font-weight="${i===active?700:400}" fill="${i===active?RQC.navy:RQC.t3}">${l}</text>`).join('')}
+    ${mx!=null?`<path d="M${mx-7},2 L${mx+7},2 L${mx},13 Z" fill="${RQC.navy}"/>`:''}
+  </svg>`;
+}
+
+function rqPageHead(s, title, eyebrow){
+  return `<div class="rq-ph"><div class="rq-ph-brand">Team <em>Parikh</em></div><div class="rq-ph-meta">Comparative Market Analysis · ${rqE(rqAddrShort(s.addr))}${s.unit?' #'+rqE(s.unit):''}, ${rqE(toTitle(s.city||''))}</div></div>
+    <div class="rq-title"><div class="rq-eyebrow">${eyebrow}</div><h2>${title}</h2></div>`;
+}
+function rqPageFoot(n,N){
+  return `<div class="rq-pf"><span>Team Parikh · Keller Williams Tri-Valley · team-parikh.com</span><span>Abhishek 916.529.7100 · Kavita 408.914.0743</span><span>Page ${n} of ${N}</span></div>`;
+}
+
+function renderClientReport(){
+  const paper=el('report-paper');
+  const subj=A.subject, res=A.lastValuation, r=A.lastV7;
+  if(!res||!r){ paper.className='report-paper'; paper.innerHTML='<div style="padding:40px;text-align:center;color:#5F6577">No valuation available. Run a CMA first.</div>'; return; }
+  paper.className='report-paper rq';
+  const dateStr=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  const v=r.v, t=r.trend, m=r.mkt, rg=r.rg, s=r.s, exp=r.exp, est=r.est;
+  const typeLbl=TP.typeLabel(s.bt), typeLo=typeLbl.toLowerCase();
+  const cityT=toTitle(subj.city||''), ixLbl=v.index.level==='zip'?`zip code ${v.index.key}`:v.index.level==='city'?toTitle(v.index.key):'the wider market area';
+  const confCls=res.conf==='HIGH'?'hi':res.conf==='MEDIUM'?'med':'lo';
+  const comps=[...v.comps].sort((a,b)=>b.wPct-a.wPct).slice(0,10);
+  const selfKey=x=>rqAddrShort(x.address||x.addr||'').toLowerCase().replace(/[^a-z0-9]/g,'')+'|'+String(x.unit||'').toLowerCase();
+  const isSelf=c=>selfKey(c)===selfKey(subj);
+  comps.forEach(c=>{ if(isSelf(c)) c._self=true; });
+  const nb=v.comps.filter(c=>c.matchLevel>=3), top=comps[0];
+  const N=4;
+
+  /* ── page 1: summary ── */
+  const attrs=[[subj.sqft?fmtN(subj.sqft):null,'Living sq ft'],[subj.br||null,'Bedrooms'],[subj.bth?rqBa(subj.bth):null,'Bathrooms'],[subj.yrBlt||null,'Year built'],
+    [subj.lotSqFt?rqLot(subj.lotSqFt):null,'Lot size'],[subj.hoaFee?fmt(subj.hoaFee)+'/mo':null,'HOA dues'],[typeLbl,'Property type']].filter(a=>a[0]!=null).slice(0,6);
+  const heroMain=`<div class="rq-hv"><div class="rq-hv-lbl">Estimated Market Value</div><div class="rq-hv-price">${fmt(res.consensus)}</div>
+      <div class="rq-hv-sub">Likely range <b>${fmt(rqR(rg.lo50))} – ${fmt(rqR(rg.hi50))}</b></div>
+      <div class="rq-hv-sub">${fmt(Math.round(est/subj.sqft))} per sq ft · based on ${v.comps.length} comparable sales</div>
+      <span class="rq-conf ${confCls}">${res.conf==='HIGH'?'High':res.conf==='MEDIUM'?'Medium':'Low'} confidence</span></div>`;
+  const heroExp=exp?`<div class="rq-hv rq-hv-exp"><div class="rq-hv-lbl">Expected Sale Price</div><div class="rq-hv-price">${fmt(rqR(exp.expected))}</div>
+      <div class="rq-hv-sub">Likely range <b>${fmt(rqR(exp.lo50))} – ${fmt(rqR(exp.hi50))}</b></div>
+      <div class="rq-hv-sub">Listed at ${fmt(exp.list)} · local sales close at ${(exp.ratio*100).toFixed(1)}% of original list</div>
+      <span class="rq-conf nt">${exp.n} recent sales</span></div>`:'';
+  const kpis=[
+    [t&&t.oneYr?rqPct(t.oneYr.pct):'—','12-month value trend',rqDir(t&&t.oneYr)],
+    [t&&t.threeYr?rqPct(t.threeYr.pct):'—','3-year value trend',rqDir(t&&t.threeYr)],
+    [m.cur.spOlp?(m.cur.spOlp*100).toFixed(1)+'%':'—','Sale ÷ original list',''],
+    [m.cur.cdom!=null?Math.round(m.cur.cdom)+' days':'—','Typical days on market',''],
+    [m.verdict.label.replace(' market',''),'Market · last 90 days','']];
+  const drivers=[];
+  if(top&&top._self) drivers.push(`The most influential sale is <b>this home’s own prior sale</b> on ${rqD(top.cd)} for ${fmt(top.sp)}. Brought to today’s market it points to <b>${fmt(rqR(top.final||top.indicated))}</b>.`);
+  else if(top) drivers.push(`The most influential sale is <b>${rqE(rqAddrShort(top.address))}</b>${top.match?` (${rqE(top.match.replace(/^Same /,'same '))})`:''}, which sold ${rqD(top.cd)} for ${fmt(top.sp)}. Adjusted to today’s market and to this home’s size and features, it points to <b>${fmt(rqR(top.final||top.indicated))}</b>.`);
+  drivers.push(nb.length?`${nb.length} of the ${v.comps.length} comparable sales are in the immediate neighborhood — same street, community, subdivision or within about half a mile — and they carry <b>${Math.round(v.neighborhoodShare*100)}%</b> of the weight.`
+    :`No sales on the same street or in the same community qualified, so the value leans on sales elsewhere in ${s.zip?'the '+s.zip+' zip code':cityT}. Location differences are the main uncertainty.`);
+  if(t&&t.oneYr) drivers.push(`Values for similar ${typeLo} homes in ${ixLbl} are <b>${t.oneYr.pct>=0?'up':'down'} ${Math.abs(t.oneYr.pct*100).toFixed(1)}%</b> over 12 months${t.threeYr?` and ${t.threeYr.pct>=0?'up':'down'} ${Math.abs(t.threeYr.pct*100).toFixed(1)}% over three years`:''}. Every older sale was brought forward to today’s prices using this trend.`);
+  drivers.push(v.dispersion<0.06?`The comparable sales agree closely (within about ±${Math.round(v.dispersion*100)}%), which supports a tight range.`
+    :v.dispersion<0.11?`The comparable sales agree reasonably well (about ±${Math.round(v.dispersion*100)}%).`
+    :`The comparable sales vary more than usual (about ±${Math.round(v.dispersion*100)}%) — usually condition, updates, view or lot differences that sales records don’t capture. A walk-through comparison matters here.`);
+  if(m.score!=null) drivers.push(`The local market (${rqE(r.mktLbl)}, last 90 days) reads as a <b>${m.verdict.label.toLowerCase()}</b>: recent sales closed at a median ${m.cur.spOlp?(m.cur.spOlp*100).toFixed(1)+'%':'—'} of original list price${m.cur.moi!=null?` with ${m.cur.moi.toFixed(1)} months of inventory`:''}.`);
+  const agent=(first,last,dre,ph,phHref,em)=>`<div class="rq-agent"><div class="rq-ag-name">${first} <em>${last}</em></div><div class="rq-ag-dre">DRE ${dre}</div><div class="rq-ag-line">${ph}</div><div class="rq-ag-line">${em}</div></div>`;
+  const page1=`<section class="rq-page rq-cover">
+    <header class="rq-band">
+      <div class="rq-band-top"><div class="rq-brand">Team <em>Parikh</em><small>Keller Williams Tri-Valley · team-parikh.com</small></div>
+        <div class="rq-band-meta"><div>${dateStr}</div>${A.clientName?`<div>Prepared for <b>${rqE(A.clientName)}</b></div>`:''}<div>Prepared by <b>${rqE(A.preparedBy||'Team Parikh')}</b></div></div></div>
+      <div class="rq-band-eyebrow">Comparative Market Analysis</div>
+      <div class="rq-band-addr">${rqE(rqAddrShort(subj.addr)||'—')}${subj.unit?' #'+rqE(subj.unit):''}</div>
+      <div class="rq-band-city">${rqE(cityT)}, California ${rqE(subj.zip||'')}</div>
+    </header>
+    <div class="rq-body">
+      <div class="rq-attrs">${attrs.map(a=>`<div><b>${rqE(a[0])}</b><i>${a[1]}</i></div>`).join('')}</div>
+      <div class="rq-hero ${exp?'two':''}">${heroMain}${heroExp}</div>
+      <div class="rq-range"><div class="rq-range-h"><span>Value range</span><span><i class="sw s50"></i>Likely (half of similar homes sell here) &nbsp; <i class="sw s80"></i>Wide (8 in 10)</span></div>${rqRangeSvg(r)}
+        <div class="rq-range-f"><span class="rq-marks">${rqRangeMarks(r).map(k=>`<span><i style="background:${k.c}"></i>${k.lbl} <b>${rqM(k.v)}</b></span>`).join('')}</span><span>Likely ${fmt(rqR(rg.lo50))} – ${fmt(rqR(rg.hi50))} · Wide ${fmt(rqR(rg.lo80))} – ${fmt(rqR(rg.hi80))}</span></div></div>
+      <div class="rq-kpis">${kpis.map(k=>`<div><b class="${k[2]}">${rqE(k[0])}</b><i>${k[1]}</i></div>`).join('')}</div>
+      <div class="rq-sec-mini">What drives this value</div>
+      <ol class="rq-drivers">${drivers.slice(0,5).map((d,i)=>`<li${i>=3?' data-trim="drv"':''}><u>${i+1}</u>${d}</li>`).join('')}</ol>
+      <div class="rq-team">${agent('Abhishek','Parikh','02069777','916.529.7100','','abhishek@team-parikh.com')}${agent('Kavita','Parikh','02118709','408.914.0743','','kavita@team-parikh.com')}
+        <div class="rq-agent rq-agent-kw"><div class="rq-ag-name">Keller <em>Williams</em></div><div class="rq-ag-dre">Tri-Valley</div><div class="rq-ag-line">team-parikh.com</div><div class="rq-ag-line">Search homes · Market reports</div></div></div>
+    </div>
+    ${rqPageFoot(1,N)}</section>`;
+
+  /* ── page 2: comparable sales ── */
+  const compRows=comps.map((c,i)=>{
+    const fin=c.final||c.indicated, other=fin-c.sp*(1+c.timeAdjPct);
+    const det=[c._self?'This home’s prior sale':(c.match||''),`Sold ${rqD(c.cd)}`,`${c.br||'—'} bd / ${rqBa(c.baths)} ba`,c.yr?`Built ${c.yr}`:'',c.lot?`Lot ${rqLot(c.lot)}`:''].filter(Boolean).join(' · ');
+    return `<tr data-grp="comp"${i>=6?` data-trim="comp" data-ci="${i+1}"`:''}><td class="rq-n"><span class="rq-dot ${c.matchLevel>=3?'nb':''}">${i+1}</span></td>
+      <td class="rq-addr"><b>${rqE(rqAddrShort(c.address))}${c.unit?' #'+rqE(c.unit):''}</b><span>${rqE(det)}</span></td>
+      <td class="num">${fmt(c.sp)}</td><td class="num">${fmtN(c.sqft)}</td><td class="num">$${fmtN(Math.round(c.sp/c.sqft))}</td>
+      <td class="num ${c.timeAdjPct>=0.0005?'pos':c.timeAdjPct<=-0.0005?'neg':''}">${rqPct(c.timeAdjPct)}</td>
+      <td class="num ${other>=500?'pos':other<=-500?'neg':''}">${other>=0?'+':'−'}${rqM(Math.abs(other)).replace('$0K','$0')}</td>
+      <td class="num strong">${fmt(rqR(fin))}</td>
+      <td class="num"><div class="rq-wbar"><i style="width:${Math.round(c.wPct/comps[0].wPct*100)}%"></i></div>${Math.round(c.wPct*100)}%</td></tr>`; }).join('');
+  const more=`<div class="rq-note" data-note="comp" data-total="${v.comps.length}" data-tpl="Showing the {n} most heavily weighted of {t} comparable sales; all {t} are included in the value."></div>`;
+  const accTxt=rg.mdape!=null?`When this method was tested on past sales of similar homes in ${rqE(cityT)}, its typical miss was <b>${(rg.mdape*100).toFixed(1)}%</b>; the ranges on page 1 come from those results.`:'The ranges on page 1 reflect how far comparable-based estimates typically miss for similar homes.';
+  const confText=res.conf==='HIGH'?`The comparable sales agree closely and are close to this home. In testing, estimates backed by this kind of agreement landed near the eventual sale price.`
+    :res.conf==='MEDIUM'?`The comparable sales agree reasonably well. A review of condition and upgrades relative to the comparables will sharpen pricing.`
+    :`The comparable sales vary more than usual — often because of condition, view, lot or location differences that sales data cannot capture. Treat the range as the starting point for a property-specific review.`;
+  const page2=`<section class="rq-page">${rqPageHead(subj,'Comparable Sales','02 · The evidence')}
+    <p class="rq-lead">Each sale below was adjusted to today’s market and to this home’s size${v.featureAdj?', age, lot and room count':''}. Closer, more similar sales receive more weight; <span class="rq-key nb"></span> gold marks the immediate neighborhood.</p>
+    <div class="rq-card"><div class="rq-card-h">Where the comparable sales point <span>dot size = weight · shaded band = likely range</span></div>${rqCompPlot(r,comps)}</div>
+    <div class="rq-tw"><table class="rq-table rq-comp">
+      <colgroup><col style="width:4%"><col style="width:33%"><col style="width:11%"><col style="width:7%"><col style="width:7.5%"><col style="width:8%"><col style="width:9.5%"><col style="width:11%"><col style="width:9%"></colgroup>
+      <thead><tr><th></th><th>Property</th><th class="num">Sale price</th><th class="num">Sq ft</th><th class="num">$/sq ft</th><th class="num">Market adj.</th><th class="num">Size &amp; feature adj.</th><th class="num">Adjusted value</th><th class="num">Weight</th></tr></thead>
+      <tbody>${compRows}</tbody></table></div>${more}
+    <div class="rq-3col">
+      <div><h4>Market adjustment</h4><p>Older sales are brought to today’s prices using the like-for-like trend for ${typeLo} homes in ${rqE(ixLbl)} (page 3).</p></div>
+      <div><h4>Size &amp; features</h4><p>Larger or smaller homes are scaled using how price per square foot actually changes with size locally${v.featureAdj?'; age, lot size and room count use locally measured values, each capped at ±8%':''}.</p></div>
+      <div><h4>Accuracy</h4><p>${accTxt}</p></div></div>
+    ${rqPageFoot(2,N)}</section>`;
+
+  /* ── page 3: neighborhood trend ── */
+  const ix=v.index, nowIx=TP.indexAt(ix,r.asOf), ns=(r.nbhdSales||[]), nsShow=ns.slice(0,10);
+  const stat=(lbl,x)=>`<div><i>${lbl}</i><b class="${rqDir(x)}">${x?rqPct(x.pct):'—'}</b><small>${x?'±'+(1.96*x.se*100).toFixed(1)+'% margin':'limited history'}</small></div>`;
+  const page3=`<section class="rq-page">${rqPageHead(subj,'Neighborhood Price Trend','03 · Three-year view')}
+    <p class="rq-lead">How the value of a home like this one has moved over the last three years in ${rqE(ixLbl)}. Each quarter compares homes of similar size, age and lot, so a quarter where larger homes happened to sell does not show up as appreciation.</p>
+    ${ix.level!=='zip'&&s.zip?`<div class="rq-note">Zip ${rqE(s.zip)} has too few ${typeLo} sales for its own trend, so ${rqE(ixLbl)} is used.</div>`:''}
+    <div class="rq-stats">${stat('6 months',t&&t.sixMo)}${stat('12 months',t&&t.oneYr)}${stat('3 years',t&&t.threeYr)}
+      <div><i>Peak quarter</i><b class="sm">${t?rqE(t.peak.label):'—'}</b><small>${t?'today '+rqPct(t.peak.vsNow)+' vs peak':''}</small></div>
+      <div><i>Low quarter</i><b class="sm">${t?rqE(t.trough.label):'—'}</b><small>${t?'today '+rqPct(t.trough.vsNow)+' vs low':''}</small></div></div>
+    <div class="rq-card"><div class="rq-card-h">This home’s estimated value by quarter <span><i class="ln gold"></i>${rqE(ixLbl.replace(/^zip code/,'Zip'))}${r.cityIx?` <i class="ln blue"></i>${rqE(cityT)} citywide`:''} <i class="sw s80b"></i>95% margin</span></div>${rqTrendSvg(r)||'<div class="rq-note">Not enough history to chart a trend.</div>'}
+      <div class="rq-note" style="margin:2px 0 0">Based on ${fmtN(ix.n)} ${typeLo} sales. ${ix.quarters.some(q=>q.partial)?'* Quarter to date.':''}</div></div>
+    <div class="rq-sub-h">Recent sales in the immediate neighborhood <span>same street, community${s.subdiv?', subdivision':''} or within ½ mile · last 3 years</span></div>
+    ${nsShow.length?`<div class="rq-tw"><table class="rq-table">
+      <colgroup><col style="width:30%"><col style="width:13%"><col style="width:13%"><col style="width:8%"><col style="width:9%"><col style="width:7%"><col style="width:9%"><col style="width:11%"></colgroup>
+      <thead><tr><th>Address</th><th class="num">Closed</th><th class="num">Sale price</th><th class="num">Sq ft</th><th class="num">Bd / Ba</th><th class="num">Built</th><th class="num">$/sq ft</th><th class="num">$/sq ft today</th></tr></thead><tbody>
+      ${nsShow.map((c,i)=>`<tr data-grp="ns"${i>=5?' data-trim="ns"':''}><td class="rq-addr1">${rqE(rqAddrShort(c.address))}${c.unit?' #'+rqE(c.unit):''}</td><td class="num">${rqD(c.cd)}</td><td class="num">${fmt(c.sp)}</td><td class="num">${fmtN(c.sqft)}</td><td class="num">${c.br||'—'} / ${rqBa(c.baths)}</td><td class="num">${c.yr||'—'}</td><td class="num">$${fmtN(Math.round(c.sp/c.sqft))}</td><td class="num strong">$${fmtN(Math.round(c.sp/c.sqft*Math.exp(nowIx-TP.indexAt(ix,c.cd))))}</td></tr>`).join('')}
+      </tbody></table></div><div class="rq-note" data-note="ns" data-total="${ns.length}" data-tpl="Showing the {n} most recent of {t} neighborhood sales."></div>`
+    :`<div class="rq-empty">No sales on the same street or in the same community in the last three years — the comparable sales on page 2 come from the wider area.</div>`}
+    ${rqPageFoot(3,N)}</section>`;
+
+  /* ── page 4: market conditions + competition ── */
+  const mfmt=(rule,x)=>x==null?'—':rule.fmt==='pct'?(x*100).toFixed(1)+'%':x.toFixed(1);
+  const readTxt=sc=>sc==null?['Not enough data','na']:sc>=2?['Strongly favors sellers','s']:sc>=1?['Favors sellers','s']:sc<=-2?['Strongly favors buyers','b']:sc<=-1?['Favors buyers','b']:['Neutral','n'];
+  const mRows=m.scores.map(x=>{ const [rt,rc]=readTxt(x.score); const ly=m.ly?m.ly[x.key]:null;
+    return `<tr><td>${rqE(x.label)}</td><td class="num strong">${mfmt(x,x.value)}</td><td class="num">${x.key==='priceCutShare'?'—':mfmt(x,ly)}</td><td><span class="rq-read ${rc}">${rt}</span></td></tr>`; }).join('');
+  const mktText={s2:`The market is <b>strongly favoring sellers</b>: inventory is thin and homes are selling quickly at or above their original asking price.`,
+    s1:`The market is <b>favoring sellers</b>. Well-priced homes move quickly, typically near or above asking.`,
+    b0:`The market is <b>balanced</b>. Well-priced homes sell at a steady pace; homes priced ahead of the comparables tend to sit and reduce.`,
+    u1:`The market is <b>favoring buyers</b>. Listings are taking longer to sell, more are cutting price, and more are closing below their original asking price.`,
+    u2:`The market is <b>strongly favoring buyers</b>, with elevated inventory, frequent price reductions and many listings expiring unsold.`,
+    na:`Recent activity is limited, so conditions are best judged from the comparable sales directly.`}[m.verdict.cls]
+    +(m.split?` Results are split by pricing: ${Math.round(m.cur.overList*100)}% of recent sales closed over list, while ${Math.round(m.cur.under98*100)}% sold more than 2% below their original price.`:'');
+  const asOf=r.asOf;
+  const comp=(r.competition||[]).filter(x=>x.pkey!==s.pkey&&!(x.address===s.address&&(x.unit||'')===(s.unit||'')))
+    .sort((a,b)=>(a.status===b.status?0:a.status==='ACTIVE'?-1:1)||Math.abs(Math.log(a.sqft/s.sqft))-Math.abs(Math.log(b.sqft/s.sqft)));
+  const cShow=comp.slice(0,8);
+  const dom=x=>x.cdom||x.dom||(x.ld!=null?Math.max(0,asOf-x.ld):null);
+  const page4=`<section class="rq-page">${rqPageHead(subj,'Market Conditions','04 · Today’s market')}
+    <div class="rq-verdict"><div class="rq-verdict-l"><i>${rqE(r.mktLbl)} · ${typeLo} · last 90 days</i><b>${rqE(m.verdict.label)}</b>${m.split?'<small>Split by pricing</small>':''}</div>${rqGauge(m.score)}</div>
+    <p class="rq-lead" style="margin-top:6px">${mktText}</p>
+    <div class="rq-tw"><table class="rq-table rq-mkt">
+      <colgroup><col style="width:44%"><col style="width:15%"><col style="width:15%"><col style="width:26%"></colgroup>
+      <thead><tr><th>Measure</th><th class="num">Last 90 days</th><th class="num">A year ago</th><th>Reading</th></tr></thead>
+      <tbody>${mRows}<tr><td>Homes sold · active listings now</td><td class="num strong">${m.cur.sold} · ${m.cur.inventory}</td><td class="num">${m.ly?`${m.ly.sold} · ${m.ly.inventory}`:'—'}</td><td></td></tr></tbody></table></div>
+    <div class="rq-sub-h">Current competition <span>active &amp; pending ${typeLo} homes within ±30% of this size in ${s.zip?'zip '+rqE(s.zip):rqE(cityT)}</span></div>
+    ${cShow.length?`<div class="rq-tw"><table class="rq-table">
+      <colgroup><col style="width:31%"><col style="width:11%"><col style="width:13%"><col style="width:9%"><col style="width:10%"><col style="width:8%"><col style="width:9%"><col style="width:9%"></colgroup>
+      <thead><tr><th>Address</th><th>Status</th><th class="num">List price</th><th class="num">Sq ft</th><th class="num">Bd / Ba</th><th class="num">Built</th><th class="num">$/sq ft</th><th class="num">Days</th></tr></thead><tbody>
+      ${cShow.map((x,i)=>`<tr data-grp="cp"${i>=4?' data-trim="cp"':''}><td class="rq-addr1">${rqE(rqAddrShort(x.address))}${x.unit?' #'+rqE(x.unit):''}</td><td><span class="rq-st ${x.status==='ACTIVE'?'a':'p'}">${x.status==='ACTIVE'?'Active':'Pending'}</span></td><td class="num">${fmt(x.lp||x.olp)}</td><td class="num">${fmtN(x.sqft)}</td><td class="num">${x.br||'—'} / ${rqBa(x.baths)}</td><td class="num">${x.yr||'—'}</td><td class="num">$${fmtN(Math.round((x.lp||x.olp)/x.sqft))}</td><td class="num">${dom(x)!=null?dom(x):'—'}</td></tr>`).join('')}
+      </tbody></table></div><div class="rq-note" data-note="cp" data-total="${comp.length}" data-tpl="Showing {n} of {t} competing listings, closest in size first."></div>`
+    :`<div class="rq-empty">No active or pending listings of similar size nearby right now — limited competition.</div>`}
+    <div class="rq-conf-box ${confCls}"><b>${res.conf==='HIGH'?'High':res.conf==='MEDIUM'?'Medium':'Low'} confidence in this estimate.</b> ${confText}</div>
+    <div class="rq-disc"><b>Important.</b> This Comparative Market Analysis is prepared for informational purposes only and is not an appraisal or a formal opinion of value. Values are produced by a statistical model from MLS comparable sales available as of ${dateStr} (data through ${rqD(r.asOf)}). Actual sale prices depend on condition, presentation, negotiation, financing, inspections, timing and other factors not visible in sales records. Do not rely on this report alone for tax, lending or legal decisions. MLS data is deemed reliable but not guaranteed.</div>
+    ${rqPageFoot(4,N)}</section>`;
+
+  paper.innerHTML=rqFit(page1+page2+page3+page4);
+}
+
+/* Lay the pages out at true Letter size off-screen and drop the lowest-priority
+   rows (extra drivers, then the lightest comps / oldest sales / farthest
+   competition) until every page clears its footer. Runs on any device, so the
+   PDF and images never overflow even when the on-screen view is the phone layout. */
+function rqFit(html){
+  const st=document.createElement('div'); st.className='rq-stage'; st.style.visibility='hidden'; st.innerHTML=html; document.body.appendChild(st);
+  try{
+    st.querySelectorAll('.rq-page').forEach(p=>{
+      const fixed=[...p.querySelectorAll('.rq-team,.rq-disc,.rq-pf')];
+      const limit=Math.min(...fixed.map(e=>e.getBoundingClientRect().top))-10;
+      const kidsOf=()=>[...(p.querySelector('.rq-body')||p).children].filter(k=>!k.matches('.rq-team,.rq-disc,.rq-pf'));
+      const bottom=()=>Math.max(0,...kidsOf().map(k=>k.getBoundingClientRect().bottom));
+      let guard=60;
+      while(bottom()>limit && guard--){
+        const c=[...p.querySelectorAll('[data-trim]')]; if(!c.length) break;
+        const last=c[c.length-1]; if(last.dataset.ci){ const g=p.querySelector(`g[data-ci="${last.dataset.ci}"]`); if(g) g.remove(); }
+        last.remove();
+      }
+    });
+    st.querySelectorAll('[data-note]').forEach(n=>{ const shown=st.querySelectorAll(`tr[data-grp="${n.dataset.note}"]`).length, tot=+n.dataset.total;
+      if(shown>=tot||!shown) n.remove(); else n.textContent=n.dataset.tpl.replace('{n}',shown).split('{t}').join(tot); });
+    return st.innerHTML;
+  }finally{ st.remove(); }
+}
+
+function printClientReport(){
+  if(!A.lastValuation||!A.subject){ toast('Report state is missing — re-open the Client Report from the CMA tab','err'); return; }
+  renderClientReport();
+  const t0=document.title; document.title=`CMA - ${A.subject.addr}${A.subject.city?', '+toTitle(A.subject.city):''}`;
+  const restore=()=>{ document.title=t0; window.removeEventListener('afterprint',restore); };
+  window.addEventListener('afterprint',restore);
+  setTimeout(()=>window.print(),150);
+}
+
+async function saveReportImage(which){
+  if(!A.lastValuation||!A.lastV7){ toast('Run a CMA first','err'); return; }
+  try{ await loadHtml2CanvasIfNeeded(); }catch(e){ toast('Could not load the image library — check your internet connection','err'); return; }
+  const bd=showExportBackdrop(which==='summary'?'CMA Summary Image':'CMA Report Image');
+  const stage=document.createElement('div'); stage.className='rq-stage';
+  try{
+    renderClientReport();
+    const pages=[...el('report-paper').querySelectorAll('.rq-page')];
+    (which==='summary'?pages.slice(0,1):pages).forEach(p=>stage.appendChild(p.cloneNode(true)));
+    document.body.appendChild(stage);
+    await new Promise(res=>requestAnimationFrame(()=>requestAnimationFrame(res)));
+    if(document.fonts&&document.fonts.ready){ try{ await document.fonts.ready; }catch(e){} }
+    const scale=which==='summary'?2:1.5, canv=[];
+    for(const p of stage.children){
+      setBackdropHint(bd,`Rendering page ${canv.length+1} of ${stage.children.length}…`);
+      canv.push(await html2canvas(p,{scale,backgroundColor:'#FBF9F4',logging:false,useCORS:true,width:816,height:1056,windowWidth:1200,windowHeight:1100,scrollX:0,scrollY:0}));
+    }
+    let out=canv[0];
+    if(canv.length>1){ const gap=Math.round(20*scale); out=document.createElement('canvas'); out.width=canv[0].width; out.height=canv.reduce((a,c)=>a+c.height,0)+gap*(canv.length-1);
+      const ctx=out.getContext('2d'); ctx.fillStyle='#1A1F2C'; ctx.fillRect(0,0,out.width,out.height); let y=0; canv.forEach(c=>{ ctx.drawImage(c,0,y); y+=c.height+gap; }); }
+    setBackdropHint(bd,'Saving PNG…');
+    const slug=String(A.subject.addr||'Subject').replace(/[^\w]+/g,'-').replace(/^-|-$/g,'');
+    await saveCanvasPng(out,`TeamParikh_CMA_${slug}_${which==='summary'?'Summary':'Full'}_${new Date().toISOString().slice(0,10)}.png`);
+    toast(which==='summary'?'Summary image saved':'Full report image saved','ok');
+  }catch(err){ console.error(err); toast('Image export failed: '+(err.message||'unknown'),'err'); }
+  finally{ if(stage.parentNode) stage.remove(); setTimeout(()=>{ if(bd.parentNode) bd.remove(); },300); }
 }
 
 </script>
