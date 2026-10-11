@@ -2133,6 +2133,10 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
   body.rq-ink .rq-table th{background:#F2EDE2!important;color:#1A1F2C;border-bottom:1.5px solid #1A1F2C;font-weight:700}
   body.rq-ink .rq-table tbody tr:nth-child(even) td{background:#FAF7F0}
 }
+
+/* adjustment summary: 5 cards */
+.adj-summary{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+@media screen and (max-width:760px){.adj-summary{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 </style>
 </head>
 <body>
@@ -2382,11 +2386,11 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
                 <div class="tog-track" id="adj-track"><div class="tog-thumb"></div></div>
                 <span class="tog-lbl" id="adj-tog-lbl">Use my adjustments in valuation</span>
               </div>
-              <button class="btn btn-g" style="font-size:11px;padding:4px 10px" onclick="autoSuggestAdjustments()">✨ Auto-Suggest</button>
+              <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--txt2)" title="Rate this home against the comp set: + if better (remodeled, view, lot), − if worse. Applied to every comp as a Condition adjustment.">Subject vs comps <input id="adj-all-pct" type="number" step="1" placeholder="±%" style="width:58px;background:var(--sur2);border:1px solid var(--bdr);border-radius:4px;padding:4px 6px;color:var(--txt);font-family:var(--fm);font-size:11px">% <button class="btn btn-g" style="font-size:11px;padding:4px 10px" onclick="applySubjectAdj()">Apply to all</button></span>
               <button class="btn btn-g" style="font-size:11px;padding:4px 10px" onclick="clearAdjustments()">↺ Reset</button>
             </div>
           </div>
-          <div class="adj-help" id="adj-help"><strong>Time</strong>, <strong>Size</strong> and <strong>Age/Lot/Rooms</strong> are calculated from this market's own sales (like-for-like price index and measured size/age/lot values) and are already in the valuation. <strong>Condition / Location / Amenities</strong> are yours — enter dollar amounts and switch on <em>Use my adjustments</em> to apply them. Gross adjustment &gt; 25% flags a weak comp.</div>
+          <div class="adj-help" id="adj-help"><strong>Time</strong>, <strong>Size</strong> and <strong>Age/Lot/Rooms</strong> are calculated from this market's own sales (like-for-like price index and measured size/age/lot values) and are already in the valuation. <strong>Condition / Location / Amenities</strong> are yours: type dollar amounts per comp, or use <em>Subject vs comps %</em> to rate this home better (+) or worse (−) than the whole comp set. Your adjustments switch on automatically. Each comp moves the value in proportion to its weight. Gross adjustment &gt; 25% flags a weak comp.</div>
           <div id="adj-area"><div class="adj-empty">Run CMA to populate the adjustment grid with your top sold comps.<br>Subject's missing fields (Sq Ft, Year Built, Lot, Beds, Baths) are needed for auto-suggestions.</div></div>
         </div>
 
@@ -11169,7 +11173,22 @@ function renderNbhdPanel(r){
 }
 
 /* ── ADJUSTMENT GRID: model adjustments (read-only) + your Cond/Loc/Amen ── */
-function autoSuggestAdjustments(){ if(!A.lastV7){toast('Run CMA first','err');return;} renderAdjustmentGrid(); toast('Time, size, age/lot/rooms adjustments come from the market model automatically — add Condition / Location / Amenities by hand','inf'); }
+function autoSuggestAdjustments(){ applySubjectAdj(); }
+function adjOn(){ if(A.adjUseInValuation) return; A.adjUseInValuation=true;
+  const tog=el('adj-track'), lbl=el('adj-tog-lbl'), row=el('adj-tog');
+  if(tog){tog.classList.add('on');row.classList.add('on');lbl.textContent='Your adjustments ON — driving valuation';} }
+// "Subject vs comps %": one condition call applied to every comp, the way an appraiser rates the subject
+// superior (+) or inferior (−) to the comp set. Stored as each comp's Condition $ so it stays editable per comp.
+function applySubjectAdj(){
+  const r=A.lastV7; if(!r){toast('Run CMA first','err');return;}
+  const pct=parseFloat((el('adj-all-pct')||{}).value);
+  if(!isFinite(pct)){ toast('Enter a % first: + if this home is better than the comps (updated, view, lot), − if worse','err'); return; }
+  r.v.comps.forEach(c=>{ const a=A.adjustments[c.id]||(A.adjustments[c.id]={cond:0,loc:0,amen:0,_userEdited:new Set()});
+    a.cond=Math.round(c.indicated*pct/100/500)*500; a._userEdited.add('cond'); });
+  A.adjAuditLog.push({ts:new Date().toISOString(),action:'subject-vs-comps',pct});
+  adjOn(); computeValueV7(r); renderValuation(A.lastValuation); renderReport(A.lastValuation); renderAdjustmentGrid();
+  toast(`Condition ${pct>0?'+':''}${pct}% applied to all ${r.v.comps.length} comps — value now ${fmt(A.lastValuation.consensus)}`,'ok');
+}
 function clearAdjustments(){ if(!confirm('Clear your manual Condition / Location / Amenities adjustments?'))return; A.adjustments={}; if(A.lastV7){ computeValueV7(A.lastV7); renderValuation(A.lastValuation); renderReport(A.lastValuation);} renderAdjustmentGrid(); toast('Manual adjustments cleared','inf'); }
 function toggleAdjustmentMode(){
   A.adjUseInValuation=!A.adjUseInValuation;
@@ -11183,9 +11202,11 @@ function setAdjustment(mlsNo,field,value){
   if(!A.adjustments[mlsNo]) A.adjustments[mlsNo]={cond:0,loc:0,amen:0,_userEdited:new Set()};
   const old=A.adjustments[mlsNo][field]||0; A.adjustments[mlsNo][field]=x; A.adjustments[mlsNo]._userEdited.add(field);
   A.adjAuditLog.push({ts:new Date().toISOString(),mlsNo,field,old,new:x});
+  const wasOff=!A.adjUseInValuation; adjOn();
   if(A.lastV7){ computeValueV7(A.lastV7); renderValuation(A.lastValuation); renderReport(A.lastValuation); }
   renderAdjustmentGrid();
-  if(!A.adjUseInValuation) toast('Turn on "Use my adjustments in valuation" to apply them','inf');
+  const c=A.lastV7&&A.lastV7.v.comps.find(x=>x.id===mlsNo);
+  if(c) toast(`${wasOff?'Your adjustments switched ON. ':''}This comp carries ${Math.round(c.wPct*100)}% of the weight, so ${fmt(x-old)} on it moves the value about ${fmt(Math.round((x-old)*c.wPct/1000)*1000)}.`,'inf');
 }
 function renderAdjustmentGrid(){
   const area=el('adj-area'); const r=A.lastV7;
@@ -11218,6 +11239,7 @@ function renderAdjustmentGrid(){
     <div class="adj-summary">
       <div class="adj-sum-card"><div class="adj-sum-lbl">Median Adj Sale</div><div class="adj-sum-val">${fmt(S.median(adjPrices))}</div><div class="adj-sum-sub">across ${comps.length} comps used</div></div>
       <div class="adj-sum-card"><div class="adj-sum-lbl">Weighted Adj Estimate</div><div class="adj-sum-val" style="color:var(--gold)">${fmt(Math.round(r.est))}</div><div class="adj-sum-sub">similarity-weighted${A.adjUseInValuation?' · incl. your adjustments':''}</div></div>
+      <div class="adj-sum-card"><div class="adj-sum-lbl">Your Adjustments</div><div class="adj-sum-val ${r.est-r.v.est>=0?'up':'down'}">${A.adjUseInValuation&&Math.abs(r.est-r.v.est)>=500?(r.est>=r.v.est?'+':'−')+fmt(Math.abs(Math.round((r.est-r.v.est)/1000)*1000)):'$0'}</div><div class="adj-sum-sub">${A.adjUseInValuation?'effect on value vs comps alone ('+fmt(Math.round(r.v.est/1000)*1000)+')':'switched off'}</div></div>
       <div class="adj-sum-card"><div class="adj-sum-lbl">Avg Gross Adj</div><div class="adj-sum-val ${meanGross>20?'down':meanGross>10?'':'up'}">${meanGross.toFixed(1)}%</div><div class="adj-sum-sub">${meanGross<15?'comp set is solid':meanGross<25?'moderate stretch':'comp set is weak'}</div></div>
       <div class="adj-sum-card"><div class="adj-sum-lbl">Comps Over 25% Gross</div><div class="adj-sum-val ${over?'down':''}">${over}</div><div class="adj-sum-sub">red-flag count</div></div>
     </div>`;
