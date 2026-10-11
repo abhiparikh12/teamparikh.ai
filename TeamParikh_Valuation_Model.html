@@ -10939,10 +10939,10 @@ function renderValuation(res){
       <div class="cons-range-sub">Likely range (half of similar sales land here) · wide range ${fmtK(rg.lo80)}–${fmtK(rg.hi80)} · from ${rg.basis}</div>
       ${s.lp?`<div class="cons-delta" style="margin-bottom:8px">vs target ${fmt(s.lp)} (${((s.lp/r.est-1)*100).toFixed(1)}%)</div>`:''}
       ${r.exp?`<div style="margin:6px 0 10px;padding:9px 11px;border:1px solid rgba(201,168,76,.45);border-radius:6px;background:rgba(201,168,76,.06)">
-        <div style="font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--gold)">Expected Sale Price · listed at ${fmt(r.exp.list)}</div>
-        <div style="font-family:var(--fm);font-size:24px;color:var(--txt);margin-top:2px">${fmt(Math.round(r.exp.expected/1000)*1000)}</div>
-        <div style="font-size:11px;color:var(--txt2)">likely ${fmtK(r.exp.lo50)}–${fmtK(r.exp.hi50)} · ${r.exp.scope}: sold at a median ${(r.exp.ratio*100).toFixed(1)}% of original list (${r.exp.n} sales); comps ${r.exp.modelGap>=0?'above':'below'} list by ${Math.abs(r.exp.modelGap*100).toFixed(1)}% nudge it ${r.exp.modelGap>=0?'up':'down'} slightly</div>
-        <div style="font-size:10px;color:var(--txt3);margin-top:3px">Once a home is listed, list price × the local sale-to-list ratio predicts the sale about twice as well as comps alone (3.1% vs 6.3% typical miss, back-tested).</div></div>`:''}
+        <div style="font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--gold)">List Price Check · listed at ${fmt(r.exp.list)}</div>
+        <div style="font-family:var(--fm);font-size:22px;color:${Math.abs(r.exp.modelGap)<0.03?'var(--txt)':r.exp.modelGap<0?'var(--red)':'var(--grn)'};margin-top:2px">List is ${pctS(-r.exp.modelGap/(1+r.exp.modelGap))} vs comps</div>
+        <div style="font-size:11px;color:var(--txt2)">${listVerdict(r.exp.list,r)}</div>
+        <div style="font-size:10px;color:var(--txt3);margin-top:5px;border-top:1px solid var(--bdr);padding-top:5px">Sale forecast if it trades like recent listings: <strong style="color:var(--txt2)">${fmt(Math.round(r.exp.expected/1000)*1000)}</strong> (${r.exp.scope}: median ${(r.exp.ratio*100).toFixed(1)}% of original list). This leans ~80% on the list price itself, so it is <em>not</em> a valuation — use it for negotiation expectations only.</div></div>`:''}
       <div class="conf-row"><div class="conf-bar"><div class="conf-fill ${cfCls}" style="width:${res.confPct}%"></div></div><span class="conf-txt ${cfTxt}">${res.conf} Confidence</span></div>
       <div style="font-size:10px;color:var(--txt3);margin-top:5px">${v.comps.length} comps used · ${v.poolN} candidates · typical miss for similar homes ${rg.mdape!=null?(rg.mdape*100).toFixed(1)+'%':'—'} · data through ${fmtDate(dayToLocal(r.asOf))}</div>
       <div class="cons-disclaimer">This figure is produced by an <strong>automated mathematical model</strong> applied to comparable MLS sales data. It is <strong>not an appraisal, not a formal opinion of value, and not a guarantee of sale price</strong>. Actual market value depends on property condition, market timing, buyer pool, and other factors the model does not capture.</div>
@@ -10951,6 +10951,8 @@ function renderValuation(res){
   ${buildReconciliationCard(res)}`;
   const expEl=el('val-explain'); if(expEl){ expEl.style.display='none'; expEl.innerHTML=''; }
 }
+function listVerdict(L,r){ const d=L/r.est-1;
+  return Math.abs(d)<0.03?'in line with the comps.':d>0?(L>r.rg.hi50?'above the likely range; expect a price cut or long market time unless the home is clearly superior to the comps.':'inside the likely range, on the high side.'):(L<r.rg.lo50?'below the likely range — priced to draw multiple offers.':'on the low side of the likely range.'); }
 function explainV7(r){
   const v=r.v, s=r.s, t=r.trend, m=r.mkt, out=[];
   const top=[...v.comps].sort((a,b)=>b.wPct-a.wPct)[0];
@@ -10961,8 +10963,8 @@ function explainV7(r){
   out.push(v.dispersion<0.06?`Comps agree closely (±${(v.dispersion*100).toFixed(0)}%) — historically that means smaller errors.`:v.dispersion<0.11?`Comps agree moderately (±${(v.dispersion*100).toFixed(0)}%).`:`Comps disagree (±${(v.dispersion*100).toFixed(0)}%) — condition, view and lot differences the MLS fields can't see probably matter. Inspect the comps before pricing.`);
   if(t&&t.oneYr) out.push(`Similar ${TP.typeLabel(s.bt).toLowerCase()} homes in ${t.level==='zip'?'zip '+t.key:toTitle(t.key)} are <strong>${pctS(t.oneYr.pct)}</strong> over 12 months and ${pctS(t.threeYr&&t.threeYr.pct)} over 3 years, holding size, age and lot constant.`);
   if(m&&m.score!=null) out.push(`Market (${r.mktLbl}, last 90 days): <strong>${m.verdict.label.toLowerCase()}</strong>${m.split?' with a split — well-priced homes sell at or above list while overpriced ones sit':''}.`);
-  if(r.exp) out.push(`It's listed at ${fmt(r.exp.list)}: similar homes here sold at a median ${(r.exp.ratio*100).toFixed(1)}% of original list, so the <strong>expected sale price is ${fmt(Math.round(r.exp.expected/1000)*1000)}</strong> (likely ${fmtK(r.exp.lo50)}–${fmtK(r.exp.hi50)}).`);
-  if(s.lp && !r.exp){ const d=s.lp/r.est-1; out.push(`Target ${fmt(s.lp)} is <strong>${pctS(d)}</strong> vs the estimate — ${Math.abs(d)<0.03?'in line with the comps.':d>0?(s.lp>r.rg.hi50?'above the likely range; expect a price cut or long market time unless the home is clearly superior to the comps.':'inside the likely range, on the high side.'):(s.lp<r.rg.lo50?'below the likely range — priced to draw multiple offers.':'on the low side of the likely range.')}`); }
+  const L=r.exp?r.exp.list:s.lp;
+  if(L){ const d=L/r.est-1; out.push(`${r.exp?'List price':'Target'} ${fmt(L)} is <strong>${pctS(d)}</strong> vs the comps value — ${listVerdict(L,r)}`); }
   return out;
 }
 function buildReconciliationCard(res){
@@ -11036,7 +11038,7 @@ function includeAll(){ A.excluded.clear(); reCalc(); }
 function excludeAll(){ toast('Excluding every comp leaves nothing to value — untick individual comps instead','err'); }
 function renderReport(res){
   const r=A.lastV7; if(!r||!res){ el('rpt-area').innerHTML='<div class="val-empty">Run CMA to generate your agent report.</div>'; return; }
-  const m=r.mkt, cls=m.verdict.cls, rg=r.rg; const c=r.exp?Math.round(r.exp.expected/1000)*1000:res.consensus;
+  const m=r.mkt, cls=m.verdict.cls, rg=r.rg; const c=res.consensus;
   const R=x=>Math.round(x/1000)*1000;
   const sell={s2:[c,Math.max(c*1.03,rg.hi50)],s1:[c,c*1.025],b0:[c*0.99,c*1.02],u1:[c*0.97,c],u2:[c*0.95,c*0.98],na:[c*0.99,c*1.02]}[cls];
   const buy ={s2:[c,c*1.04],s1:[c*0.99,c*1.02],b0:[c*0.97,c],u1:[c*0.94,c*0.98],u2:[c*0.92,c*0.96],na:[c*0.97,c]}[cls];
@@ -11058,7 +11060,7 @@ function renderReport(res){
       </div>
     </div>
     <div class="rpt-col">
-      <div class="rpt-hd hd-buy">Buyer Strategy${r.exp?' · anchored on expected sale':''}</div>
+      <div class="rpt-hd hd-buy">Buyer Strategy</div>
       <div class="rpt-price">${fmt(c)}</div>
       <div class="rpt-range">Offer range: ${fmt(R(buy[0]))} – ${fmt(R(buy[1]))}</div>
       <div class="rpt-note">${buyNote}</div>
@@ -11218,10 +11220,11 @@ function valueListingStrict(target, _pool, opts={}){
   const {rec,v}=x;
   const cal=TP.calibration(store,{city:rec.city,bt:rec.bt,sqft:rec.sqft}); let rg=TP.rangeFor(v,cal);
   const ex=TP.expectedSale(store,{city:rec.city,bt:rec.bt,olp:target.olp||rec.olp||rec.lp},v.est);
-  const estOut = ex? ex.expected : v.est; if(ex) rg={...rg,lo50:ex.lo50,hi50:ex.hi50};
+  // est is ALWAYS the comps value. The list-price forecast is ~80% list price by construction, so using it here
+  // made every listing look 'fairly priced, a hair under list' and killed mispricing detection.
   const gross=v.comps.map(c=>(Math.abs(c.timeAdj)+Math.abs(c.sizeAdj)+Math.abs(c.featAdj||0))/c.sp*100);
   const nb=v.comps.filter(c=>c.matchLevel>=3).length;
-  return {est:Math.round(estOut), compsValue:Math.round(v.est), lo:Math.round(rg.lo50), hi:Math.round(rg.hi50), engineUsed:'v7', biasApplied:0, biasSource:'none',
+  return {est:Math.round(v.est), compsValue:Math.round(v.est), expected:ex?Math.round(ex.expected):null, lo:Math.round(rg.lo50), hi:Math.round(rg.hi50), engineUsed:'v7', biasApplied:0, biasSource:'none',
     n:v.comps.length, nInRadius:nb, sdPct:(v.dispersion*100).toFixed(1), medGrossAdj:(S.median(gross)||0).toFixed(0), relaxed:0,
     proximityProven: v.neighborhoodShare>=0.3, ppsf:Math.round(v.est/rec.sqft),
     comps:v.comps.slice(0,5).map(c=>({...(A._byId.get(c.id)||{}), _adj:c.indicated-c.sp, _adjPrice:c.indicated}))};
@@ -11541,7 +11544,7 @@ function rqAddrShort(a){ a=String(a||''); return a===a.toUpperCase()?toTitle(a):
 /* ── SVG: value range strip with list / expected markers ── */
 function rqRangeMarks(r){
   const m=[{v:r.est,lbl:'Comparable-sales value',c:RQC.navy}];
-  if(r.exp){ m.push({v:r.exp.expected,lbl:'Expected sale',c:RQC.grn}); m.push({v:r.exp.list,lbl:'List price',c:RQC.red}); }
+  if(r.exp){ m.push({v:r.exp.list,lbl:'List price',c:RQC.red}); }
   return m;
 }
 function rqRangeSvg(r){
@@ -11645,10 +11648,11 @@ function renderClientReport(){
       <div class="rq-hv-sub">Likely range <b>${fmt(rqR(rg.lo50))} – ${fmt(rqR(rg.hi50))}</b></div>
       <div class="rq-hv-sub">${fmt(Math.round(est/subj.sqft))} per sq ft · based on ${v.comps.length} comparable sales</div>
       <span class="rq-conf ${confCls}">${res.conf==='HIGH'?'High':res.conf==='MEDIUM'?'Medium':'Low'} confidence</span></div>`;
-  const heroExp=exp?`<div class="rq-hv rq-hv-exp"><div class="rq-hv-lbl">Expected Sale Price</div><div class="rq-hv-price">${fmt(rqR(exp.expected))}</div>
-      <div class="rq-hv-sub">Likely range <b>${fmt(rqR(exp.lo50))} – ${fmt(rqR(exp.hi50))}</b></div>
-      <div class="rq-hv-sub">Listed at ${fmt(exp.list)} · local sales close at ${(exp.ratio*100).toFixed(1)}% of original list</div>
-      <span class="rq-conf nt">${exp.n} recent sales</span></div>`:'';
+  const lg=exp?exp.list/est-1:0;
+  const heroExp=exp?`<div class="rq-hv rq-hv-exp"><div class="rq-hv-lbl">List Price</div><div class="rq-hv-price">${fmt(exp.list)}</div>
+      <div class="rq-hv-sub">List is <b>${rqPct(lg)}</b> ${lg>=0?'above':'below'} the comparable-sales value</div>
+      <div class="rq-hv-sub">${Math.abs(lg)<0.03?'In line with the comparable sales':lg>0?(exp.list>rg.hi50?'Above the likely range':'Within the likely range, on the high side'):(exp.list<rg.lo50?'Below the likely range':'Within the likely range, on the low side')}</div>
+      <span class="rq-conf nt">Local sales close at ${(exp.ratio*100).toFixed(1)}% of list</span></div>`:'';
   const kpis=[
     [t&&t.oneYr?rqPct(t.oneYr.pct):'—','12-month value trend',rqDir(t&&t.oneYr)],
     [t&&t.threeYr?rqPct(t.threeYr.pct):'—','3-year value trend',rqDir(t&&t.threeYr)],
