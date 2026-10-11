@@ -2091,6 +2091,33 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
   .rt-input-lbl input{width:100%!important;font-size:16px!important;padding:4px 8px!important}
   .rt-controls .btn{font-size:12px;padding:8px 6px;justify-content:center;white-space:nowrap}
 }
+
+.rq-where{font-size:8.5px;color:#5F6577;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rq-where.nb{color:#806B30;font-weight:600}
+.rq-tt{font-size:7.5px;font-weight:700;border-radius:3px;padding:1px 5px;margin-left:3px;white-space:nowrap;color:#FFFFFF;background:#5F6577}
+.rq-tt.t-DE{background:#2E5A8A}.rq-tt.t-ATT{background:#806B30}.rq-tt.t-DU{background:#6B4A8A}
+.rq-table tr.rq-xt td{background:#EEF3F9!important}
+.rq-table tr.rq-xt td:first-child{box-shadow:inset 3px 0 0 #2E5A8A}
+.rq-table tr.rq-xt.t-ATT td{background:#F6F0E0!important}.rq-table tr.rq-xt.t-ATT td:first-child{box-shadow:inset 3px 0 0 #806B30}
+.rq-table tr.rq-xt.t-DU td{background:#F3EEF8!important}.rq-table tr.rq-xt.t-DU td:first-child{box-shadow:inset 3px 0 0 #6B4A8A}
+.rq-tleg{font-size:8.5px;color:#5F6577;margin:5px 0 0;line-height:1.7}
+
+/* ── printer-friendly mode: no large dark fills (they band / streak on office printers) ── */
+@media print{
+  body.rq-ink .rq-band{background:#FFFFFF!important;color:#1A1F2C;border-top:4px solid #1A1F2C;border-bottom:2px solid #806B30}
+  body.rq-ink .rq-brand{color:#1A1F2C}
+  body.rq-ink .rq-brand em,body.rq-ink .rq-brand small,body.rq-ink .rq-band-eyebrow{color:#806B30}
+  body.rq-ink .rq-band-meta{color:#3A4258}
+  body.rq-ink .rq-band-meta b,body.rq-ink .rq-band-addr{color:#1A1F2C}
+  body.rq-ink .rq-band-city{color:#5F6577}
+  body.rq-ink .rq-agent-kw{background:#FFFFFF!important;border-color:#806B30}
+  body.rq-ink .rq-agent-kw::before{border-color:#E8E0CC}
+  body.rq-ink .rq-agent-kw .rq-ag-name{color:#1A1F2C}
+  body.rq-ink .rq-agent-kw .rq-ag-name em,body.rq-ink .rq-agent-kw .rq-ag-dre{color:#806B30}
+  body.rq-ink .rq-agent-kw .rq-ag-line{color:#3A4258}
+  body.rq-ink .rq-table th{background:#F2EDE2!important;color:#1A1F2C;border-bottom:1.5px solid #1A1F2C;font-weight:700}
+  body.rq-ink .rq-table tbody tr:nth-child(even) td{background:#FAF7F0}
+}
 </style>
 </head>
 <body>
@@ -2668,7 +2695,7 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
       <label class="rt-input-lbl">Prepared for: <input type="text" id="rt-client" placeholder="Client name" oninput="updateClientReportFields()"></label>
       <label class="rt-input-lbl">Prepared by: <input type="text" id="rt-preparer" value="Team Parikh" oninput="updateClientReportFields()"></label>
       <button class="btn btn-g" onclick="closeClientReport()">✕ Close</button>
-      <button class="btn btn-g" onclick="saveReportImage('summary')">🖼 Summary Image</button><button class="btn btn-g" onclick="saveReportImage('full')">🖼 Full Report Image</button><button class="btn btn-gold" onclick="printClientReport()">🖨 Print / Save PDF</button>
+      <button class="btn btn-g" onclick="saveReportImage('summary')">🖼 Summary Image</button><button class="btn btn-g" onclick="saveReportImage('full')">🖼 Full Report Image</button><button class="btn btn-g" onclick="printClientReport('pdf')" title="Full navy design — choose Save as PDF in the print dialog">📄 Save PDF</button><button class="btn btn-gold" onclick="printClientReport('ink')" title="Light header for paper printers">🖨 Print</button>
     </div>
   </div>
   <div class="report-scroll">
@@ -10129,7 +10156,9 @@ function communityMatch(s, c){
   const sameZip = s.zip && c.zip && s.zip===c.zip;
   if(s.street && c.street && s.street===c.street && (sameZip || s.city===c.city))
     return {tag:'Same street', factor:0.35, level:4};
-  if(s.hoaMo>=75 && c.hoaMo>0 && sameZip){
+  // condo/townhome: the same HOA fee alone is not the same project — units in one project are built within a few
+  // years of each other. (Not applied to single-family: custom-home HOA communities span decades of build years.)
+  if(s.hoaMo>=75 && c.hoaMo>0 && sameZip && !(s.bt!=='DE' && c.bt!=='DE' && s.yr>1800 && c.yr>1800 && Math.abs(s.yr-c.yr)>5)){
     const yrs=((s.asOfRef||c.cd||0)-(c.cd||c.ld||0))/365.25;
     const d=Math.abs(Math.log(c.hoaMo)+HOA_GROWTH*yrs-Math.log(s.hoaMo));
     if(d<0.07) return {tag:'Same HOA community', factor:0.5, level:3};
@@ -10233,7 +10262,13 @@ function trendSummary(ix, asOf){
 }
 
 /* ── 7. VALUATION ─────────────────────────────────────────────────────────── */
-const VAL_DEFAULTS={k:10, monthsBack:36, sizeBand:0.30, sizeBandWide:0.45, minPool:5, nbhdFactor:0.2, nbhdTimeRelief:3, nbhdFirst:true, nbhdMax:12};
+// recencyHalfLife: comp weight halves every N months (never below recencyFloor). Backtest (1,912 sales, last 12 mo):
+// condos/townhomes 5.41% → 5.17% typical miss with 9 mo / 0.3; single-family got WORSE (6.70% → 6.8%) because the
+// like-for-like index already prices old sales to today, so it stays off for SFR unless set explicitly.
+// Appraiser rule: comps within ±20% of the subject's living area (±25% only if fewer than k qualify).
+// Backtest (1,848 sales): 6.21% typical miss vs 6.20% at the old ±30/45% — no accuracy cost.
+const VAL_DEFAULTS={k:10, monthsBack:36, sizeBand:0.20, sizeBandWide:0.25, largeHomeSqft:3500, sizeBandLarge:0.30, sizeBandLargeWide:0.35, minPool:5, nbhdFactor:0.2, nbhdTimeRelief:3, nbhdFirst:true, nbhdMax:12,
+  recencyHalfLifeAtt:9, recencyHalfLifeDe:0, recencyFloor:0.3};
 function subjectFrom(rec){
   return {address:rec.address, unit:rec.unit, city:rec.city, zip:rec.zip, bt:rec.bt, sqft:rec.sqft, br:rec.br,
     baths:rec.baths, yr:rec.yr, lot:rec.lot, hoaRaw:rec.hoaRaw, hoaFreq:rec.hoaFreq, hoaMo:rec.hoaMo,
@@ -10271,8 +10306,10 @@ function value(store, subj0, opts={}){
     for(const c of (o.cities||[])) if(c!==s.city) addAll(store.soldIdx('c|'+c+'|'+tg)); }
   const pool0=uni.filter(c=> c.cd<maxCd && c.cd>=minCd &&
     c.id!==o.excludeId && !(o.exclude && o.exclude.has(c.id)) && !(c.pkey===s.pkey && asOf-c.cd<180) && (!o.filter || o.filter(c)));
-  let band=o.sizeBand, pool=pool0.filter(c=>Math.abs(Math.log(c.sqft/s.sqft))<=Math.log(1+band));
-  if(pool.length<o.k){ band=o.sizeBandWide; pool=pool0.filter(c=>Math.abs(Math.log(c.sqft/s.sqft))<=Math.log(1+band)); }
+  // larger homes (> largeHomeSqft) are rarer and more custom, so they get a wider size band
+  const big=s.sqft>o.largeHomeSqft;
+  let band=big?o.sizeBandLarge:o.sizeBand, pool=pool0.filter(c=>Math.abs(Math.log(c.sqft/s.sqft))<=Math.log(1+band));
+  if(pool.length<o.k){ band=big?o.sizeBandLargeWide:o.sizeBandWide; pool=pool0.filter(c=>Math.abs(Math.log(c.sqft/s.sqft))<=Math.log(1+band)); }
   if(pool.length<o.minPool) return {error:`Only ${pool.length} comparable ${typeLabel(s.bt)} sales within ±${Math.round(band*100)}% of ${s.sqft} sf in ${s.city} — load more data.`};
   const scored=pool.filter(c=>{ if(c.cd>=perMin && c.cd<=perMax) return true; return communityMatch(s,c).level>=3; }).map(c=>{
     const months=(asOf-c.cd)/30.44;
@@ -10310,7 +10347,10 @@ function value(store, subj0, opts={}){
     }
     const ff=Math.exp(fa);
     const ind=c.sp*tf*sf*ff;
-    const w=1/(0.5+t.dist);
+    // recency: a sale's weight halves every recencyHalfLife months (floored) — older sales still count, just less
+    const hl=o.recencyHalfLife!=null? o.recencyHalfLife : (tg==='DE'? o.recencyHalfLifeDe : o.recencyHalfLifeAtt);
+    const rec=hl? Math.max(o.recencyFloor, Math.pow(0.5, t.months/hl)) : 1;
+    const w=rec/(0.5+t.dist);
     sw+=w; swl+=w*Math.log(ind);
     return {id:c.id, address:c.address, unit:c.unit, city:c.city, zip:c.zip, bt:c.bt, cd:c.cd, sp:c.sp, lp:c.lp, olp:c.olp,
       sqft:c.sqft, br:c.br, baths:c.baths, yr:c.yr, lot:c.lot, hoaMo:c.hoaMo, cdom:c.cdom,
@@ -10857,7 +10897,7 @@ function runCMA(keepExclusions){
   r.mktLbl=r.mkt===r.mZip?'zip '+s.zip:toTitle(s.city);
   // active / pending competition (same type, similar size, zip or city)
   const sameArea=l=>s.zip?l.zip===s.zip:l.city===s.city;
-  r.competition=store.all.filter(x=>(x.status==='ACTIVE'||x.status==='PENDING')&&TP.typeGroup(x.bt)===tg&&x.sqft>0&&Math.abs(Math.log(x.sqft/s.sqft))<=Math.log(1.3)&&sameArea(x)&&x.id!==s.id);
+  r.competition=findCompetition(s,tg,vres.est,asOf,sameArea);
   r.nbhdSales=neighborhoodSales(s,asOf);
   r.exp = s.olp ? TP.expectedSale(store,s,vres.est) : null;
   A.lastV7=r;
@@ -10868,13 +10908,34 @@ function runCMA(keepExclusions){
   toast(`CMA complete — ${vres.comps.length} comps used from ${vres.poolN} candidates in ${scopeStr}`,'ok');
   tryGeocodeMap();
 }
+// Active/pending competition.
+//  • Immediate neighborhood (same street / subdivision / HOA community): ANY property type, within ±30% of the
+//    living area or with list price within ±30% of the value — flagged by type in the client report.
+//  • Rest of the zip (or city): SAME property type only, within ±20% of the living area or ±20% of the value.
+// Nearest first, then closest in size. Relists of one property collapse to the newest listing.
+function findCompetition(s,tg,est,asOf,sameArea){
+  const ns=TP.normSubject(s); ns.asOfRef=asOf;
+  const best=new Map(), within=(x,p)=>Math.abs(Math.log(x))<=Math.log(1+p);
+  for(const x of store.all){
+    if((x.status!=='ACTIVE'&&x.status!=='PENDING')||!x.sqft||x.id===s.id||x.pkey===ns.pkey) continue;
+    const L=x.lp||x.olp||0, cm=TP.communityMatch(ns,x), near=cm.level>=3;
+    const ok = near ? (within(x.sqft/s.sqft,0.30) || (L&&within(L/est,0.30)))
+                    : (TP.typeGroup(x.bt)===tg && sameArea(x) && (within(x.sqft/s.sqft,0.20) || (L&&within(L/est,0.20))));
+    if(!ok) continue;
+    const prev=best.get(x.pkey), sz=Math.abs(Math.log(x.sqft/s.sqft));
+    if(!prev || (x.ld||0)>(prev.x.ld||0)) best.set(x.pkey,{x,cm,sz});
+  }
+  const out=[...best.values()].sort((a,b)=>(b.cm.level-a.cm.level)||(a.sz-b.sz));
+  out.forEach(o=>{ o.x._cmTag=o.cm.level>=3?o.cm.tag:(o.x.zip===s.zip?'Same zip':'Same city'); o.x._cmLevel=o.cm.level; });
+  return out.map(o=>o.x);
+}
 function reCalc(){ if(A.subject) runCMA(true); }
 // same street / same HOA community / subdivision / within ½ mi — last 3 years, independent of the Period bar
 function neighborhoodSales(s, asOf){
   const tg=TP.typeGroup(s.bt), ns=TP.normSubject(s); ns.asOfRef=asOf;
   const seen=new Set(), out=[], from=TP.addMonths(asOf,-36);
   const scan=arr=>{ for(const c of arr){ if(seen.has(c)) continue; seen.add(c);
-    if(c.cd<from||c.cd>=asOf||c.pkey===ns.pkey) continue; if(TP.communityMatch(ns,c).level>=3) out.push(c); } };
+    if(c.cd<from||c.cd>=asOf||c.pkey===ns.pkey||Math.abs(Math.log(c.sqft/s.sqft))>Math.log(1.2)) continue; if(TP.communityMatch(ns,c).level>=3) out.push(c); } };
   scan(store.soldIdx('c|'+s.city+'|'+tg)); if(s.zip) scan(store.soldIdx('z|'+s.zip+'|'+tg));
   return out.sort((a,b)=>b.cd-a.cd);
 }
@@ -10897,7 +10958,7 @@ function buildCompsV7(r){
   const wantA=el('f-actv').checked, wantP=el('f-pend').checked;
   r.competition.forEach(x=>{ if((x.status==='ACTIVE'&&!wantA)||(x.status==='PENDING'&&!wantP)) return; const l=A._byId.get(x.id); if(!l) return;
     const d=(Math.log(x.sqft/r.s.sqft)/0.10)**2+((x.yr&&r.s.yr)?((x.yr-r.s.yr)/10)**2:0)+((x.br&&r.s.br)?((x.br-r.s.br)/1.5)**2:0);
-    l.score=Math.round(100*Math.exp(-d/6)); l._v7=null; l._match=x.zip===r.s.zip?'Same zip':'Same city'; list.push(l); });
+    l.score=Math.round(100*Math.exp(-d/6)); l._v7=null; l._match=x._cmTag||(x.zip===r.s.zip?'Same zip':'Same city'); list.push(l); });
   A.comps=list;
 }
 function confClasses(g){ return g==='HIGH'?['fill-hi','hi']:g==='MEDIUM'?['fill-med','med']:['fill-lo','lo']; }
@@ -11539,7 +11600,7 @@ function rqTicks(lo,hi,n){
   const step=[1,2,2.5,5,10].map(m=>m*p).find(s=>s>=raw)||10*p;
   const out=[]; for(let v=Math.ceil(lo/step)*step; v<=hi+1e-9; v+=step) out.push(v); return out;
 }
-function rqAddrShort(a){ a=String(a||''); return a===a.toUpperCase()?toTitle(a):a; }  // MLS all-caps entries → title case; mixed case left as typed
+function rqAddrShort(a){ a=String(a||''); return a===a.toUpperCase()?toTitle(a):a.replace(/(^|\s)([a-z])/g,(m,s,c)=>s+c.toUpperCase()); }  // all-caps → title case; lowercase words capitalised ('Byron ln' → 'Byron Ln')  // MLS all-caps entries → title case; mixed case left as typed
 
 /* ── SVG: value range strip with list / expected markers ── */
 function rqRangeMarks(r){
@@ -11731,7 +11792,7 @@ function renderClientReport(){
       <div><i>Low quarter</i><b class="sm">${t?rqE(t.trough.label):'—'}</b><small>${t?'today '+rqPct(t.trough.vsNow)+' vs low':''}</small></div></div>
     <div class="rq-card"><div class="rq-card-h">This home’s estimated value by quarter <span><i class="ln gold"></i>${rqE(ixLbl.replace(/^zip code/,'Zip'))}${r.cityIx?` <i class="ln blue"></i>${rqE(cityT)} citywide`:''} <i class="sw s80b"></i>95% margin</span></div>${rqTrendSvg(r)||'<div class="rq-note">Not enough history to chart a trend.</div>'}
       <div class="rq-note" style="margin:2px 0 0">Based on ${fmtN(ix.n)} ${typeLo} sales. ${ix.quarters.some(q=>q.partial)?'* Quarter to date.':''}</div></div>
-    <div class="rq-sub-h">Recent sales in the immediate neighborhood <span>same street, community${s.subdiv?', subdivision':''} or within ½ mile · last 3 years</span></div>
+    <div class="rq-sub-h">Recent sales in the immediate neighborhood <span>same street, community${s.subdiv?', subdivision':''} or within ½ mile · within ±20% of this size · last 3 years</span></div>
     ${nsShow.length?`<div class="rq-tw"><table class="rq-table">
       <colgroup><col style="width:30%"><col style="width:13%"><col style="width:13%"><col style="width:8%"><col style="width:9%"><col style="width:7%"><col style="width:9%"><col style="width:11%"></colgroup>
       <thead><tr><th>Address</th><th class="num">Closed</th><th class="num">Sale price</th><th class="num">Sq ft</th><th class="num">Bd / Ba</th><th class="num">Built</th><th class="num">$/sq ft</th><th class="num">$/sq ft today</th></tr></thead><tbody>
@@ -11753,9 +11814,8 @@ function renderClientReport(){
     na:`Recent activity is limited, so conditions are best judged from the comparable sales directly.`}[m.verdict.cls]
     +(m.split?` Results are split by pricing: ${Math.round(m.cur.overList*100)}% of recent sales closed over list, while ${Math.round(m.cur.under98*100)}% sold more than 2% below their original price.`:'');
   const asOf=r.asOf;
-  const comp=(r.competition||[]).filter(x=>x.pkey!==s.pkey&&!(x.address===s.address&&(x.unit||'')===(s.unit||'')))
-    .sort((a,b)=>(a.status===b.status?0:a.status==='ACTIVE'?-1:1)||Math.abs(Math.log(a.sqft/s.sqft))-Math.abs(Math.log(b.sqft/s.sqft)));
-  const cShow=comp.slice(0,8);
+  const comp=(r.competition||[]).filter(x=>x.pkey!==s.pkey&&!(rqAddrShort(x.address).toLowerCase()===rqAddrShort(s.address).toLowerCase()&&(x.unit||'')===(s.unit||'')));
+  const cShow=comp.slice(0,10);
   const dom=x=>x.cdom||x.dom||(x.ld!=null?Math.max(0,asOf-x.ld):null);
   const page4=`<section class="rq-page">${rqPageHead(subj,'Market Conditions','04 · Today’s market')}
     <div class="rq-verdict"><div class="rq-verdict-l"><i>${rqE(r.mktLbl)} · ${typeLo} · last 90 days</i><b>${rqE(m.verdict.label)}</b>${m.split?'<small>Split by pricing</small>':''}</div>${rqGauge(m.score)}</div>
@@ -11764,12 +11824,12 @@ function renderClientReport(){
       <colgroup><col style="width:44%"><col style="width:15%"><col style="width:15%"><col style="width:26%"></colgroup>
       <thead><tr><th>Measure</th><th class="num">Last 90 days</th><th class="num">A year ago</th><th>Reading</th></tr></thead>
       <tbody>${mRows}<tr><td>Homes sold · active listings now</td><td class="num strong">${m.cur.sold} · ${m.cur.inventory}</td><td class="num">${m.ly?`${m.ly.sold} · ${m.ly.inventory}`:'—'}</td><td></td></tr></tbody></table></div>
-    <div class="rq-sub-h">Current competition <span>active &amp; pending ${typeLo} homes within ±30% of this size in ${s.zip?'zip '+rqE(s.zip):rqE(cityT)}</span></div>
+    <div class="rq-sub-h">Current competition <span>active &amp; pending · nearest first · neighborhood: any type within ±30% of size or value · rest of zip: ${typeLo} homes within ±20%</span></div>
     ${cShow.length?`<div class="rq-tw"><table class="rq-table">
-      <colgroup><col style="width:31%"><col style="width:11%"><col style="width:13%"><col style="width:9%"><col style="width:10%"><col style="width:8%"><col style="width:9%"><col style="width:9%"></colgroup>
-      <thead><tr><th>Address</th><th>Status</th><th class="num">List price</th><th class="num">Sq ft</th><th class="num">Bd / Ba</th><th class="num">Built</th><th class="num">$/sq ft</th><th class="num">Days</th></tr></thead><tbody>
-      ${cShow.map((x,i)=>`<tr data-grp="cp"${i>=4?' data-trim="cp"':''}><td class="rq-addr1">${rqE(rqAddrShort(x.address))}${x.unit?' #'+rqE(x.unit):''}</td><td><span class="rq-st ${x.status==='ACTIVE'?'a':'p'}">${x.status==='ACTIVE'?'Active':'Pending'}</span></td><td class="num">${fmt(x.lp||x.olp)}</td><td class="num">${fmtN(x.sqft)}</td><td class="num">${x.br||'—'} / ${rqBa(x.baths)}</td><td class="num">${x.yr||'—'}</td><td class="num">$${fmtN(Math.round((x.lp||x.olp)/x.sqft))}</td><td class="num">${dom(x)!=null?dom(x):'—'}</td></tr>`).join('')}
-      </tbody></table></div><div class="rq-note" data-note="cp" data-total="${comp.length}" data-tpl="Showing {n} of {t} competing listings, closest in size first."></div>`
+      <colgroup><col style="width:25%"><col style="width:16%"><col style="width:9%"><col style="width:12%"><col style="width:8%"><col style="width:9%"><col style="width:7%"><col style="width:7.5%"><col style="width:6.5%"></colgroup>
+      <thead><tr><th>Address</th><th>Where</th><th>Status</th><th class="num">List price</th><th class="num">Sq ft</th><th class="num">Bd / Ba</th><th class="num">Built</th><th class="num">$/sq ft</th><th class="num">Days</th></tr></thead><tbody>
+      ${cShow.map((x,i)=>`<tr data-grp="cp"${i>=4?' data-trim="cp"':''}${TP.typeGroup(x.bt)!==TP.typeGroup(s.bt)?` class="rq-xt t-${rqE(TP.typeGroup(x.bt))}"`:''}><td class="rq-addr1">${rqE(rqAddrShort(x.address))}${x.unit?' #'+rqE(x.unit):''}${TP.typeGroup(x.bt)!==TP.typeGroup(s.bt)?` <span class="rq-tt t-${rqE(TP.typeGroup(x.bt))}">${rqE(TP.typeLabel(x.bt))}</span>`:''}</td><td class="rq-where ${x._cmLevel>=3?'nb':''}">${rqE(x._cmTag||'')}</td><td><span class="rq-st ${x.status==='ACTIVE'?'a':'p'}">${x.status==='ACTIVE'?'Active':'Pending'}</span></td><td class="num">${fmt(x.lp||x.olp)}</td><td class="num">${fmtN(x.sqft)}</td><td class="num">${x.br||'—'} / ${rqBa(x.baths)}</td><td class="num">${x.yr||'—'}</td><td class="num">$${fmtN(Math.round((x.lp||x.olp)/x.sqft))}</td><td class="num">${dom(x)!=null?dom(x):'—'}</td></tr>`).join('')}
+      </tbody></table></div>${cShow.some(x=>TP.typeGroup(x.bt)!==TP.typeGroup(s.bt))?`<div class="rq-tleg">Highlighted rows are a different property type from this ${typeLo} home: <span class="rq-tt t-DE">Single-family</span> <span class="rq-tt t-ATT">Condo / Townhome</span> <span class="rq-tt t-DU">Duplex</span> — they compete for the same buyers nearby but are not used in the valuation.</div>`:''}<div class="rq-note" data-note="cp" data-total="${comp.length}" data-tpl="Showing {n} of {t} competing listings, nearest first."></div>`
     :`<div class="rq-empty">No active or pending listings of similar size nearby right now — limited competition.</div>`}
     <div class="rq-conf-box ${confCls}"><b>${res.conf==='HIGH'?'High':res.conf==='MEDIUM'?'Medium':'Low'} confidence in this estimate.</b> ${confText}</div>
     <div class="rq-disc"><b>Important.</b> This Comparative Market Analysis is prepared for informational purposes only and is not an appraisal or a formal opinion of value. Values are produced by a statistical model from MLS comparable sales available as of ${dateStr} (data through ${rqD(r.asOf)}). Actual sale prices depend on condition, presentation, negotiation, financing, inspections, timing and other factors not visible in sales records. Do not rely on this report alone for tax, lending or legal decisions. MLS data is deemed reliable but not guaranteed.</div>
@@ -11803,11 +11863,14 @@ function rqFit(html){
   }finally{ st.remove(); }
 }
 
-function printClientReport(){
+// mode 'ink' (default, for paper): light header and table heads — large dark fills band on office printers.
+// mode 'pdf': the full navy design, for emailing.
+function printClientReport(mode){
   if(!A.lastValuation||!A.subject){ toast('Report state is missing — re-open the Client Report from the CMA tab','err'); return; }
   renderClientReport();
+  document.body.classList.toggle('rq-ink', mode!=='pdf');
   const t0=document.title; document.title=`CMA - ${A.subject.addr}${A.subject.city?', '+toTitle(A.subject.city):''}`;
-  const restore=()=>{ document.title=t0; window.removeEventListener('afterprint',restore); };
+  const restore=()=>{ document.title=t0; document.body.classList.remove('rq-ink'); window.removeEventListener('afterprint',restore); };
   window.addEventListener('afterprint',restore);
   setTimeout(()=>window.print(),150);
 }
