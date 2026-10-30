@@ -7568,7 +7568,7 @@ async function runOpportunityScanner(opts={}){
     if(parseFloat(v.medGrossAdj) >= 15) risks.push({type:'adj', sev:'med', desc:`Comps needed large adjustments (${v.medGrossAdj}% gross) — limited truly-similar inventory nearby`});
     const _raw = (target._r && target._r.statusRaw) || '';
     if(_raw==='CS') risks.push({type:'contingent', sev:'hi', desc:`Contingent-show: the seller already has an accepted offer — this is only available if that contract falls through`});
-    if(_raw==='BOM' || _raw==='RACT') risks.push({type:'bom', sev:'med', desc:`Back on market after a prior contract — find out why it fell through (inspection, financing, appraisal) before relying on the discount`});
+    if(_raw==='BOM' || _raw==='BOMK' || _raw==='RACT') risks.push({type:'bom', sev:'med', desc:`Back on market after a prior contract — find out why it fell through (inspection, financing, appraisal) before relying on the discount`});
 
     // Opportunity score
     const gapComponent = 50 * (1 - Math.exp(-gapPct/9));
@@ -7637,7 +7637,9 @@ function oppCoverage(){
   if(A._oppCov && A._oppCov.key===key) return A._oppCov;
   const today = Math.floor(Date.now()/864e5), days = new Set();
   let mx = 0;
-  for(const r of store.all){ const t = r.ud; if(t!=null && t<=today+1){ days.add(t); if(t>mx) mx = t; } }
+  // Only updates to listings already on the market >=21 days count as proof that status changes were captured.
+  // (An export filtered by LIST date holds only new listings; it cannot reveal that an older listing went pending/sold.)
+  for(const r of store.all){ const t = r.ud; if(t!=null && t<=today+1 && (r.ld==null || t - r.ld >= 21)){ days.add(t); if(t>mx) mx = t; } }
   const cov = {key, gapStart:null, gapEnd:null, lastTouch:mx||null, behindDays:mx?Math.max(0,today-mx):null};
   if(mx && days.size>=30){
     let run = 0, end = null;
@@ -7657,7 +7659,7 @@ function oppNotAvailableReason(l, policy, opts){
   const r = l._r; if(!r) return null;
   const raw = r.statusRaw||'';
   if(raw==='CS' && policy!=='cs') return 'cs';
-  const backOnMkt = raw==='BOM' || raw==='RACT';
+  const backOnMkt = raw==='BOM' || raw==='BOMK' || raw==='RACT';
   const csIncluded = raw==='CS' && policy==='cs';
   if((r.pend!=null || r.coe!=null) && !backOnMkt && !csIncluded) return 'underContract';
   if(r.sp>0) return 'dirty';
@@ -7958,7 +7960,7 @@ function oppCardHTML(r){
     ? r.risks.map(rk=>`<div class="opp-risk-bullet sev-${rk.sev}">${rk.desc}</div>`).join('')
     : `<div class="opp-risk-bullet sev-low">No flagged risks from available data — verify in person and via disclosures</div>`;
   const unv = A.oppScan && A.oppScan.includeStale && oppIsUnverified(t._r, A.oppScan.cov);
-  const stLbl = unv ? 'Unverified' : raw==='CS' ? 'Contingent-show' : (raw==='BOM'||raw==='RACT') ? 'Back on market' : 'Active';
+  const stLbl = unv ? 'Unverified' : raw==='CS' ? 'Contingent-show' : (raw==='BOM'||raw==='BOMK'||raw==='RACT') ? 'Back on market' : 'Active';
   const stCls = (raw==='CS'||unv) ? 'warn' : 'ok';
   const listed = t.listDate ? ` · listed ${t.listDate.toLocaleDateString('en-US',{month:'short',day:'numeric'})}` : '';
   return `<div class="opp-card" data-mls="${_oe(t.mlsNo)}">
@@ -10478,7 +10480,7 @@ function makeGetter(row){
 const STATUS_MAP = {
   SOLD:    ['SLD','SOLD','CLOSED','CLSD','SOM'],   // SOM = sold off-MLS (reported after closing)
   PENDING: ['PEND','PENDING','AC','UC','UCB','PS','CTG','CONT'],   // AC = active-contingent (under contract)
-  ACTIVE:  ['ACTV','ACT','ACTIVE','NEW','PCH','BOM','RACT','EXT','CS'], // CS = contingent-show (accrues DOM)
+  ACTIVE:  ['ACTV','ACT','ACTIVE','NEW','PCH','BOM','BOMK','RACT','EXT','CS'], // CS = contingent-show (accrues DOM)
   OFF:     ['WC','WDN','WITHDRAWN','CAN','CANC','CANCELLED','CANCELED','EXPR','EXP','EXPIRED','HOLD','TEMP','OFF'],
 };
 const STATUS_LOOKUP={}; for(const [k,arr] of Object.entries(STATUS_MAP)) arr.forEach(c=>STATUS_LOOKUP[c]=k);
