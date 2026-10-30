@@ -7652,7 +7652,9 @@ function oppCoverage(){
 }
 function oppIsUnverified(r, cov){
   if(!r || !cov || cov.gapEnd==null) return false;
-  const t = Math.max(r.ud||0, r.sd||0, r.cd||0, r.offm||0, r.pend||0, r.ld||0);
+  // r.seen = the day this row was last re-downloaded / written to the cloud. A fresh export that still
+  // shows the listing as Active proves it was open on that day, even if the MLS update date is old.
+  const t = Math.max(r.ud||0, r.sd||0, r.cd||0, r.offm||0, r.pend||0, r.ld||0, r.seen||0);
   return t < cov.gapEnd;
 }
 function oppNotAvailableReason(l, policy, opts){
@@ -10569,6 +10571,9 @@ class Store{
   }
   importRows(rows, name){
     const recs=rows.map(x=>parseRow(x,name));
+    // "as-of" day of this export = its newest update date. Every row in it was confirmed as listed on that day.
+    let asof=0; for(const r of recs){ if(r.ud!=null && r.ud>asof && r.ud<=todayDay()+1) asof=r.ud; }
+    if(asof) for(const r of recs) r.seen=asof;
     const info={name, rows:rows.length, capHit: rows.length===10000 || rows.length===5000 || rows.length===2500,
       cities:[...new Set(recs.map(r=>r.city))].filter(Boolean)};
     const res=this.addRecords(recs, info);
@@ -11159,7 +11164,7 @@ function v2From(x){
     city:(x.city||'').toUpperCase(),zip:(x.zip||'').slice(0,5),bt:x.bt||'',lp:x.lp!=null?+x.lp:null,olp:x.olp!=null?+x.olp:null,sp:x.sp!=null?+x.sp:null,
     sqft:+x.sqft||0,br:+x.br||0,bth:+x.bth||0,pb:+x.pb||0,garSp:+x.gar_sp||0,yr:+x.yr_blt||0,lot:+x.lot_sqft||0,hoaRaw:+x.hoa_raw||0,hoaFreq:x.hoa_freq||'',hoaMo:+x.hoa_mo||0,
     dom:+x.dom||0,cdom:+x.cdom||0,ld:TP.parseDay(x.list_date),pend:TP.parseDay(x.pend_date),offm:TP.parseDay(x.off_mkt_date),cd:TP.parseDay(x.close_date),coe:TP.parseDay(x.coe_date),
-    sd:TP.parseDay(x.stat_date),ud:TP.parseDay(x.updt_date),offers:x.num_offers,howSold:x.how_sold||'',lat:x.lat,lng:x.lng,subdiv:x.subdivision||null,elem:x.elem_school||null,src:x.source_file||'cloud',
+    seen:x.updated_at?Math.floor(Date.parse(x.updated_at)/864e5):null, sd:TP.parseDay(x.stat_date),ud:TP.parseDay(x.updt_date),offers:x.num_offers,howSold:x.how_sold||'',lat:x.lat,lng:x.lng,subdiv:x.subdivision||null,elem:x.elem_school||null,src:x.source_file||'cloud',
     street:sp_.street,hnum:sp_.hnum};
   r.gar=r.garSp>0; r.baths=r.bth+0.5*r.pb; r.pkey=`${r.zip||r.city}|${r.street}|${r.hnum||''}|${r.unit.toLowerCase()}`;
   return r;
