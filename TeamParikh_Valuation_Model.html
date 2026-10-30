@@ -2069,6 +2069,27 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
 .rq-3col>div{background:#F2EDE2;border:1px solid #D9CFB7;border-radius:5px;padding:8px 10px}
 .rq-3col h4{margin:0 0 3px;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#806B30;font-weight:700}
 .rq-3col p{margin:0;font-size:9.5px;line-height:1.5;color:#3A4258}
+.ro-card{border:1px solid #D9CFB7;border-left:4px solid var(--cat,#806B30);border-radius:6px;background:#fff;padding:8px 11px 7px;margin-bottom:9px}
+.ro-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.ro-addr{font-family:'TPR Serif','Cormorant Garamond',Georgia,serif;font-size:17px;font-weight:600;line-height:1.1;color:#1A1F2C}
+.ro-sub{font-size:8.5px;letter-spacing:.07em;text-transform:uppercase;color:#5F6577;margin-top:2px}
+.ro-price{text-align:right;flex-shrink:0}
+.ro-price b{display:block;font-family:'TPR Serif','Cormorant Garamond',Georgia,serif;font-size:19px;line-height:1.1;color:#1A1F2C}
+.ro-price i{display:block;font-style:normal;font-size:8.5px;color:#1F6B47;font-weight:600}
+.ro-tag{display:inline-block;font-size:7.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:#fff;background:var(--cat,#806B30);border-radius:8px;padding:1px 7px;margin-bottom:2px}
+.ro-stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;margin:6px 0}
+.ro-stats>div{background:#F2EDE2;border-radius:4px;padding:3px 4px;text-align:center}
+.ro-stats b{display:block;font-size:10.5px;color:#1A1F2C}
+.ro-stats i{display:block;font-style:normal;font-size:7px;letter-spacing:.08em;text-transform:uppercase;color:#806B30}
+.ro-why{margin:0 0 6px;padding-left:15px;font-size:9px;line-height:1.45;color:#3A4258}
+.ro-why li{margin-bottom:1.5px}.ro-why b{color:#1A1F2C}
+.ro-comp{margin-bottom:3px}.ro-comp td{padding:3.5px 4px}
+.ro-foot{display:flex;flex-wrap:wrap;gap:3px 12px;font-size:8.5px;color:#3A4258;margin-top:4px}
+.ro-ok{color:#1F6B47;font-weight:700}.ro-risk{color:#9A3530}
+.ro-legend{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0 4px}
+.ro-legend>div{border-left:4px solid var(--cat);background:#F2EDE2;border-radius:4px;padding:6px 8px}
+.ro-legend b{display:block;font-size:9.5px;color:#1A1F2C}.ro-legend span{font-size:8.5px;color:#3A4258;line-height:1.4}
+.rq-title h2 small{font-size:14px;color:#806B30;font-weight:500}
 .rq-conf-box{margin-top:14px;padding:9px 12px;border-radius:5px;border-left:4px solid #1F6B47;background:#FFFFFF;border-top:1px solid #D9CFB7;border-right:1px solid #D9CFB7;border-bottom:1px solid #D9CFB7;font-size:10px;line-height:1.55;color:#3A4258}
 .rq-conf-box.med{border-left-color:#A56B19}.rq-conf-box.lo{border-left-color:#9A3530}
 .rq-conf-box b{color:#1A1F2C}
@@ -2501,7 +2522,7 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
     <div class="tab-pane opp-pane" id="pane-opps">
       <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;margin-bottom:12px;background:rgba(245,162,58,.10);border:1px solid rgba(245,162,58,.5);border-radius:var(--r)">
         <span style="font-size:16px;flex-shrink:0">🚧</span>
-        <div style="font-size:12px;line-height:1.5;color:var(--txt)"><strong style="color:var(--org)">Listings expected to sell above their asking price.</strong> Each value is the <em>expected sale price</em>: list price × the local sale-to-list ratio, nudged by how far the comps disagree with the list. Back-tested, a listing the comps call 10% underpriced sells only ~2% higher than typical — list prices usually reflect condition the MLS data can't show. Expect competition on these, not a bargain.</div>
+        <div style="font-size:12px;line-height:1.5;color:var(--txt)"><strong style="color:var(--org)">Active listings priced below what recent comparable sales support.</strong> Each value is the <em>comparable-sales value</em> (tight, recent, nearby sold comps adjusted to the home and to today's market) — not a forecast of the sale price. List prices often reflect condition the MLS data can't show, so treat each as a lead to verify, not a bargain. Use <strong>📄 Client Report</strong> to turn the current results into a client-ready report.</div>
       </div>
       <!-- opp-city select kept hidden — driven by unified city bar -->
       <select id="opp-city" style="display:none" onchange="runOpportunityScanner()"><option value="">All Cities</option></select>
@@ -2557,6 +2578,7 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
         <div class="opp-tool-grp" style="flex:1"></div>
         <button class="btn btn-gold" onclick="runOpportunityScanner({refine:true})">🔍 Scan</button>
         <button class="btn btn-blue" onclick="runOpportunityBacktest()" title="Replay history: of listings the model would have flagged as deals, how many actually sold at or above the model's estimate?">🧪 Backtest accuracy</button>
+        <button class="btn btn-gold" onclick="openOppReport()" title="Client-ready report for the current results (city scan, filters or drawn area): market conditions, neighborhood stats, then each opportunity with its comparable sales">📄 Client Report</button>
         <button class="btn btn-g" onclick="exportOpportunities()">⬇ Export</button>
       </div>
       <div class="opp-toolbar opp-filterbar" id="opp-filterbar" style="align-items:flex-end">
@@ -8043,6 +8065,219 @@ function oppRender(view){
   oppAreaText();
 }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   OPPORTUNITIES v9 — CLIENT REPORT
+   Built from whatever the Opportunities tab is showing right now (city scan,
+   filters, drawn map circle). Market conditions → neighborhood stats → each
+   opportunity with its own comparable-sales analysis. An opportunity only makes
+   the report if its own comps back it up (see oppRptSupport).
+   ══════════════════════════════════════════════════════════════════════════ */
+const OPPRPT = {MAX_PER_CAT:6, MIN_COMPS:3, MAX_COMPS:5, MIN_SHARE:0.6, MIN_GAP:0.03,
+  CATS:[{tag:'Deep Discount',   key:'deep',   floor:12, color:'#1F6B47', blurb:'Listed 12% or more below the value the comparable sales support.'},
+        {tag:'Strong Opportunity',key:'strong',floor:7,  color:'#2F5D9B', blurb:'Listed 7–12% below the value the comparable sales support.'},
+        {tag:'Buyer Advantage', key:'buyer',  floor:3,  color:'#806B30', blurb:'Listed 3–7% below the value the comparable sales support.'}]};
+const _med = a => { a = a.filter(x=>x!=null&&isFinite(x)).sort((x,y)=>x-y); if(!a.length) return null; const m=a.length>>1; return a.length%2?a[m]:(a[m-1]+a[m])/2; };
+
+/* Does this listing's own comparable-sales analysis back up the discount?
+   Pick up to 5 of the most heavily weighted comps, show them newest first, and require that most of them
+   (adjusted to this home and to today's market) are worth more than the list price AND that their median is
+   at least 3% above list. Otherwise the listing is held back rather than shown with weak support. */
+function oppRptAnalyze(r){
+  // never put a listing in front of a client when the scan itself raised a high-severity flag (implausibly large discount, leasehold, data error…)
+  if((r.risks||[]).some(k=>k.sev==='hi')) return {ok:false, why:'high-severity risk flag — verify before presenting'};
+  const x = _valueRecord(r.target, {minComps:5}); if(!x) return {ok:false, why:'could not be valued'};
+  const {rec, v} = x, lp = r.target.lp || rec.lp;
+  if(!lp) return {ok:false, why:'no list price'};
+  const top = [...v.comps].sort((a,b)=>b.wPct-a.wPct).slice(0, 8);
+  const pick = top.sort((a,b)=>b.cd-a.cd).slice(0, OPPRPT.MAX_COMPS);
+  if(pick.length < OPPRPT.MIN_COMPS) return {ok:false, why:`only ${pick.length} comparable sale(s)`};
+  const adj = c => c.final || c.indicated;
+  const vals = pick.map(adj), med = _med(vals), above = vals.filter(a=>a>lp).length;
+  const share = above/pick.length, gapComps = med/lp - 1;
+  const cal = TP.calibration(store,{city:rec.city,bt:rec.bt,sqft:rec.sqft}), rg = TP.rangeFor(v, cal);
+  const ok = share >= OPPRPT.MIN_SHARE && gapComps >= OPPRPT.MIN_GAP;
+  return {ok, why: ok?'':(share<OPPRPT.MIN_SHARE?`only ${above} of ${pick.length} comps are above list`:`comps median is only ${(gapComps*100).toFixed(1)}% above list`),
+    rec, v, lp, est:v.est, pick, med, above, share, gapComps, rg, nb:v.comps.filter(c=>c.matchLevel>=3).length, total:v.comps.length,
+    ppsfList: rec.sqft? lp/rec.sqft : null, ppsfComps: _med(pick.map(c=>adj(c)/c.sqft)), grade:(rg.grade||'').toUpperCase()};
+}
+function oppRptBuild(){
+  const view = (A.opportunities||[]).filter(r=>r.tag && r.tag!=='Fair Deal');
+  const groups = OPPRPT.CATS.map(c=>({...c, items:[], held:[], total:0}));
+  const by = {}; groups.forEach(g=>by[g.tag]=g);
+  view.forEach(r=>{ const g = by[r.tag]; if(g) g.total++; });
+  groups.forEach(g=>{
+    const cand = view.filter(r=>r.tag===g.tag);
+    let looked = 0;
+    for(const r of cand){
+      if(g.items.length >= OPPRPT.MAX_PER_CAT || looked >= OPPRPT.MAX_PER_CAT*3) break;
+      looked++;
+      const a = oppRptAnalyze(r);
+      if(a.ok) g.items.push({r, a}); else g.held.push({r, why:a.why});
+    }
+    g.notReached = Math.max(0, cand.length - looked);
+  });
+  const items = groups.flatMap(g=>g.items);
+  const cities = [...new Set(view.map(r=>r.target.city))];
+  const tgs = view.map(r=>TP.typeGroup(r.target.bt)); const tgCount = {}; tgs.forEach(t=>tgCount[t]=(tgCount[t]||0)+1);
+  const topTg = Object.entries(tgCount).sort((a,b)=>b[1]-a[1])[0];
+  const domTg = topTg && topTg[1]/tgs.length >= 0.7 ? topTg[0] : null;
+  const btCount = {}; view.forEach(r=>{ const b=r.target.bt; btCount[b]=(btCount[b]||0)+1; });
+  const topBt = Object.entries(btCount).sort((a,b)=>b[1]-a[1])[0];
+  const geo = {}; if(cities.length===1) geo.city = cities[0]; if(domTg) geo.tg = domTg;
+  const c = A.oppCircle, cityLbl = A.oppScan && el('opp-city') && el('opp-city').value ? toTitle(el('opp-city').value) : (cities.length===1?toTitle(cities[0]):(cities.length?`${cities.length} cities`:'All cities'));
+  const area = c ? `Within ${c.mi} mi of the selected area · ${cityLbl}` : cityLbl;
+  return {groups, items, geo, area, domTg, bt:(topBt&&topBt[1]/view.length>=0.7)?topBt[0]:null, viewN:view.length, cityLbl, circle:c||null,
+    held: groups.reduce((s,g)=>s+g.held.length,0), notReached: groups.reduce((s,g)=>s+g.notReached,0), spec: oppFilterSummary(oppFilterSpec())};
+}
+
+/* ── page pieces ─────────────────────────────────────────────────────── */
+function roHead(model, title, eyebrow){
+  return `<div class="rq-ph"><div class="rq-ph-brand">Team <em>Parikh</em></div><div class="rq-ph-meta">Buyer Opportunity Report · ${rqE(model.area)}</div></div>
+    <div class="rq-title"><div class="rq-eyebrow">${eyebrow}</div><h2>${title}</h2></div>`;
+}
+function roCard(it, idx, n, cat){
+  const {r, a} = it, t = r.target, rec = a.rec, lp = a.lp, adj = c => c.final || c.indicated;
+  const gap = a.est/lp - 1;
+  const cut = rec.olp && rec.olp > lp*1.005 ? (rec.olp-lp)/rec.olp : 0;
+  const typeLbl = t.bt==='DE'?'Single-family':t.bt==='CO'?'Condo':t.bt==='TH'?'Townhome':TP.typeLabel(t.bt);
+  const stats = [[t.sqft?fmtN(t.sqft):'—','sq ft'],[`${t.br||'—'} / ${rqBa(t.bth)}`,'bd / ba'],[t.yrBlt||'—','built'],[t.lotSqFt?rqLot(t.lotSqFt):'—','lot'],[(t.cdom||t.dom||0)+' d','on market']];
+  const why = [];
+  why.push(`Listed at <b>${fmt(lp)}</b>, <b>${(gap*100).toFixed(1)}%</b> below the <b>${fmt(rqR(a.est))}</b> that the comparable sales support (likely range ${fmt(rqR(a.rg.lo50))} – ${fmt(rqR(a.rg.hi50))}${lp < a.rg.lo50 ? '; the list price is below the low end' : ''}).`);
+  why.push(`<b>${a.above} of ${a.pick.length}</b> comparable sales shown below, once adjusted to this home and to today’s market, are worth more than the list price. Their median adjusted value is <b>${fmt(rqR(a.med))}</b> (${(a.gapComps*100).toFixed(1)}% above list).`);
+  if(a.ppsfList && a.ppsfComps) why.push(`Asking <b>$${fmtN(Math.round(a.ppsfList))}</b> per sq ft; the adjusted comparable sales average <b>$${fmtN(Math.round(a.ppsfComps))}</b> per sq ft.`);
+  why.push(a.nb>0 ? `${a.nb} of the ${a.total} comparable sales behind the value are in the immediate neighborhood (same street, community, subdivision or within about ½ mile).` : `No sales on the same street or in the same community qualified, so the value leans on similar homes elsewhere in ${rec.zip?'zip '+rec.zip:toTitle(rec.city)}.`);
+  if(cut>0.004) why.push(`Price already reduced <b>${(cut*100).toFixed(1)}%</b> from ${fmt(rec.olp)}.`);
+  const risks = (r.risks||[]).filter(k=>k.sev==='hi'||k.sev==='med').slice(0,2);
+  const rows = a.pick.map((c,i)=>{ const f=adj(c), d=f/lp-1;
+    return `<tr${i>=3?' data-trim="roc" data-grp="roc"':' data-grp="roc"'}><td class="rq-n"><span class="rq-dot ${c.matchLevel>=3?'nb':''}">${i+1}</span></td>
+      <td class="rq-addr"><b>${rqE(rqAddrShort(c.address))}${c.unit?' #'+rqE(c.unit):''}</b><span>${rqE([c.match||'',`${c.br||'—'} bd / ${rqBa(c.baths)} ba`,c.yr?'Built '+c.yr:''].filter(Boolean).join(' · '))}</span></td>
+      <td class="num">${rqD(c.cd)}</td><td class="num">${fmt(c.sp)}</td><td class="num">${fmtN(c.sqft)}</td><td class="num">$${fmtN(Math.round(c.sp/c.sqft))}</td>
+      <td class="num strong">${fmt(rqR(f))}</td><td class="num ${d>=0?'pos':'neg'}">${d>=0?'+':'−'}${Math.abs(d*100).toFixed(1)}%</td></tr>`; }).join('');
+  return `<div class="ro-card" style="--cat:${cat.color}">
+    <div class="ro-head"><div><div class="ro-addr">${rqE(rqAddrShort(t.address))}${t.unit?' #'+rqE(t.unit):''}</div>
+        <div class="ro-sub">${rqE(toTitle(t.city))} · ${typeLbl} · MLS# ${rqE(t.mlsNo)}</div></div>
+      <div class="ro-price"><span class="ro-tag">${rqE(r.tag)}</span><b>${fmt(lp)}</b><i>${(gap*100).toFixed(1)}% below ${fmt(rqR(a.est))}</i></div></div>
+    <div class="ro-stats">${stats.map(s=>`<div><b>${rqE(s[0])}</b><i>${s[1]}</i></div>`).join('')}</div>
+    <ul class="ro-why">${why.slice(0,4).map(w=>`<li>${w}</li>`).join('')}${why[4]?`<li data-trim="row">${why[4]}</li>`:''}</ul>
+    <table class="rq-table ro-comp"><colgroup><col style="width:4%"><col style="width:33%"><col style="width:12%"><col style="width:12%"><col style="width:8%"><col style="width:9%"><col style="width:13%"><col style="width:9%"></colgroup>
+      <thead><tr><th></th><th>Comparable sale</th><th class="num">Closed</th><th class="num">Sale price</th><th class="num">Sq ft</th><th class="num">$/sq ft</th><th class="num">Adjusted value</th><th class="num">vs list</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="ro-foot"><span class="ro-ok">✔ Supported by comparable sales</span><span>${a.above} of ${a.pick.length} above list · median ${fmt(rqR(a.med))} · ${a.grade==='HIGH'?'High':a.grade==='MEDIUM'?'Medium':'Low'} confidence</span>
+      ${risks.length?`<span class="ro-risk">Check: ${risks.map(k=>rqE(String(k.desc).replace(/<[^>]*>/g,'').split(' — ')[0])).join(' · ')}</span>`:''}</div>
+  </div>`;
+}
+
+function oppRenderReport(){
+  const paper = el('report-paper'); if(!paper) return;
+  const model = A.oppRptModel || (A.oppRptModel = oppRptBuild());
+  if(!model.items.length){
+    paper.className='report-paper'; paper.innerHTML = `<div style="padding:40px;text-align:center;color:#5F6577">No opportunities in the current view are supported by their own comparable sales.<br>Run a scan, loosen the filters or the Min Tag, then reopen the report.</div>`; return; }
+  paper.className = 'report-paper rq';
+  const dateStr = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  const asOf = store.asOf(model.geo.city||null);
+  const g = model.geo, m = TP.marketRead(store, g, {asOf}), cur = m.cur;
+  const tgLbl = model.domTg==='DE' ? 'single-family' : model.domTg ? 'condo & townhome' : 'all property types';
+  const items = model.items, nOpp = items.length;
+  const equity = items.reduce((s,it)=>s+(it.a.est-it.a.lp),0);
+  const avgGap = items.reduce((s,it)=>s+(it.a.est/it.a.lp-1),0)/nOpp;
+  const pages = [];   // functions of (n, N) so numbering can be filled in once the page count is known
+
+  /* cover */
+  const glance = items.slice().sort((a,b)=>(b.a.est/b.a.lp)-(a.a.est/a.a.lp)).map((it,i)=>{ const t=it.r.target;
+    return `<tr data-trim="glc"><td class="rq-addr1">${rqE(rqAddrShort(t.address))}${t.unit?' #'+rqE(t.unit):''}</td><td>${rqE(it.r.tag)}</td><td class="num">${fmt(it.a.lp)}</td><td class="num">${fmt(rqR(it.a.est))}</td><td class="num pos">${((it.a.est/it.a.lp-1)*100).toFixed(1)}%</td></tr>`; }).join('');
+  pages.push((n,N)=>`<section class="rq-page rq-cover">
+    <header class="rq-band"><div class="rq-band-top"><div class="rq-brand">Team <em>Parikh</em><small>Keller Williams Tri-Valley · team-parikh.com</small></div>
+      <div class="rq-band-meta"><div>${dateStr}</div>${A.clientName?`<div>Prepared for <b>${rqE(A.clientName)}</b></div>`:''}<div>Prepared by <b>${rqE(A.preparedBy||'Team Parikh')}</b></div></div></div>
+      <div class="rq-band-eyebrow">Buyer Opportunity Report</div>
+      <div class="rq-band-addr">${rqE(model.cityLbl)}</div>
+      <div class="rq-band-city">${model.circle?`Within ${model.circle.mi} mile${model.circle.mi===1?'':'s'} of the selected area · `:''}${rqE(tgLbl)} · data through ${rqD(asOf)}</div></header>
+    <div class="rq-body">
+      <div class="rq-kpis"><div><b>${nOpp}</b><i>Opportunities shown</i></div>${model.groups.map(gr=>`<div><b style="color:${gr.color}">${gr.items.length}</b><i>${gr.tag}</i></div>`).join('')}<div><b class="up">${rqM(equity)}</b><i>Combined value above list</i></div></div>
+      <p class="rq-lead" style="margin-top:12px">These are active listings priced below what recent comparable sales support. Each one was valued on its own and is shown with the sales behind the value; a listing appears here only when most of those sales, adjusted to the home and to today’s market, are worth more than its list price. On average the listings below are priced <b>${(avgGap*100).toFixed(1)}%</b> under their comparable-sales value.</p>
+      <div class="ro-legend">${model.groups.map(gr=>`<div style="--cat:${gr.color}"><b>${gr.tag}</b><span>${gr.blurb}</span></div>`).join('')}</div>
+      <div class="rq-sub-h">Opportunities at a glance <span>${rqE(model.spec||'all property types')}</span></div>
+      <div class="rq-tw"><table class="rq-table"><colgroup><col style="width:36%"><col style="width:22%"><col style="width:14%"><col style="width:16%"><col style="width:12%"></colgroup>
+        <thead><tr><th>Address</th><th>Category</th><th class="num">List price</th><th class="num">Comps value</th><th class="num">Below</th></tr></thead><tbody>${glance}</tbody></table></div>
+    </div>${rqPageFoot(n,N)}</section>`);
+
+  /* market conditions */
+  const mfmt=(rule,x)=>x==null?'—':rule.fmt==='pct'?(x*100).toFixed(1)+'%':x.toFixed(1);
+  const readTxt=sc=>sc==null?['Not enough data','na']:sc>=2?['Strongly favors sellers','s']:sc>=1?['Favors sellers','s']:sc<=-2?['Strongly favors buyers','b']:sc<=-1?['Favors buyers','b']:['Neutral','n'];
+  const mRows = m.scores.map(x=>{ const [rt,rc]=readTxt(x.score); const ly=m.ly?m.ly[x.key]:null;
+    return `<tr><td>${rqE(x.label)}</td><td class="num strong">${mfmt(x,x.value)}</td><td class="num">${x.key==='priceCutShare'?'—':mfmt(x,ly)}</td><td><span class="rq-read ${rc}">${rt}</span></td></tr>`; }).join('');
+  const mktText = {s2:`The market is <b>strongly favoring sellers</b>: inventory is thin and homes sell quickly at or above their original asking price. Listings priced below comparable sales are the exception, and tend to draw competing offers.`,
+    s1:`The market is <b>favoring sellers</b>. Well-priced homes move quickly, typically near or above asking.`,
+    b0:`The market is <b>balanced</b>. Well-priced homes sell at a steady pace; homes priced ahead of the comparables tend to sit and reduce.`,
+    u1:`The market is <b>favoring buyers</b>. Listings are taking longer to sell, more are cutting price, and more are closing below their original asking price. That is the setting in which the opportunities in this report arise.`,
+    u2:`The market is <b>strongly favoring buyers</b>, with elevated inventory, frequent price reductions and many listings expiring unsold.`,
+    na:`Recent activity is limited, so conditions are best judged from the comparable sales directly.`}[m.verdict.cls]
+    + (m.split?` Results are split by pricing: ${Math.round(cur.overList*100)}% of recent sales closed over list, while ${Math.round(cur.under98*100)}% sold more than 2% below their original price.`:'');
+  pages.push((n,N)=>`<section class="rq-page">${roHead(model,'Market Conditions','01 · Today’s market')}
+    <div class="rq-verdict"><div class="rq-verdict-l"><i>${rqE(model.cityLbl)} · ${rqE(tgLbl)} · last 90 days</i><b>${rqE(m.verdict.label)}</b>${m.split?'<small>Split by pricing</small>':''}</div>${rqGauge(m.score)}</div>
+    <p class="rq-lead" style="margin-top:6px">${mktText}</p>
+    <div class="rq-tw"><table class="rq-table rq-mkt"><colgroup><col style="width:44%"><col style="width:15%"><col style="width:15%"><col style="width:26%"></colgroup>
+      <thead><tr><th>Measure</th><th class="num">Last 90 days</th><th class="num">A year ago</th><th>Reading</th></tr></thead>
+      <tbody>${mRows}<tr><td>Homes sold · active listings now</td><td class="num strong">${cur.sold} · ${cur.inventory}</td><td class="num">${m.ly?`${m.ly.sold} · ${m.ly.inventory}`:'—'}</td><td></td></tr></tbody></table></div>
+    ${m.stale?`<div class="rq-note">The newest sales data is ${todayDay()-asOf} days old; recent changes may not be reflected.</div>`:''}
+    ${rqPageFoot(n,N)}</section>`);
+
+  /* neighborhood stats */
+  const f = r => (!g.city||r.city===g.city) && (!g.tg||TP.typeGroup(r.bt)===g.tg);
+  const sold90 = store.all.filter(r=>r.status==='SOLD' && r.cd!=null && r.cd>asOf-90 && r.cd<=asOf && r.sp && f(r));
+  const medPrice = _med(sold90.map(r=>r.sp)), medPpsf = _med(sold90.filter(r=>r.sqft>0).map(r=>r.sp/r.sqft));
+  const ix = model.bt ? TP.getIndex(store,{city:g.city,bt:model.bt,asOf,level:g.city?'city':'region'}) : null;
+  const tr = ix ? TP.trendSummary(ix, asOf) : null;
+  const est0 = _med(items.map(it=>it.a.est));
+  const stat=(lbl,x)=>`<div><i>${lbl}</i><b class="${rqDir(x)}">${x?rqPct(x.pct):'—'}</b><small>${x?'±'+(1.96*x.se*100).toFixed(1)+'% margin':'limited history'}</small></div>`;
+  const tile=(lbl,val,sub)=>`<div><i>${lbl}</i><b>${val}</b><small>${sub||''}</small></div>`;
+  const chart = ix && est0 ? rqTrendSvg({v:{index:ix}, est:est0, asOf, cityIx:null}) : '';
+  const catRows = model.groups.filter(gr=>gr.items.length).map(gr=>{ const lps=gr.items.map(it=>it.a.lp), gaps=gr.items.map(it=>it.a.est/it.a.lp-1);
+    return `<tr><td><b style="color:${gr.color}">${gr.tag}</b></td><td class="num">${gr.items.length}</td><td class="num">${fmt(_med(lps))}</td><td class="num">${fmt(_med(gr.items.map(it=>it.a.est)))}</td><td class="num pos">${(_med(gaps)*100).toFixed(1)}%</td></tr>`; }).join('');
+  pages.push((n,N)=>`<section class="rq-page">${roHead(model,'Neighborhood Stats','02 · The local picture')}
+    <p class="rq-lead">What ${rqE(tgLbl)} homes have actually sold for in ${rqE(model.cityLbl)} over the last 90 days, how values have moved, and where the opportunities sit relative to that market.</p>
+    <div class="rq-stats">${tile('Median sale price',medPrice?fmt(rqR(medPrice,5000)):'—',`${sold90.length} sales · 90 days`)}${tile('Median $ / sq ft',medPpsf?'$'+fmtN(Math.round(medPpsf)):'—','closed sales')}${tile('Typical days on market',cur.cdom!=null?Math.round(cur.cdom)+' d':'—','sold homes')}${tile('Sale ÷ original list',cur.spOlp?(cur.spOlp*100).toFixed(1)+'%':'—','90 days')}${tile('Months of inventory',cur.moi!=null?cur.moi.toFixed(1):'—',`${cur.inventory} active now`)}</div>
+    ${tr?`<div class="rq-stats">${stat('6 months',tr.sixMo)}${stat('12 months',tr.oneYr)}${stat('3 years',tr.threeYr)}<div><i>Peak quarter</i><b class="sm">${rqE(tr.peak.label)}</b><small>today ${rqPct(tr.peak.vsNow)} vs peak</small></div><div><i>Low quarter</i><b class="sm">${rqE(tr.trough.label)}</b><small>today ${rqPct(tr.trough.vsNow)} vs low</small></div></div>`:''}
+    ${chart?`<div class="rq-card"><div class="rq-card-h">Value of a typical home like these, by quarter <span><i class="sw s80b"></i>95% margin</span></div>${chart}<div class="rq-note" style="margin:2px 0 0">Like-for-like price index for ${rqE(model.cityLbl)} (${model.bt==='DE'?'single-family':model.bt==='CO'?'condo':'townhome'}), scaled to the median comparable-sales value of the opportunities (${fmt(rqR(est0))}). Based on ${fmtN(ix.n)} sales.</div></div>`:`<div class="rq-empty">Not enough sales of one property type to chart a price trend for this selection.</div>`}
+    <div class="rq-sub-h">Where the opportunities sit <span>medians by category</span></div>
+    <div class="rq-tw"><table class="rq-table"><colgroup><col style="width:34%"><col style="width:12%"><col style="width:18%"><col style="width:20%"><col style="width:16%"></colgroup>
+      <thead><tr><th>Category</th><th class="num">Homes</th><th class="num">Median list</th><th class="num">Median comps value</th><th class="num">Median below</th></tr></thead><tbody>${catRows}</tbody></table></div>
+    ${rqPageFoot(n,N)}</section>`);
+
+  /* opportunity pages: 2 per page, grouped by category */
+  let secNo = 3;
+  model.groups.forEach(gr=>{
+    if(!gr.items.length) return;
+    for(let i=0;i<gr.items.length;i+=2){
+      const chunk = gr.items.slice(i,i+2), first = i===0, no = secNo;
+      pages.push((n,N)=>`<section class="rq-page">${roHead(model, first?`${gr.tag}`:`${gr.tag} <small>continued</small>`, `0${no} · ${gr.items.length} ${gr.items.length===1?'opportunity':'opportunities'}`)}
+        ${first?`<p class="rq-lead" style="margin-bottom:8px">${gr.blurb} ${gr.total>gr.items.length?`Showing the ${gr.items.length} strongest of ${gr.total} in this category that are backed by their own comparable sales.`:''}</p>`:''}
+        ${chunk.map((it,j)=>roCard(it,i+j+1,gr.items.length,gr)).join('')}${rqPageFoot(n,N)}</section>`);
+    }
+    secNo++;
+  });
+  /* notes & disclaimer */
+  const heldNote = model.held ? `<p><b>${model.held}</b> additional listing(s) the scan flagged were left out: their own comparable sales did not back up the discount (most comps were not above the list price, or the median was less than ${OPPRPT.MIN_GAP*100}% above it), or the scan raised a high-severity risk flag (for example an implausibly large discount) that needs checking first.</p>` : '';
+  pages.push((n,N)=>`<section class="rq-page">${roHead(model,'How to read this report','Notes')}
+    <div class="rq-3col" style="margin-top:4px"><div><h4>The comparable-sales value</h4><p>Each home is valued from recent sales of similar homes nearby. Older sales are brought to today’s prices with a like-for-like price index, then adjusted for size, age, lot and rooms. Closer, more similar sales carry more weight.</p></div>
+      <div><h4>The support check</h4><p>For each listing, up to five of the most heavily weighted comparable sales are shown, newest first. A listing is included only if most of them are worth more than the list price after adjustment and their median is at least 3% above list.</p></div>
+      <div><h4>What it does not capture</h4><p>Condition, updates, view, layout and any issue a sales record cannot show. A price below comparable sales may reflect exactly such a difference. A walk-through and inspection are the next step.</p></div></div>
+    <div class="rq-lead" style="margin-top:14px">${heldNote}<p>Listing status can change at any time. Confirm that a home is still available and not under contract before acting on any listing in this report.</p></div>
+    <div class="rq-disc"><b>Important.</b> This report is prepared for informational purposes only and is not an appraisal or a formal opinion of value. Values are produced by a statistical model from MLS comparable sales available as of ${rqD(asOf)}. Estimates do not account for condition, updates, view or other features that sales records do not capture. Actual sale prices may differ. Prices, status and availability are subject to change. Information is deemed reliable but is not guaranteed.</div>
+    ${rqPageFoot(n,N)}</section>`);
+
+  const N = pages.length;
+  paper.innerHTML = rqFit(pages.map((p,i)=>p(i+1,N)).join(''));
+}
+function openOppReport(){
+  if(!(A.oppAll && A.oppAll.length)){ toast('Run a scan first — the report is built from the Opportunities results','err'); return; }
+  if(!(A.opportunities && A.opportunities.length)){ toast('No opportunities match the current filters / area','err'); return; }
+  A.reportMode = 'opps'; A.oppRptModel = null;
+  const t = document.querySelector('#report-overlay .rt-title'); if(t) t.textContent = 'Buyer Opportunity Report';
+  toast(`Analyzing ${A.opportunities.length} opportunities against their comparable sales…`,'inf');
+  el('report-overlay').classList.remove('hidden');
+  el('report-paper').innerHTML = '<div style="padding:40px;text-align:center;color:#5F6577">Building report…</div>';
+  setTimeout(()=>{ try{ oppRenderReport(); }catch(e){ console.error(e); toast('Report failed: '+e.message,'err'); } }, 60);
+}
+
 function exportOpportunities(){
   if(!A.opportunities.length){toast('Run scan first','err');return;}
   const hdr = ['MLS#','Address','City','Type','List$','Model Value','Gap%','Tag','OppScore','SqFt','BR','Bth','YrBlt','CDOM','RiskFlags','TopReason'];
@@ -10071,10 +10306,11 @@ function openClientReport(){
   if(!A.lastValuation || !A.subject){
     toast('Run a CMA from the CMA tab first','err');return;
   }
+  A.reportMode=null; const _t=document.querySelector('#report-overlay .rt-title'); if(_t) _t.textContent='Client CMA Report';
   renderClientReport();
   el('report-overlay').classList.remove('hidden');
 }
-function closeClientReport(){ el('report-overlay').classList.add('hidden'); }
+function closeClientReport(){ el('report-overlay').classList.add('hidden'); A.reportMode=null; A.oppRptModel=null; const t=document.querySelector('#report-overlay .rt-title'); if(t) t.textContent='Client CMA Report'; }
 function printClientReport(){
   // Guard against printing the fallback message — if state is gone, refuse
   if(!A.lastValuation || !A.subject){
@@ -10091,7 +10327,7 @@ function updateClientReportFields(){
   // CRITICAL: only re-render if state is still valid. Otherwise typing in the
   // "Prepared for" / "Prepared by" fields could downgrade a valid report to
   // the "No valuation" fallback (which would then print as a useless PDF).
-  if(A.lastValuation && A.subject){
+  if(A.reportMode==='opps' || (A.lastValuation && A.subject)){
     renderClientReport();
   }
 }
@@ -12219,6 +12455,7 @@ function rqPageFoot(n,N){
 }
 
 function renderClientReport(){
+  if(A.reportMode==='opps') return oppRenderReport();
   const paper=el('report-paper');
   const subj=A.subject, res=A.lastValuation, r=A.lastV7;
   if(!res||!r){ paper.className='report-paper'; paper.innerHTML='<div style="padding:40px;text-align:center;color:#5F6577">No valuation available. Run a CMA first.</div>'; return; }
@@ -12407,18 +12644,18 @@ async function rqFontsReady(){
   await Promise.race([Promise.all(loads), new Promise(r=>setTimeout(r,4000))]);
 }
 async function printClientReport(mode){
-  if(!A.lastValuation||!A.subject){ toast('Report state is missing — re-open the Client Report from the CMA tab','err'); return; }
+  if(A.reportMode!=='opps' && (!A.lastValuation||!A.subject)){ toast('Report state is missing — re-open the Client Report from the CMA tab','err'); return; }
   renderClientReport();
   await rqFontsReady();
   document.body.classList.toggle('rq-ink', mode!=='pdf');
-  const t0=document.title; document.title=`CMA - ${A.subject.addr}${A.subject.city?', '+toTitle(A.subject.city):''}`;
+  const t0=document.title; document.title=A.reportMode==='opps'?`Buyer Opportunity Report - ${(A.oppRptModel&&A.oppRptModel.area)||'Team Parikh'}`:`CMA - ${A.subject.addr}${A.subject.city?', '+toTitle(A.subject.city):''}`;
   const restore=()=>{ document.title=t0; document.body.classList.remove('rq-ink'); window.removeEventListener('afterprint',restore); };
   window.addEventListener('afterprint',restore);
   setTimeout(()=>window.print(),150);
 }
 
 async function saveReportImage(which){
-  if(!A.lastValuation||!A.lastV7){ toast('Run a CMA first','err'); return; }
+  if(A.reportMode!=='opps' && (!A.lastValuation||!A.lastV7)){ toast('Run a CMA first','err'); return; }
   try{ await loadHtml2CanvasIfNeeded(); }catch(e){ toast('Could not load the image library — check your internet connection','err'); return; }
   const bd=showExportBackdrop(which==='summary'?'CMA Summary Image':'CMA Report Image');
   const stage=document.createElement('div'); stage.className='rq-stage';
@@ -12439,8 +12676,8 @@ async function saveReportImage(which){
     if(canv.length>1){ const gap=Math.round(20*scale); out=document.createElement('canvas'); out.width=canv[0].width; out.height=canv.reduce((a,c)=>a+c.height,0)+gap*(canv.length-1);
       const ctx=out.getContext('2d'); ctx.fillStyle='#1A1F2C'; ctx.fillRect(0,0,out.width,out.height); let y=0; canv.forEach(c=>{ ctx.drawImage(c,0,y); y+=c.height+gap; }); }
     setBackdropHint(bd,'Saving PNG…');
-    const slug=String(A.subject.addr||'Subject').replace(/[^\w]+/g,'-').replace(/^-|-$/g,'');
-    await saveCanvasPng(out,`TeamParikh_CMA_${slug}_${which==='summary'?'Summary':'Full'}_${new Date().toISOString().slice(0,10)}.png`);
+    const slug=String(A.reportMode==='opps'?('Opportunities_'+((A.oppRptModel&&A.oppRptModel.cityLbl)||'')):(A.subject.addr||'Subject')).replace(/[^\w]+/g,'-').replace(/^-|-$/g,'');
+    await saveCanvasPng(out,`TeamParikh_${A.reportMode==='opps'?'OppReport':'CMA'}_${slug}_${which==='summary'?'Summary':'Full'}_${new Date().toISOString().slice(0,10)}.png`);
     toast(which==='summary'?'Summary image saved':'Full report image saved','ok');
   }catch(err){ console.error(err); toast('Image export failed: '+(err.message||'unknown'),'err'); }
   finally{ if(stage.parentNode) stage.remove(); setTimeout(()=>{ if(bd.parentNode) bd.remove(); },300); }
