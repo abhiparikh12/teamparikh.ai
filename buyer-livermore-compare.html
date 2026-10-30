@@ -1,0 +1,1062 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Livermore Three-Property Comparison</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0f2540; --gold: #c9963a; --gold-light: #f5e6c8;
+    --red: #b5302a; --red-light: #fdf0ef;
+    --amber: #b5721a; --amber-light: #fef6e4;
+    --green: #1f6b3a; --green-light: #edf7f1;
+    --slate: #f4f5f7; --text: #1a1e2e; --muted: #5c6278;
+    --border: #dde1ea; --white: #ffffff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Source Sans 3', sans-serif; color: var(--text); background: #f0f2f6; font-size: 15px; line-height: 1.7; }
+  .report-header { background: #111214; color: white; padding: 48px 60px 40px; position: relative; overflow: hidden; }
+  .report-header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gold); }
+  .report-header::after { content: ''; position: absolute; bottom: -60px; right: -60px; width: 200px; height: 200px; border-radius: 50%; border: 40px solid rgba(201,150,58,0.12); }
+  .tag { display: inline-block; background: var(--gold); color: var(--navy); font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 4px 12px; border-radius: 2px; margin-bottom: 16px; }
+  .report-header h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; margin-bottom: 6px; line-height: 1.2; }
+  .report-header .address { font-size: 18px; color: rgba(255,255,255,0.75); margin-bottom: 24px; }
+  .header-meta { display: flex; gap: 32px; flex-wrap: wrap; }
+  .meta-item { font-size: 13px; color: rgba(255,255,255,0.6); }
+  .meta-item strong { display: block; color: rgba(255,255,255,0.9); font-weight: 600; font-size: 14px; }
+  .tab-bar { background: #111214; border-top: 1px solid rgba(255,255,255,0.1); display: flex; padding: 0 60px; overflow-x: auto; }
+  .tab-btn { padding: 14px 18px; font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.5); cursor: pointer; border: none; background: none; border-bottom: 3px solid transparent; white-space: nowrap; transition: all 0.2s; font-family: 'Source Sans 3', sans-serif; }
+  .tab-btn:hover { color: rgba(255,255,255,0.8); }
+  .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .wrapper { max-width: 980px; margin: 0 auto; padding: 40px 20px 80px; }
+  .exec-summary { background: #111214; color: white; border-radius: 8px; padding: 28px 32px; margin-bottom: 36px; border-left: 4px solid var(--gold); }
+  .exec-summary h2 { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--gold); margin-bottom: 12px; }
+  .exec-summary p { font-size: 14px; line-height: 1.75; color: rgba(255,255,255,0.85); }
+  .exec-summary p + p { margin-top: 10px; }
+  .scorecard { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 36px; }
+  .score-card { background: white; border-radius: 8px; padding: 20px 18px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border-top: 3px solid transparent; }
+  .score-card.red { border-top-color: var(--red); }
+  .score-card.amber { border-top-color: var(--amber); }
+  .score-card.green { border-top-color: var(--green); }
+  .score-card .count { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; line-height: 1; margin-bottom: 6px; }
+  .score-card.red .count { color: var(--red); }
+  .score-card.amber .count { color: var(--amber); }
+  .score-card.green .count { color: var(--green); }
+  .score-card .label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+  .section { margin-bottom: 40px; }
+  .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--border); }
+  .section-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .icon-red { background: var(--red-light); }
+  .icon-amber { background: var(--amber-light); }
+  .icon-green { background: var(--green-light); }
+  .icon-navy { background: rgba(15,37,64,0.08); }
+  .section-header h2 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 600; color: var(--navy); }
+  .section-header .subtitle { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .finding-card { background: white; border-radius: 8px; margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); overflow: hidden; border-left: 4px solid var(--border); }
+  .finding-card.critical { border-left-color: var(--red); }
+  .finding-card.caution { border-left-color: var(--amber); }
+  .finding-card.ok { border-left-color: var(--green); }
+  .finding-header { padding: 14px 20px; display: flex; align-items: center; gap: 12px; cursor: pointer; user-select: none; }
+  .finding-header:hover { background: #fafbfd; }
+  .badge { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; white-space: nowrap; }
+  .badge-red { background: var(--red-light); color: var(--red); }
+  .badge-amber { background: var(--amber-light); color: var(--amber); }
+  .badge-green { background: var(--green-light); color: var(--green); }
+  .badge-navy { background: rgba(15,37,64,0.08); color: var(--navy); }
+  .finding-title { font-weight: 600; font-size: 14px; flex: 1; }
+  .finding-body { padding: 0 20px 16px 44px; font-size: 14px; color: var(--muted); line-height: 1.75; display: none; }
+  .finding-body.open { display: block; }
+  .finding-body ul { padding-left: 20px; margin-top: 8px; }
+  .finding-body li { margin-bottom: 4px; }
+  .chevron { font-size: 12px; color: var(--muted); transition: transform 0.2s; }
+  .chevron.open { transform: rotate(90deg); }
+  .action-note { background: var(--gold-light); border-left: 3px solid var(--gold); padding: 10px 14px; border-radius: 4px; margin-top: 12px; font-size: 13px; color: #6b4c14; font-weight: 600; }
+  .buyer-note { background: var(--green-light); border-left: 3px solid var(--green); padding: 10px 14px; border-radius: 4px; margin-top: 12px; font-size: 13px; color: #1f5230; font-weight: 600; }
+  .specs-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 28px; }
+  .spec-item { background: white; border-radius: 6px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+  .spec-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 4px; }
+  .spec-value { font-size: 14px; font-weight: 600; color: var(--text); }
+  .doc-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.05); font-size: 13.5px; }
+  .doc-table th { background: #111214; color: white; padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+  .doc-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .doc-table tr:last-child td { border-bottom: none; }
+  .doc-table tr:nth-child(even) td { background: #fafbfd; }
+  .priority-high { color: var(--red); font-weight: 600; }
+  .priority-med { color: var(--amber); font-weight: 600; }
+  .priority-ok { color: var(--green); font-weight: 600; }
+  .age-banner { background: #fff8ed; border: 1px solid #f5d9a0; border-left: 4px solid var(--amber); border-radius: 6px; padding: 16px 20px; margin-bottom: 28px; font-size: 14px; color: #6b4c14; line-height: 1.65; }
+  .info-banner { background: #f0f4fa; border: 1px solid #c5d3e8; border-left: 4px solid var(--navy); border-radius: 6px; padding: 16px 20px; margin-bottom: 28px; font-size: 14px; color: #2a3a52; line-height: 1.65; }
+  .pest-cost-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.05); font-size: 14px; margin-bottom: 24px; }
+  .pest-cost-table th { background: #111214; color: white; padding: 10px 16px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .pest-cost-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .pest-cost-table tr:last-child td { border-bottom: none; }
+  .pest-cost-table .cost { font-weight: 700; color: var(--red); white-space: nowrap; }
+  .pest-cost-table .section1 { background: #fdf0ef; }
+  .pest-cost-table .section2 { background: #fef6e4; }
+  .pest-cost-table .fi { background: #f4f5f7; }
+  .total-row td { font-weight: 700; background: var(--slate); }
+  /* COMP */
+  .comp-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; margin-bottom: 32px; }
+  .comp-card { background: white; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
+  .comp-card-header { padding: 14px 18px 10px; border-bottom: 1px solid var(--border); }
+  .comp-address { font-weight: 700; font-size: 15px; color: var(--navy); }
+  .comp-sold-date { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .comp-price { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: var(--navy); margin-top: 6px; }
+  .comp-card-body { padding: 12px 18px 16px; }
+  .comp-stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 10px; }
+  .comp-stat .cs-label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .comp-stat .cs-val { font-weight: 600; font-size: 13px; }
+  .comp-psf { color: var(--amber); }
+  .comp-tag { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; margin-top: 6px; }
+  .comp-tag-green { background: var(--green-light); color: var(--green); }
+  .comp-tag-amber { background: var(--amber-light); color: var(--amber); }
+  .comp-tag-red { background: var(--red-light); color: var(--red); }
+  .comp-tag-navy { background: rgba(15,37,64,0.08); color: var(--navy); }
+  .comp-adjust { font-size: 12.5px; color: var(--muted); margin-top: 10px; line-height: 1.6; }
+  .comp-bar-row { display: flex; align-items: center; gap: 10px; margin-top: 6px; }
+  .comp-bar-label { font-size: 12px; color: var(--muted); width: 75px; flex-shrink: 0; }
+  .comp-bar-track { flex: 1; background: #e8ecf3; border-radius: 4px; height: 6px; }
+  .comp-bar-fill { height: 6px; border-radius: 4px; background: var(--gold); }
+  .subject-card { background: #111214; color: white; border-radius: 8px; padding: 24px 28px; margin-bottom: 28px; border-left: 4px solid var(--gold); }
+  .subject-card h3 { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 16px; margin-bottom: 12px; }
+  .val-range { display: flex; gap: 16px; margin-top: 14px; flex-wrap: wrap; }
+  .val-box { background: rgba(255,255,255,0.07); border-radius: 6px; padding: 12px 16px; flex: 1; min-width: 140px; }
+  .val-box .vb-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.5); margin-bottom: 4px; }
+  .val-box .vb-val { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: white; }
+  .val-box .vb-sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 3px; }
+  /* TIER BOXES */
+  .tier-box { background: white; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); overflow: hidden; }
+  .tier-header { padding: 14px 20px; font-weight: 700; font-size: 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .tier-header.t-seller { background: #fdf3f3; color: var(--red); border-left: 4px solid var(--red); }
+  .tier-header.t-negotiate { background: #fef9f0; color: var(--amber); border-left: 4px solid var(--amber); }
+  .tier-header.t-buyer { background: #f0f8f4; color: var(--green); border-left: 4px solid var(--green); }
+  .tier-row { display: grid; grid-template-columns: 1fr 130px 160px; gap: 12px; padding: 10px 20px; border-bottom: 1px solid #f3f5f8; font-size: 13.5px; align-items: start; }
+  .tier-row:last-child { border-bottom: none; }
+  .tr-cost { font-weight: 700; color: var(--muted); text-align: right; }
+  .tr-source { font-size: 12px; color: var(--muted); font-style: italic; }
+  .tier-total { display: grid; grid-template-columns: 1fr 130px 160px; gap: 12px; padding: 12px 20px; background: var(--slate); font-weight: 700; font-size: 14px; }
+  .report-footer { background: #111214; color: rgba(255,255,255,0.55); text-align: center; padding: 24px 40px; font-size: 12px; line-height: 1.7; }
+  @media (max-width: 700px) {
+    .report-header { padding: 32px 24px 28px; }
+    .tab-bar { padding: 0 12px; }
+    .scorecard { grid-template-columns: repeat(2,1fr); }
+    .specs-grid { grid-template-columns: repeat(2,1fr); }
+    .comp-grid { grid-template-columns: 1fr; }
+    .tier-row, .tier-total { grid-template-columns: 1fr; }
+  }
+
+  /* AGENT TOPBAR */
+  .agent-topbar { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; }
+  .agent-topbar-photo { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; object-position: center 15%; border: 2px solid var(--gold); flex-shrink: 0; }
+  .agent-topbar-text { flex: 1; }
+  .agent-topbar-name { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 600; color: white; line-height: 1.2; }
+  .agent-topbar-title { font-size: 11px; color: rgba(255,255,255,0.55); margin-top: 2px; letter-spacing: 0.3px; }
+  .agent-topbar-logo { height: 54px; width: auto; flex-shrink: 0; }
+  .agent-topbar-sep { width: 1px; height: 40px; background: rgba(201,150,58,0.35); flex-shrink: 0; }
+  /* TEAM PARIKH LABEL */
+  .team-parikh-label { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+  .team-parikh-label-name { font-family: 'Source Sans 3', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--gold); }
+  .team-parikh-label-pipe { color: rgba(201,150,58,0.5); font-size: 18px; font-weight: 300; line-height: 1; }
+  .team-parikh-label-brokerage { font-family: 'Source Sans 3', sans-serif; font-size: 13px; font-weight: 400; color: rgba(255,255,255,0.75); letter-spacing: 0.3px; }
+
+  /* --- Disclaimer modal (additive) --- */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(8,12,22,0.82); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.hidden { display: none; }
+  .modal-box { background: var(--white); max-width: 640px; width: 100%; border-radius: 8px; border-top: 5px solid var(--gold); padding: 32px 34px 26px; box-shadow: 0 24px 60px rgba(0,0,0,0.45); max-height: 90vh; overflow-y: auto; }
+  .modal-box h2 { font-family: 'Playfair Display', serif; font-size: 21px; color: var(--navy); margin-bottom: 14px; }
+  .modal-box p { font-size: 14px; line-height: 1.75; color: var(--text); margin-bottom: 12px; }
+  .modal-box .modal-key { background: var(--gold-light); border-left: 3px solid var(--gold); padding: 12px 14px; border-radius: 3px; font-size: 13.5px; line-height: 1.7; margin-bottom: 14px; }
+  .modal-btn { display: block; width: 100%; margin-top: 6px; background: var(--navy); color: var(--white); border: none; padding: 13px; border-radius: 4px; font-family: 'Source Sans 3', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; letter-spacing: 0.3px; }
+  .modal-btn:hover { background: #1b3a63; }
+</style>
+<style>
+  .cmp-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); margin-bottom: 32px; }
+  .cmp-table { width: 100%; min-width: 760px; border-collapse: collapse; background: white; font-size: 13.5px; }
+  .cmp-table th { background: #111214; color: white; padding: 12px 14px; text-align: left; font-size: 12px; font-weight: 600; letter-spacing: 0.4px; vertical-align: bottom; }
+  .cmp-table th .th-sub { display: block; font-weight: 400; font-size: 11px; color: rgba(255,255,255,0.55); letter-spacing: 0; margin-top: 2px; }
+  .cmp-table th:first-child { width: 150px; }
+  .cmp-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.55; }
+  .cmp-table td:first-child { font-weight: 700; color: var(--navy); font-size: 12px; text-transform: uppercase; letter-spacing: 0.6px; background: #fafbfd; }
+  .cmp-table tr.grp td { background: var(--slate); color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 8px 14px; }
+  .cmp-table .muted { color: var(--muted); font-size: 12.5px; }
+  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
+  .dot-g { background: var(--green); } .dot-a { background: var(--amber); } .dot-r { background: var(--red); } .dot-n { background: #9aa3b5; }
+  .prop-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 36px; }
+  .prop-card { background: white; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; display: flex; flex-direction: column; }
+  .prop-card-head { background: #111214; color: white; padding: 16px 18px; border-bottom: 3px solid var(--gold); }
+  .prop-card-head .pc-addr { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; }
+  .prop-card-head .pc-sub { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+  .prop-card-body { padding: 14px 18px 18px; font-size: 13.5px; line-height: 1.65; flex: 1; }
+  .prop-card-body h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); margin: 10px 0 4px; }
+  .prop-card-body h4:first-child { margin-top: 0; }
+  .prop-card-body ul { padding-left: 18px; }
+  .prop-card-body li { margin-bottom: 3px; }
+  .prop-card-foot { padding: 0 18px 16px; }
+  .pc-link { display: inline-block; font-size: 12.5px; font-weight: 700; color: var(--navy); cursor: pointer; border-bottom: 1px solid var(--gold); background: none; border-top: 0; border-left: 0; border-right: 0; font-family: 'Source Sans 3', sans-serif; padding: 0 0 1px; }
+  .src { font-size: 11.5px; color: #8a90a2; font-style: italic; }
+  .check-list { list-style: none; padding: 0; }
+  .check-list li { background: white; border-radius: 6px; padding: 10px 14px 10px 40px; margin-bottom: 8px; position: relative; font-size: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  .check-list li::before { content: '☐'; position: absolute; left: 14px; top: 9px; color: var(--gold); font-size: 16px; }
+  .finding-body p + p { margin-top: 8px; }
+  @media (max-width: 900px) { .prop-cards { grid-template-columns: 1fr; } }
+  @media (max-width: 700px) { .wrapper { padding: 28px 16px 64px; } .exec-summary { padding: 22px 20px; } .finding-body { padding: 0 16px 14px 20px; } }
+@media (max-width: 700px) { .doc-table, .pest-cost-table { font-size: 12px; } .doc-table th, .doc-table td, .pest-cost-table th, .pest-cost-table td { padding: 8px 8px; } .doc-table td, .pest-cost-table td { overflow-wrap: anywhere; } }
+</style>
+<style>body{background:#f0f2f6;}</style></head><body>
+<div class="modal-overlay" id="disclaimerModal">
+  <div class="modal-box">
+    <h2>Please Read Before Continuing</h2>
+    <div class="modal-key">This advisory is <strong>not a substitute for, and is not provided in lieu of, the seller disclosure packages, inspection reports, or preliminary title reports</strong> for these three properties. It is a convenience summary prepared for ease of reference only.</div>
+    <p>The comparison covers only the documents that were provided for each home, and those packages are not equally complete. Where a document was not in a package, this advisory says so; it does not assume what that document would say.</p>
+    <p>Buyer is responsible for independently reviewing every source document in its original form. Where this summary and a source document differ, <strong>the source document governs</strong>. Cost figures are the inspectors' and contractors' own bids or estimates as printed. They are not quotes obtained for the buyer.</p>
+    <p>Nothing here constitutes an appraisal, legal advice, tax advice, or an inspection. Buyer should engage qualified independent professionals before the inspection period expires.</p>
+    <button class="modal-btn" onclick="closeModal()">I Understand — Continue to the Advisory</button>
+  </div>
+</div>
+
+<div class="report-header">
+  <div class="agent-topbar">
+    <img class="agent-topbar-photo" src="data:image/jpeg;base64,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" alt="Abhishek Parikh">
+    <div class="agent-topbar-text">
+      <div class="agent-topbar-name">Abhishek Parikh</div>
+      <div class="agent-topbar-title">Realtor® &nbsp;·&nbsp; Team Parikh at Keller Williams Luxury</div>
+    </div>
+    <div class="agent-topbar-sep"></div>
+    <img class="agent-topbar-logo" src="data:image/png;base64,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" alt="Team Parikh">
+  </div>
+
+  <div class="team-parikh-label">
+    <span class="team-parikh-label-name">Team Parikh</span>
+    <span class="team-parikh-label-pipe">|</span>
+    <span class="team-parikh-label-brokerage">Keller Williams</span>
+  </div>
+
+  <div class="tag">Buyer Disclosure Review · Three-Property Comparison</div>
+  <h1>Inspection, Disclosure &amp; Title Comparison</h1>
+  <div class="address">1162 Aberdeen Avenue &nbsp;·&nbsp; 1314 Vancouver Way &nbsp;·&nbsp; 2784 Crater Road — Livermore, CA 94550</div>
+  <div class="header-meta">
+    <div class="meta-item"><strong>Prepared</strong>October 29, 2026</div>
+    <div class="meta-item"><strong>Documents Reviewed</strong>25 documents across 3 properties (updated Oct. 29)</div>
+    <div class="meta-item"><strong>Inspections</strong>Aberdeen June 2026 · Vancouver Oct. 7, 2026 · Crater Oct. 1–2, 2026</div>
+    <div class="meta-item"><strong>Title Reports</strong>Aberdeen (Apr. 30, 2026) · Vancouver (May 15, 2026) · Crater (Sept. 30, 2026)</div>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="showTab('compare', this)">⚖️ Side-by-Side Comparison</button>
+  <button class="tab-btn" onclick="showTab('aberdeen', this)">🏡 1162 Aberdeen Ave</button>
+  <button class="tab-btn" onclick="showTab('vancouver', this)">🏡 1314 Vancouver Way</button>
+  <button class="tab-btn" onclick="showTab('crater', this)">🏡 2784 Crater Rd</button>
+</div>
+
+<!-- ================= TAB: COMPARISON ================= -->
+<div id="tab-compare" class="tab-content active">
+<div class="wrapper">
+  <div class="exec-summary">
+    <h2>The Short Version</h2>
+    <p>All three are older Livermore homes, and each package shows the ordinary wear you would expect for its age. None of them is clean, and none of them shows anything the reports call a reason to walk away. The differences come down to <strong>which big-ticket items are open, which have already been handled, and how complete each package is.</strong></p>
+    <p><strong>1162 Aberdeen Ave</strong> (1957, one story, pool) is the most "pre-handled." The seller completed the Section 1 termite work and HomeGuard issued a clearance on June 30, 2026, along with interior paint, carpet and some new windows. The main open items are a roof with an estimated 1–3 years of life and a <strong>Tesla (formerly SolarCity) solar Power Purchase Agreement</strong> the buyer would need to assume. The seller estimates payments at $120–250 a month and the agreement ends in 2035. The City permit report shows the 1991 two-bedroom addition, the 2005 re-roof and the sewer and solar work all permitted and finaled. It also carries a City note that the property <strong>"may have a structure"</strong> without required permits, to be removed or permitted at transfer; the report does not say which structure. The seller has provided an addendum but no TDS, SPQ or ESD form.</p>
+    <p><strong>1314 Vancouver Way</strong> (1985, one story) has the most complete paperwork: full TDS, SPQ, prelim and all three inspections. It also carries the most open work. The roof report rates the roof at zero remaining life. There is a horizontal foundation crack with a $14,694 repair proposal, though a second reviewer called it "not a concern" that can be monitored. The termite report calls for whole-house drywood fumigation, and several plumbing leaks are listed.</p>
+    <p><strong>2784 Crater Road</strong> (roughly 1973, two story, pool and spa) has the newest mechanical systems: furnace about 9 years, A/C 2018, water heater 2024. It is also the only home with a dedicated pool inspection. Its larger items are <strong>$10,320 of Section 1 fungus repairs</strong>, a roof the roofer suggests replacing within 2–4 years, and several pool equipment items, including a heater the inspector says is no longer usable. As a trust sale, the seller completed the <strong>Exempt Seller Disclosure (ESD)</strong> in place of a TDS and answered "No" to every question.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">🏠</div><div><h2>At a Glance</h2><div class="subtitle">What stands out for each home, from the documents provided</div></div></div>
+    <div class="prop-cards">
+      <div class="prop-card">
+        <div class="prop-card-head"><div class="pc-addr">1162 Aberdeen Ave</div><div class="pc-sub">1957 · 1 story · 4 BR (per seller) · Pool</div></div>
+        <div class="prop-card-body">
+          <h4>Already handled</h4>
+          <ul><li>Section 1 termite work completed; clearance issued 6/30/2026</li><li>Sewer line replaced (last 10 yrs); kitchen &amp; primary bath remodeled 2016</li><li>2026 paint, carpet, select windows</li></ul>
+          <h4>Biggest open items</h4>
+          <ul><li>Roof: 1–3 yrs remaining life</li><li>Solar PPA assumption (credit qualification)</li><li>City note: a structure may lack permits</li><li>Crawlspace supply piping corrosion with leakage</li><li>Right-side retaining wall movement</li></ul>
+          <h4>Package gaps</h4>
+          <ul><li>No TDS/SPQ/ESD form; full NHD report not attached</li></ul>
+        </div>
+        <div class="prop-card-foot"><button class="pc-link" onclick="goTab('aberdeen')">Open Aberdeen detail →</button></div>
+      </div>
+      <div class="prop-card">
+        <div class="prop-card-head"><div class="pc-addr">1314 Vancouver Way</div><div class="pc-sub">1985 · 1 story · No pool</div></div>
+        <div class="prop-card-body">
+          <h4>Already handled</h4>
+          <ul><li>Seller obtained a foundation proposal and a second review</li><li>Exterior painted before listing</li></ul>
+          <h4>Biggest open items</h4>
+          <ul><li>Roof: zero remaining life per roofer; no bid provided</li><li>Horizontal foundation crack: $14,694 proposal vs. "monitor"</li><li>Drywood termites: whole-structure fumigation (in $9,231 Sec. 1)</li><li>Several plumbing leaks; water heater ~27 yrs</li></ul>
+          <h4>Package gaps</h4>
+          <ul><li>AVID and SPQ addendum referenced but not included</li></ul>
+        </div>
+        <div class="prop-card-foot"><button class="pc-link" onclick="goTab('vancouver')">Open Vancouver detail →</button></div>
+      </div>
+      <div class="prop-card">
+        <div class="prop-card-head"><div class="pc-addr">2784 Crater Road</div><div class="pc-sub">~1973 · 2 story · 4 BR / 2 full + 2 half · Pool &amp; spa</div></div>
+        <div class="prop-card-body">
+          <h4>Already handled</h4>
+          <ul><li>Newer HVAC (furnace ~9 yrs, A/C 2018) and 2024 water heater</li><li>Newer windows; newer variable-speed pool pump</li></ul>
+          <h4>Biggest open items</h4>
+          <ul><li>$10,320 Section 1 fungus repairs (beams $6,600)</li><li>Roof: replace within 2–4 yrs; $1,400 repairs now</li><li>Pool heater, pool sub-panel, light GFCI, spa suction opening</li><li>Smoke/CO detectors; pool safety features</li></ul>
+          <h4>Package gaps</h4>
+          <ul><li>ESD only (trust sale); solar ownership not documented</li></ul>
+        </div>
+        <div class="prop-card-foot"><button class="pc-link" onclick="goTab('crater')">Open Crater detail →</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">📊</div><div><h2>Side-by-Side Detail</h2><div class="subtitle"><span class="dot dot-g"></span>favorable &nbsp; <span class="dot dot-a"></span>worth reviewing &nbsp; <span class="dot dot-r"></span>larger open item &nbsp; <span class="dot dot-n"></span>not documented</div></div></div>
+    <div class="cmp-wrap">
+    <table class="cmp-table">
+      <thead><tr><th></th><th>1162 Aberdeen Ave<span class="th-sub">HomeGuard · June 8–9, 2026</span></th><th>1314 Vancouver Way<span class="th-sub">HomeGuard · Oct. 7, 2026</span></th><th>2784 Crater Road<span class="th-sub">Specialty Inspections · Oct. 1–2, 2026</span></th></tr></thead>
+      <tbody>
+        <tr class="grp"><td colspan="4">The Home</td></tr>
+        <tr><td>Year built</td><td>1957 (per inspector)</td><td>1985 (per inspector)</td><td>~1973 (listing agent: 53 yrs; tract map 1973)</td></tr>
+        <tr><td>Layout</td><td>One story · 4 BR per seller (public record shows 5; seller unsure why)</td><td>One story · BR/BA count not stated</td><td>Two story · 4 BR · 2 full + 2 half baths</td></tr>
+        <tr><td>Foundation</td><td>Perimeter, slab &amp; pier/grade beam · crawlspace</td><td>Poured concrete perimeter · crawlspace</td><td>Raised perimeter &amp; piers · crawlspace</td></tr>
+        <tr><td>Pool / spa</td><td>Pool (owned pool-solar heating) · <span class="muted">not inspected</span></td><td>None</td><td>Pool + attached spa · separate pool inspection done</td></tr>
+        <tr><td>Solar (electric)</td><td><span class="dot dot-a"></span>Tesla/SolarCity PPA, 12.74 kW · seller est. $120–250/mo · ends 2035 — buyer assumes</td><td><span class="dot dot-n"></span>Roof report notes "a solar panel" on roof; SPQ answers "No" to solar</td><td><span class="dot dot-n"></span>Panels present; ownership/financing not documented</td></tr>
+
+        <tr class="grp"><td colspan="4">Major Systems</td></tr>
+        <tr><td>Roof</td><td><span class="dot dot-a"></span>Comp shingle, ~18–22 yrs wear (re-roof permit finaled 2005) · <strong>1–3 yrs</strong> remaining · $785 repair bid with 1-yr leak certification · panels rest on roof</td><td><span class="dot dot-r"></span>Comp shingle, ~30 yrs · <strong>zero</strong> remaining life · "beyond practical repair" · no replacement bid in package</td><td><span class="dot dot-a"></span>Comp shingle, ~25–30 yrs · replace within <strong>2–4 yrs</strong> · $1,400 repairs with 1-yr leak-free warranty</td></tr>
+        <tr><td>Foundation</td><td><span class="dot dot-a"></span>Minor wall cracks; past repairs noted; foundation contractor referral; crawlspace moisture</td><td><span class="dot dot-r"></span>Horizontal crack · $14,694 remove-and-replace proposal · second reviewer: "not a concern," can be monitored</td><td><span class="dot dot-g"></span>"Performed well and in good condition," but most of crawlspace not accessible</td></tr>
+        <tr><td>Heating / cooling</td><td><span class="dot dot-a"></span>York furnace, Luxaire A/C · replaced within last 15 yrs (seller) · A/C not tested (cold day)</td><td><span class="dot dot-a"></span>Goodman furnace &amp; A/C · ages not stated · HVAC contractor review suggested</td><td><span class="dot dot-g"></span>Furnace ~9 yrs · A/C 2018 · both operating</td></tr>
+        <tr><td>Water heater</td><td>Navien tankless, gas · age unknown</td><td><span class="dot dot-a"></span>GE 40-gal · ~27 yrs · strapping improper</td><td><span class="dot dot-g"></span>40-gal gas · 2024 · strapped &amp; elevated</td></tr>
+        <tr><td>Electrical</td><td><span class="dot dot-a"></span>200A service · 5 action items (exposed garage wiring, ungrounded outlets, reversed polarity, double taps)</td><td><span class="dot dot-g"></span>200A main + 125A sub · minor items · no GFCIs listed</td><td><span class="dot dot-a"></span>Capacity undetermined · aluminum branch circuits need anti-oxidant · older breakers</td></tr>
+        <tr><td>Plumbing</td><td><span class="dot dot-a"></span>Crawlspace supply pipe "heavy corrosion, rust and leakage" · sewer line replaced</td><td><span class="dot dot-a"></span>Multiple fixture/drain leaks; two with active leakage</td><td><span class="dot dot-g"></span>Copper supply / ABS drain · one wet-bar drain leak</td></tr>
+
+        <tr class="grp"><td colspan="4">Wood-Destroying Pests (Termite Report)</td></tr>
+        <tr><td>Findings</td><td>Fungus only · no termites</td><td>Drywood termites + fungus</td><td>Fungus only · no termites</td></tr>
+        <tr><td>Section 1</td><td><span class="dot dot-g"></span>$1,817 bid · <strong>completed &amp; cleared 6/30/2026</strong></td><td><span class="dot dot-r"></span><strong>$9,231</strong> incl. fumigation ($2,270)</td><td><span class="dot dot-r"></span><strong>$10,320</strong> (beams $6,600)</td></tr>
+        <tr><td>Section 2</td><td>$2,888 · open</td><td>$4,360 · open</td><td>$0 (owner/tradesperson items)</td></tr>
+        <tr><td>Further inspection</td><td>$0 (storage-blocked areas)</td><td>$1,035</td><td>$450 + time &amp; materials</td></tr>
+
+        <tr class="grp"><td colspan="4">Safety Items Flagged by Inspector</td></tr>
+        <tr><td>Items</td><td>Pool drowning-prevention features · garage fire separation &amp; door closer · walkway trip hazards · CO detector at right hall</td><td>Garage door auto-reverse failed · no self-closer on garage-house door · water heater strapping</td><td>Missing smoke detectors · no CO detectors · range not secured · pool drowning-prevention features · pool light GFCI &amp; spa suction opening</td></tr>
+
+        <tr class="grp"><td colspan="4">Paperwork</td></tr>
+        <tr><td>Seller disclosure</td><td><span class="dot dot-a"></span>Addendum #1, solar questionnaire, lead paint &amp; water heater forms · no TDS/SPQ/ESD form</td><td><span class="dot dot-g"></span>Full TDS &amp; SPQ (10/7/2026)</td><td><span class="dot dot-a"></span>ESD (trust sale) · all answers "No" (10/12/2026)</td></tr>
+        <tr><td>Permit history</td><td><span class="dot dot-a"></span>City report: addition, re-roof, sewer, solar all finaled · City notes a structure may lack permits</td><td><span class="dot dot-n"></span>Not in package</td><td><span class="dot dot-n"></span>Not in package</td></tr>
+        <tr><td>Natural hazards</td><td><span class="dot dot-g"></span>Not in flood, dam, fire, fault or seismic hazard zones (NHD)</td><td><span class="dot dot-n"></span>Not in package</td><td><span class="dot dot-n"></span>Not in package</td></tr>
+        <tr><td>Preliminary title</td><td><span class="dot dot-a"></span>Chicago Title, eff. Apr. 30, 2026 · $364,000 deed of trust (2020) + $100,000 credit line (2024) · solar contract notice recorded</td><td><span class="dot dot-a"></span>Lawyers Title, eff. May 15, 2026 · $285,000 deed of trust (2012) · two 50% owners</td><td><span class="dot dot-g"></span>Old Republic, eff. Sept. 30, 2026 · no open deeds of trust found</td></tr>
+        <tr><td>Seller</td><td>Trust (seller is also the listing agent)</td><td>Trust + co-owners; attorney-in-fact signed disclosures</td><td>Trust (acting trustee)</td></tr>
+        <tr><td>Property tax</td><td>FY 25–26 paid; installments $4,443.04 each</td><td>FY 25–26 paid; 2025–26 installments $2,841.62 each</td><td>$1,409.20 per installment (current year, not yet due)</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-amber">💲</div><div><h2>Documented Costs</h2><div class="subtitle">Only figures printed in the reports. Items without a bid are listed as "no bid"</div></div></div>
+    <div class="cmp-wrap">
+    <table class="cmp-table">
+      <thead><tr><th>Item</th><th>1162 Aberdeen Ave</th><th>1314 Vancouver Way</th><th>2784 Crater Road</th></tr></thead>
+      <tbody>
+        <tr><td>Termite — open</td><td>$2,888 (Sec. 2)</td><td>$9,231 + $4,360 + $1,035 (Sec. 1, Sec. 2, further inspection)</td><td>$10,320 + $450 (Sec. 1, further inspection)</td></tr>
+        <tr><td>Roof — repairs</td><td>$785 with 1-yr certification</td><td>No bid; roofer says repair is not practical</td><td>$1,400 with 1-yr warranty</td></tr>
+        <tr><td>Roof — replacement</td><td>Home inspector's estimator: $18,000–$28,500 (AI-based range, not a bid)</td><td>No bid in package</td><td>No bid in package</td></tr>
+        <tr><td>Foundation</td><td>No bid</td><td>$14,694 proposal (Foundation Repair of CA)</td><td>—</td></tr>
+        <tr><td>Pool</td><td>Not inspected</td><td>—</td><td>No prices quoted (heater, valves, sub-panel, light breaker, fill valve)</td></tr>
+        <tr><td>Solar</td><td>PPA: $0.150/kWh year 1, rising 2.9%/yr · seller est. $120–250/mo</td><td>—</td><td>Not documented</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="info-banner">ℹ️ The three companies price differently. HomeGuard (Aberdeen, Vancouver) lists every line item in its termite authorization. Specialty Inspections (Crater) bundles some items to "tradesperson." Treat the totals as each report's own number rather than an apples-to-apples quote. A single contractor bid on the items that matter most is the cleanest way to compare.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-green">🧭</div><div><h2>How the Three Compare</h2><div class="subtitle">A practical read of the documents. This is not a recommendation on which home to buy</div></div></div>
+    <div class="finding-card ok"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-green">Systems</span><span class="finding-title">Crater has the newest mechanicals; Vancouver the oldest water heater</span></div>
+      <div class="finding-body">Crater's furnace (~9 yrs), A/C (2018) and water heater (2024) are the newest in the group. Aberdeen's HVAC was replaced within the last 15 years per the seller, and it has a tankless water heater of unknown age. Vancouver's water heater is about 27 years old, and the inspector suggests planning for replacement.</div></div>
+    <div class="finding-card caution"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Roofs</span><span class="finding-title">All three roofs are near the end of their service life, on different timelines</span></div>
+      <div class="finding-body">Vancouver is rated at zero years remaining with no practical repair. Aberdeen has 1–3 years left, and Crater 2–4 years. Aberdeen and Crater both offer one-year leak warranties after repairs; neither warranty covers the roof under solar panels. Consider budgeting for a re-roof on any of the three, sooner at Vancouver.</div></div>
+    <div class="finding-card caution"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Structure</span><span class="finding-title">Vancouver is the only home with a specific foundation repair proposal</span></div>
+      <div class="finding-body">The seller's side obtained a $14,694 remove-and-replace proposal and a second opinion that the crack can be monitored. Aberdeen notes minor cracks and past repairs, with a referral to a foundation contractor. Crater's foundation was described as in good condition, but most of its crawlspace could not be reached. Consider a structural engineer's evaluation at Vancouver, and crawlspace access at Crater.</div></div>
+    <div class="finding-card caution"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Pest</span><span class="finding-title">Aberdeen's Section 1 is done; Vancouver and Crater each have about $9–10K open</span></div>
+      <div class="finding-body">Aberdeen has a completion notice and clearance from HomeGuard. Vancouver's Section 1 includes whole-structure fumigation for drywood termites. Crater's is all fungus repair, with most of it in the beams. Section 1 items are commonly negotiated with the seller.</div></div>
+    <div class="finding-card"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-navy">Paperwork</span><span class="finding-title">All three now have title reports; a few pieces are still outstanding</span></div>
+      <div class="finding-body">Aberdeen: ask which seller disclosure form applies (TDS/SPQ or ESD), and for the full natural hazard report and the 2024 reports the addendum refers to. Also ask how the City's unpermitted-structure note will be resolved. Crater: request solar ownership documents. Vancouver: the AVID and SPQ addendum are still not in the package; an updated prelim is also worth requesting (the current one is dated May 2026). The TDS and SPQ sent in the second batch are the same Vancouver forms already reviewed.</div></div>
+  </div>
+</div>
+</div>
+
+<!-- ================= TAB: ABERDEEN ================= -->
+<div id="tab-aberdeen" class="tab-content">
+<div class="wrapper">
+  <div class="exec-summary">
+    <h2>1162 Aberdeen Avenue — Summary</h2>
+    <p>A 1957 single-story home with a pool, owned since 2000. The seller is a licensed agent who is also representing the sale. The house has had steady updates: sewer line replaced from house to street within the last 10 years, kitchen and primary bath remodeled in 2016, hardwood and appliances in 2015, HVAC replaced within the last 15 years, and fresh interior paint, bedroom carpet and several new windows in 2026.</p>
+    <p>HomeGuard inspected in June 2026. The seller then had the <strong>Section 1 termite work completed, and HomeGuard certified the home free of active infestation or infection</strong> in visible areas on June 30, 2026. The open items center on the <strong>roof</strong> (1–3 years of estimated life, with solar panels resting on it), <strong>corroded supply piping in the crawlspace</strong>, a <strong>right-side retaining wall</strong> showing movement, and a group of electrical and safety corrections.</p>
+    <p>Three things are specific to this home. First, the electric solar is a <strong>Tesla (formerly SolarCity) Power Purchase Agreement</strong>. The 49 panels (12.74 kW) belong to the solar company, the buyer would assume the contract, and the seller estimates payments at $120–250 a month through 2035. Second, the <strong>City permit report</strong> shows the major work permitted and finaled, but notes the property "may have a structure" without required permits that must be removed or permitted at transfer. Third, title shows two loans that would be paid off in escrow. The natural hazard report places the home outside all mapped flood, fire, fault and seismic hazard zones.</p>
+  </div>
+
+  <div class="scorecard">
+    <div class="score-card green"><div class="count">✓</div><div class="label">Sec. 1 Termite Cleared</div></div>
+    <div class="score-card amber"><div class="count" style="font-size:28px;">1–3 yrs</div><div class="label">Roof Life Remaining</div></div>
+    <div class="score-card amber"><div class="count" style="font-size:28px;">$2,888</div><div class="label">Termite Sec. 2 Open</div></div>
+    <div class="score-card amber"><div class="count">PPA</div><div class="label">Solar to Assume · to 2035</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">🏠</div><div><h2>Property Snapshot</h2><div class="subtitle">As stated in the inspection reports and seller addendum</div></div></div>
+    <div class="specs-grid">
+      <div class="spec-item"><div class="spec-label">Built</div><div class="spec-value">1957</div></div>
+      <div class="spec-item"><div class="spec-label">Type</div><div class="spec-value">One-story single-family</div></div>
+      <div class="spec-item"><div class="spec-label">Bedrooms</div><div class="spec-value">4 per seller (record shows 5)</div></div>
+      <div class="spec-item"><div class="spec-label">Legal / APN</div><div class="spec-value">Lot 31, Tract 1637 · 097-0089-054</div></div>
+      <div class="spec-item"><div class="spec-label">Addition</div><div class="spec-value">1991: 2 BR + 1 BA, 440 sq ft (permitted)</div></div>
+      <div class="spec-item"><div class="spec-label">Hazard Zones</div><div class="spec-value">None mapped (NHD)</div></div>
+      <div class="spec-item"><div class="spec-label">Foundation</div><div class="spec-value">Perimeter, slab &amp; pier · crawlspace</div></div>
+      <div class="spec-item"><div class="spec-label">Roof</div><div class="spec-value">Comp shingle (re-roof 2005) + low-slope vinyl</div></div>
+      <div class="spec-item"><div class="spec-label">Electrical</div><div class="spec-value">225/200A PV-ready main (2016) · 100A sub</div></div>
+      <div class="spec-item"><div class="spec-label">Heating / Cooling</div><div class="spec-value">York gas furnace · Luxaire A/C</div></div>
+      <div class="spec-item"><div class="spec-label">Water Heater</div><div class="spec-value">Navien tankless, gas</div></div>
+      <div class="spec-item"><div class="spec-label">Pool</div><div class="spec-value">Yes · owned solar pool heating</div></div>
+      <div class="spec-item"><div class="spec-label">Solar (electric)</div><div class="spec-value">49 panels, 12.74 kW · PPA</div></div>
+      <div class="spec-item"><div class="spec-label">Lot</div><div class="spec-value">Uneven · retaining walls</div></div>
+      <div class="spec-item"><div class="spec-label">Garage</div><div class="spec-value">Attached · loft</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">📄</div><div><h2>Documents Reviewed</h2><div class="subtitle">And what was not in the package</div></div></div>
+    <table class="doc-table">
+      <tr><th>Document</th><th>Prepared by</th><th>Date</th><th>Status</th></tr>
+      <tr><td>Addendum #1 to TDS &amp; SPQ</td><td>Sellers</td><td>Signed 10/27/2026</td><td class="priority-ok">Provided</td></tr>
+      <tr><td>Home Inspection (Rpt 678394)</td><td>HomeGuard — Tomas Carmona</td><td>June 8, 2026</td><td class="priority-ok">Provided</td></tr>
+      <tr><td>Termite / WDO Report (Rpt 678394)</td><td>HomeGuard — Eric Mejia, FR68502</td><td>June 9, 2026</td><td class="priority-ok">Provided</td></tr>
+      <tr><td>Roof Inspection</td><td>HomeGuard — Matthew Robinson</td><td>June 8, 2026</td><td class="priority-ok">Provided</td></tr>
+      <tr><td>Notice of Work Completed (termite)</td><td>HomeGuard</td><td>June 30, 2026</td><td class="priority-ok">Provided</td></tr>
+      <tr><td>Solar Power Purchase Agreement</td><td>SolarCity Corporation</td><td>Dec. 1, 2015</td><td class="priority-ok">Provided</td></tr>
+      <tr><td>Solar Advisory &amp; Questionnaire</td><td>Sellers</td><td>June 18, 2026</td><td class="priority-ok">Provided</td></tr>
+      <tr><td>Preliminary Title Report (FWAC-5862600495)</td><td>Chicago Title — Amy Chadim</td><td>Effective Apr. 30, 2026</td><td class="priority-ok">Provided</td></tr>
+      <tr><td>Report of Residential Building Record (CR260441)</td><td>City of Livermore</td><td>June 11, 2026</td><td class="priority-ok">Provided</td></tr>
+      <tr><td>General disclosures: Natural Hazard Disclosure statement, lead paint, water heater, CO, trust signature, advisories</td><td>Sellers / Property I.D.</td><td>June 2026</td><td class="priority-ok">Provided</td></tr>
+      <tr><td>TDS, SPQ or ESD form</td><td>—</td><td>—</td><td class="priority-med">Not in package</td></tr>
+      <tr><td>Full NHD report (statement references it)</td><td>Property I.D.</td><td>—</td><td class="priority-med">Not in package</td></tr>
+      <tr><td>2024 home, termite &amp; roof reports and completion letters (referenced in addendum)</td><td>HomeGuard</td><td>July 2024</td><td class="priority-med">Not in package</td></tr>
+      <tr><td>Pool inspection</td><td>—</td><td>—</td><td class="priority-med">None performed</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-red">🔎</div><div><h2>Items Worth Prioritizing</h2><div class="subtitle">The handful of findings that carry the most cost or follow-up</div></div></div>
+
+    <div class="finding-card critical"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-red">Roof</span><span class="finding-title">Main roof has an estimated 1–3 years of remaining life</span></div>
+      <div class="finding-body">
+        <p>HomeGuard's roofer describes the composition shingle as showing about 18–22 years of wear, "poor yet serviceable," with <strong>1–3 years</strong> of estimated remaining life. Corrective items 1–8 are bid at <strong>$785</strong>: exposed fasteners, debris, damaged shingles, chimney flashing, unsealed bracket holes, roof-to-wall mastic, ridge caps, and loose fasteners. HomeGuard offers a <strong>1-year leak-free certification</strong> once it performs that work. The low-slope vinyl section is rated "fair."</p>
+        <p>The home inspector separately notes the sloped roofing is "nearing or past the end of its life cycle." Its AI-based estimator range is $18,000–$28,500, which is not a bid. The inspector also notes water stains in the attic and garage loft.</p>
+        <div class="action-note">Consider asking whether the seller will complete the $785 roof repairs and provide HomeGuard's 1-year certification. Budget for a re-roof in the near term, and get a replacement bid during the inspection period.</div>
+        <div class="src">Roof Report p.3–4, p.11 · Home Inspection Roofing #2, Structure #2</div>
+      </div></div>
+
+    <div class="finding-card critical"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-red">Solar</span><span class="finding-title">Solar panels are under a Power Purchase Agreement the buyer would assume</span></div>
+      <div class="finding-body">
+        <p>The seller signed a <strong>SolarCity PPA</strong> on December 1, 2015; the seller now lists Tesla, which acquired SolarCity. Under a PPA, the solar company <strong>owns the panels</strong> and the homeowner buys the power they produce. The City permit for the <strong>49-panel, 12.74 kW</strong> system was finaled January 20, 2016.</p>
+        <ul>
+          <li><strong>Rate:</strong> $0.1500/kWh in year one, rising <strong>2.90% per year</strong>. Billed monthly on actual production (est. 15,813 kWh in year one).</li>
+          <li><strong>Term:</strong> 20 years from the interconnection date. The seller's questionnaire gives installation and connection as 12/15 and the expiration as <strong>2035</strong>. That puts the agreement in about its 11th year; by the contract's 2.90% escalator, the year-11 rate works out to roughly $0.20/kWh (our arithmetic, not a figure in the documents).</li>
+          <li><strong>Seller's estimates:</strong> current solar payments of <strong>$120–250 per month</strong>, plus an annual PG&amp;E true-up of $0–150. Net metering is in place; there is no battery. The seller indicates there is a transfer fee and a maintenance agreement, and refers to the agreement for details.</li>
+          <li><strong>Transfer:</strong> buyer qualifies with a <strong>650+ FICO</strong>, by paying cash, or by qualifying for a mortgage plus a $250 fee. 15 days to 3 months' written notice. Alternatives: seller prepays the remaining payments (at a 5% discount) or buys the system at appraised fair market value.</li>
+          <li><strong>Roof work:</strong> the solar company removes and reinstalls panels for roof repairs for <strong>$499</strong>.</li>
+          <li><strong>Recording:</strong> title shows a <strong>Notice of Independent Solar Energy Producer Contract</strong> recorded August 16, 2016. If the buyer assumes the PPA, this notice stays as an exception on the owner's and lender's policies. Title also shows a <strong>financing statement in favor of Tesla, Inc.</strong>, recorded February 22, 2023 (debtor: Debbie Lavell). The documents do not say what it covers.</li>
+        </ul>
+        <div class="action-note">Consider requesting a current Tesla statement (rate, contract year, last 12 months of bills) and the transfer packet. Ask whether the seller intends to transfer the PPA or prepay it, and what the 2023 Tesla financing statement relates to. Include the $499 panel removal in any re-roof estimate, and check with the buyer's lender about its solar requirements.</div>
+        <div class="src">Solar PPA p.1–2, §4, §10, §12, Exhibit 2 §4 · Solar Advisory &amp; Questionnaire p.2–3 · Prelim Exceptions 5, 7 · City permit D151757</div>
+      </div></div>
+
+
+    <div class="finding-card critical"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-red">Permits</span><span class="finding-title">City record notes a structure that may lack permits</span></div>
+      <div class="finding-body">
+        <p>The City of Livermore Report of Residential Building Record (June 11, 2026) includes this checked statement: <strong>"City of Livermore records indicate that this property may have a structure constructed that does not have the required permits or approvals. The City Council has mandated that the structure be removed or permitted at transfer of title."</strong> The report does not identify the structure.</p>
+        <p>The permits of record are all finaled, except a 1983 re-roof permit that expired; the roof was redone under a 2005 permit:</p>
+        <table class="doc-table" style="margin:10px 0 6px;">
+          <tr><th>Year</th><th>Work</th><th>Result</th></tr>
+          <tr><td>1957</td><td>Residence and garage</td><td>—</td></tr>
+          <tr><td>1971</td><td>Swimming pool</td><td class="priority-ok">Finaled</td></tr>
+          <tr><td>1976</td><td>Patio cover (256 sq ft)</td><td class="priority-ok">Finaled</td></tr>
+          <tr><td>1977</td><td>Termite repair</td><td class="priority-ok">Finaled</td></tr>
+          <tr><td>1983</td><td>Re-roof</td><td class="priority-med">Expired</td></tr>
+          <tr><td>1991–92</td><td>Addition of 2 bedrooms + 1 bathroom (440 sq ft); hall and primary bath floor and shower repair</td><td class="priority-ok">Finaled</td></tr>
+          <tr><td>2005</td><td>Re-roof</td><td class="priority-ok">Finaled</td></tr>
+          <tr><td>2012</td><td>Trenchless sewer lateral replacement with two-way cleanout</td><td class="priority-ok">Finaled</td></tr>
+          <tr><td>2015–16</td><td>49 roof-mounted solar panels (12.74 kW); main panel upgraded to PV-ready 225/200A</td><td class="priority-ok">Finaled</td></tr>
+        </table>
+        <p>The record does not list permits for the 2016 kitchen and primary bath remodel, the gazebo, or the 2026 window replacements the seller describes. The report also states the seller is responsible for approved smoke alarms, a carbon monoxide alarm and a chimney spark arrestor at the time of sale. The home inspector noted the right chimney has no rain cap and did not locate a CO detector in the right hallway.</p>
+        <div class="action-note">Consider asking the seller and the City which structure the note refers to and how it will be resolved before close: permitted, removed, or another arrangement the City accepts. Also ask about permits for the 2016 remodel. The 1991 permitted addition may also help explain the 4- vs. 5-bedroom question.</div>
+        <div class="src">City of Livermore Report CR260441 · Addendum #1 · Home Inspection Roofing #8, Interior #1</div>
+      </div></div>
+    <div class="finding-card caution"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Roof / Solar</span><span class="finding-title">Panels are resting directly on the roof surface</span></div>
+      <div class="finding-body">The roofer notes the panels "are resting directly on the roof surface," keeping water from draining and rubbing the shingles. The roof under the panels was not inspected, and HomeGuard's certification excludes it. The roofer recommends a contractor inspect and repair; this item is not in the $785 bid.
+        <div class="action-note">Consider having Tesla inspect the mounting, since it owns the system. Have the roof under the panels looked at when the panels come off for re-roofing.</div>
+        <div class="src">Roof Report item 12, p.4, p.11</div></div></div>
+
+    <div class="finding-card caution"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Plumbing</span><span class="finding-title">Crawlspace supply piping shows heavy corrosion with leakage</span></div>
+      <div class="finding-body">Exposed metal supply piping under the kitchen shows "heavy corrosion, rust and leakage." The inspector's estimator range is $1,800–$5,000. The termite report separately lists a leak at the kitchen subarea supply line (Sec. 2, item 2I, $567), still open. The inspector notes both the metallic supply and drain piping "may be nearing the end of [their] effective service life." Drain pipes show corrosion with no leakage.
+        <div class="action-note">Consider a licensed plumber's evaluation of the supply and drain piping, ideally with a sewer camera of the house side of the line. The sewer lateral itself was replaced per the seller.</div>
+        <div class="src">Home Inspection Plumbing #1–4 · Termite 2I</div></div></div>
+
+    <div class="finding-card caution"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Site</span><span class="finding-title">Right-side retaining wall shows movement and cracks</span></div>
+      <div class="finding-body">The inspector notes the right-side retaining wall "shows evidence of significant movement and/or cracks" and recommends further evaluation by the appropriate tradesperson. The estimator range is $1,500–$3,000. The rear retaining wall shows slight movement; the recommendation there is to monitor. Portions of the lot are sloped, and the area has expansive soil.
+        <div class="action-note">Consider a contractor or engineer's look at the right-side wall during the inspection period.</div>
+        <div class="src">Home Inspection Exterior #6, #12, #18 · Structure #10</div></div></div>
+
+    <div class="finding-card caution"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Foundation</span><span class="finding-title">Minor foundation cracks and past repairs noted; contractor review suggested</span></div>
+      <div class="finding-body">The inspector observed minor cracks in the foundation walls. Its standard recommendation is a licensed foundation contractor for further evaluation. It also noted evidence of past foundation and crawlspace repairs, efflorescence, and periodic moisture in the crawlspace (monitor; soils specialist if excessive). Floor-member water stains under the baths and kitchen were dry and appear to be from past leaks. The seller's addendum does not mention foundation work.
+        <div class="action-note">Consider asking the seller about the past foundation and crawlspace repairs and any permits. A foundation contractor's walk-through would close this out.</div>
+        <div class="src">Home Inspection Structure #3–#10</div></div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-amber">🐜</div><div><h2>Termite Report &amp; Completed Work</h2><div class="subtitle">HomeGuard Report 678394 · inspected June 9, 2026 · no termites found</div></div></div>
+    <table class="pest-cost-table">
+      <tr><th>Item</th><th>Finding</th><th>Bid</th><th>Status</th></tr>
+      <tr class="section1"><td>1A</td><td>Fungus damage, front door kick-board trim</td><td class="cost">$365</td><td class="priority-ok">Completed</td></tr>
+      <tr class="section1"><td>1B</td><td>Fungus damage, base of front porch support post(s)</td><td class="cost">$587</td><td class="priority-ok">Completed</td></tr>
+      <tr class="section1"><td>1C</td><td>Fungus damage, hall door — replace door</td><td class="cost">Will bid</td><td class="priority-ok">Completed</td></tr>
+      <tr class="section1"><td>1D</td><td>Surface fungus beneath kitchen sink, hall bath &amp; primary bath — treat</td><td class="cost">$865</td><td class="priority-ok">Completed</td></tr>
+      <tr class="section2"><td>2A</td><td>Vegetation touching structure</td><td>Owner</td><td class="priority-med">Open</td></tr>
+      <tr class="section2"><td>2B</td><td>Gutters/downspouts leaking or clogged</td><td class="cost">$995</td><td class="priority-med">Open</td></tr>
+      <tr class="section2"><td>2C</td><td>Water stains at garage roof (refer to roofer)</td><td>Other trade</td><td class="priority-med">Open</td></tr>
+      <tr class="section2"><td>2D</td><td>Leakage around primary bath stall shower — reseal</td><td class="cost">$276</td><td class="priority-med">Open</td></tr>
+      <tr class="section2"><td>2E</td><td>Kitchen countertop cracked</td><td>Other trade</td><td class="priority-med">Open</td></tr>
+      <tr class="section2"><td>2F</td><td>Hall bath toilet loose — reset</td><td class="cost">$418</td><td class="priority-med">Open</td></tr>
+      <tr class="section2"><td>2G</td><td>Hall bath sink shelf delaminated</td><td class="cost">$474</td><td class="priority-med">Open</td></tr>
+      <tr class="section2"><td>2H</td><td>Hall bath tub tile grout</td><td class="cost">$158</td><td class="priority-med">Open</td></tr>
+      <tr class="section2"><td>2I</td><td>Plumbing leak at kitchen subarea supply line</td><td class="cost">$567</td><td class="priority-med">Open</td></tr>
+      <tr class="fi"><td>3A–3B</td><td>Parts of garage and attic not inspected (storage)</td><td>N/C / Owner</td><td class="priority-med">Open</td></tr>
+      <tr class="total-row"><td colspan="2">Section 1 completed · clearance issued June 30, 2026<br>Section 2 open</td><td>$2,888</td><td></td></tr>
+    </table>
+    <div class="buyer-note">✓ HomeGuard's Notice of Work Completed certifies the property "is now free of evidence of active infestation or infection in the visible and accessible areas." Repairs carry a 1-year guarantee.</div>
+    <div class="info-banner" style="margin-top:14px;">ℹ️ <strong>Minor paperwork clarifications:</strong> the completion notice references a report "dated 3/25/2025," while the report in the package (same number 678394) is dated 6/9/2026. The notice shows $3,451 total, while the attached invoice shows $1,952 with item 1C at $0. Neither affects the clearance itself. Consider asking HomeGuard for a corrected copy for the file.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">🔍</div><div><h2>Home Inspection — Other Findings</h2><div class="subtitle">HomeGuard, June 8, 2026. Estimates are the report's AI-based ranges, not bids</div></div></div>
+
+    <div class="finding-card caution"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Safety</span><span class="finding-title">Safety items the inspector flagged</span></div>
+      <div class="finding-body"><ul>
+        <li><strong>Pool:</strong> fewer than two of the drowning-prevention features required at sale under Health &amp; Safety Code §115922 (est. $3,000–$7,500). The pool itself was not inspected.</li>
+        <li><strong>Garage fire separation:</strong> open or missing wall/ceiling finishes where the garage meets the house, attic or crawlspace (est. $2,000–$4,500).</li>
+        <li><strong>Garage-to-house door:</strong> self-closer not functioning properly (est. $80–$250).</li>
+        <li><strong>Trip hazards:</strong> heaved walkway sections at the front and left (est. $750–$1,350); irrigation pipes at the front walk and stairs (est. $500–$1,500).</li>
+        <li><strong>CO detector:</strong> none located at the right hallway (est. $150–$700).</li>
+        <li><strong>Disposal:</strong> power cord not secured (est. $85–$210).</li>
+      </ul>
+      <div class="action-note">The pool safety features and CO detector are typical seller-side items at sale. Consider including them in a repair request.</div></div></div>
+
+    <div class="finding-card caution"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Electrical</span><span class="finding-title">Five electrical action items</span></div>
+      <div class="finding-body"><ul>
+        <li>Exposed wiring on garage walls below 7 ft</li>
+        <li>Ungrounded 3-prong outlets in the living room and bedrooms</li>
+        <li>Reversed polarity at a family room outlet</li>
+        <li>Inoperative exterior right-side outlet, possibly a switch</li>
+        <li>Double taps in the garage sub-panel</li>
+      </ul>
+      <p>Also noted: the sub-panel sits in a closet or cabinet, which is not allowed for new installations; the panel is crowded; some breakers are off for reasons not determined; there is aluminum wiring on the 240V circuits only, which the inspector says needs no action; and GFCI upgrades are suggested.</p>
+      <div class="action-note">Consider one licensed electrician visit to address the list together.</div></div></div>
+
+    <div class="finding-card caution"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Exterior / Wood</span><span class="finding-title">Water damage at rear rafters and right-side exterior door</span></div>
+      <div class="finding-body">The inspector notes water damage to rafters at the rear (est. $1,500–$4,600) and at the right-side exterior door. The termite report does not list either location as a separate item, so they are not covered by the completed Section 1 work. Gutters and downspouts leak in several areas (termite 2B, $995).
+        <div class="action-note">Consider asking HomeGuard's termite inspector whether these two spots were reviewed.</div></div></div>
+
+    <div class="finding-card"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-navy">Interior</span><span class="finding-title">Vermin activity, countertop, and routine interior items</span></div>
+      <div class="finding-body"><ul>
+        <li>Evidence of vermin activity; the inspector expects it extends to inaccessible areas (est. $300–$3,864). The seller has recurring Terminix service.</li>
+        <li>Kitchen countertop cracked or worn, with water damage around the sink.</li>
+        <li>Primary bedroom window: possible failed thermal seal. Several windows were replaced in 2026; the timing relative to the June inspection is not stated.</li>
+        <li>Dishwasher lacks an air gap; oven not secured to cabinet.</li>
+        <li>Grout and caulk in the baths; tub stopper; shower wiper seal.</li>
+      </ul></div></div>
+
+    <div class="finding-card"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-navy">HVAC</span><span class="finding-title">Furnace operated; A/C could not be tested</span></div>
+      <div class="finding-body">The furnace produced heat. A flexible gas line passes through the furnace housing, and the inspector recommends rigid pipe at that point (est. $500–$1,500). The A/C was not tested because it was below 65°F; refrigerant line insulation is damaged and the condenser is not secured. The inspector recommends an HVAC contractor's review. A seismic gas shut-off is not present.</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-green">📝</div><div><h2>Seller Disclosures &amp; Hazards</h2><div class="subtitle">What the seller disclosed</div></div></div>
+    <div class="finding-card ok"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-green">Disclosed</span><span class="finding-title">Repairs and updates listed by the seller</span></div>
+      <div class="finding-body"><ul>
+        <li><strong>2026:</strong> fresh interior paint; exterior touch-up; new carpet in all bedrooms; new windows (kitchen, 2 in primary bedroom, 1 in bedroom with bath); new hallway door; all Section 1 termite work; new hall bath light; home warranty ordered through HomeGuard.</li>
+        <li><strong>2024:</strong> fence sections rebuilt; new steps outside the slider; new closet doors; attic access door added; panel clearance shelf removed; garage door weather-stripping; hallway door jamb repaired; plus items completed from the 2024 termite, roof and home inspection reports.</li>
+        <li><strong>Earlier:</strong> main sewer line replaced to the street with a cleanout (last 10 yrs); kitchen and primary bath remodeled (2016); hardwood and appliances (2015); HVAC replaced (last 15 yrs).</li>
+        <li><strong>Ongoing services:</strong> Terminix pest service; Pool Chlo pool service; Diablo Solar annual pool-solar service.</li>
+        <li>The seller states the home has always had 4 bedrooms since purchase in 2000, and is not aware why public record shows 5.</li>
+      </ul></div></div>
+    <div class="finding-card ok"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-green">Disclosed</span><span class="finding-title">Other seller forms and the natural hazard statement</span></div>
+      <div class="finding-body"><ul>
+        <li><strong>Natural Hazard Disclosure</strong> (Property I.D., June 5, 2026): the home is <strong>not</strong> in a FEMA flood zone, a dam inundation area, a high or very high fire hazard zone, a wildland area, an earthquake fault zone, or a seismic (landslide or liquefaction) hazard zone. The statement references a full report covering items such as Mello-Roos/special assessments and airport influence; that report is not in the package. An Alameda County Right to Farm notice is included; it is a standard countywide notice.</li>
+        <li><strong>Lead-based paint</strong> (pre-1978 home): sellers report no knowledge of lead-based paint hazards and no reports.</li>
+        <li><strong>Water heater:</strong> sellers certify compliance at close of escrow. The form notes that the statutory strapping requirement generally does not apply to a properly bolted tankless unit like this one.</li>
+        <li><strong>Seller capacity:</strong> sellers are Michael Ross Lavell and Debra Marie Lavell, trustees of their 2019 living trust.</li>
+      </ul>
+      <div class="action-note">The water heater and CO forms are the versions used by sellers exempt from the TDS, but no TDS, SPQ or ESD form for this property is in the package. Consider asking the listing agent which disclosure form applies, and requesting it.</div></div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">📜</div><div><h2>Preliminary Title Report</h2><div class="subtitle">Chicago Title · FWAC-5862600495 · effective April 30, 2026</div></div></div>
+    <table class="doc-table">
+      <tr><th>#</th><th>Item</th><th>What it means</th></tr>
+      <tr><td>1–3</td><td>2026–27 property taxes; supplemental and escaped assessments</td><td>Standard. FY 2025–26 is shown <strong>paid</strong> ($4,443.04 per installment). Expect a supplemental bill after purchase.</td></tr>
+      <tr><td>4</td><td>CC&amp;Rs recorded July 5, 1956</td><td>Original tract restrictions; no HOA indicated</td></tr>
+      <tr><td>5</td><td>SolarCity Notice of Independent Solar Energy Producer Contract (rec. 2016)</td><td>Public notice that the solar company owns the panels. Remains on the policy if the buyer assumes the PPA; a termination is required to remove it.</td></tr>
+      <tr><td>6</td><td>Deed of trust, $364,000 (2020), MERS / Guild Mortgage</td><td>Seller's existing loan; paid off through escrow</td></tr>
+      <tr><td>7</td><td>Financing statement — secured party Tesla, Inc. (rec. Feb. 2023)</td><td>Purpose not stated; consider asking seller and title</td></tr>
+      <tr><td>8</td><td>Credit-line deed of trust, $100,000 (2024), Third Federal Savings</td><td>Seller's credit line; title requires the seller to suspend and close the line for payoff</td></tr>
+      <tr><td>9</td><td>Trust — Certification of Trust required</td><td>Routine trust paperwork</td></tr>
+    </table>
+    <div class="info-banner" style="margin-top:14px;">ℹ️ Title vests in Michael Ross Lavell and Debra Marie Lavell, trustees of their 2019 living trust. No conveyances were recorded in the last 24 months. Livermore is not on the title company's list of cities with a city transfer tax. The prelim is dated April 30, 2026; an updated prelim is worth requesting.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-green">✅</div><div><h2>Suggested Next Steps</h2><div class="subtitle">For the inspection period</div></div></div>
+    <ul class="check-list">
+      <li>Ask the seller and the City which structure the City's permit note refers to, and how it will be resolved before close</li>
+      <li>Ask which seller disclosure form applies (TDS/SPQ or ESD) and request it, along with the full natural hazard report and the 2024 HomeGuard reports referenced in the addendum</li>
+      <li>Request a current Tesla statement, 12 months of bills and the transfer packet; confirm the buyer's qualification and what the 2023 Tesla financing statement covers</li>
+      <li>Get a re-roof bid that includes solar removal and reinstall ($499 per the PPA); ask whether the seller will complete the $785 repairs and certification</li>
+      <li>Have a plumber review the crawlspace supply and drain piping</li>
+      <li>Have the right-side retaining wall evaluated</li>
+      <li>Consider a pool inspection, since the pool was not inspected</li>
+      <li>Request pool drowning-prevention features, the CO detector and the electrical action items as seller repairs</li>
+    </ul>
+  </div>
+</div>
+</div>
+
+<!-- ================= TAB: VANCOUVER ================= -->
+<div id="tab-vancouver" class="tab-content">
+<div class="wrapper">
+  <div class="exec-summary">
+    <h2>1314 Vancouver Way — Summary</h2>
+    <p>A 1985 single-story home on a level lot, not occupied by the seller. The disclosure package is the most complete of the three: full TDS and SPQ, a preliminary title report, HomeGuard home, termite and roof reports, and a foundation proposal with a second review. The seller disclosures are short. They note a skylight that previously leaked and was resealed, a possible sprinkler pipe leak on the west side, shared fences, audible road noise, a dead backyard lawn, and an east gate needing repair.</p>
+    <p>The inspections identify three larger items. The <strong>roof</strong> is rated at zero remaining life and "beyond practical repair." There is a <strong>horizontal foundation crack</strong>: a contractor proposed $14,694 to remove and replace an 8-ft section, and a second reviewer wrote that it "is not a concern but could be monitored." And there is <strong>drywood termite activity</strong> calling for whole-structure fumigation, part of $9,231 in Section 1. Several plumbing fixture leaks and a ~27-year-old water heater round out the list.</p>
+    <p>On title, the home is held <strong>50% by Arthur &amp; Sofia McConn and 50% by Teal P. McConn as trustee</strong>, with a 2012 deed of trust of $285,000 of record. These are ordinary escrow items. Consider confirming with escrow early that all owners or their authorized representatives are lined up to sign.</p>
+  </div>
+
+  <div class="scorecard">
+    <div class="score-card red"><div class="count">0 yrs</div><div class="label">Roof Life Remaining</div></div>
+    <div class="score-card red"><div class="count" style="font-size:28px;">$14,694</div><div class="label">Foundation Proposal</div></div>
+    <div class="score-card red"><div class="count" style="font-size:28px;">$9,231</div><div class="label">Termite Section 1</div></div>
+    <div class="score-card green"><div class="count">Full</div><div class="label">TDS · SPQ · Title</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">🏠</div><div><h2>Property Snapshot</h2><div class="subtitle">As stated in the reports, disclosures and preliminary title</div></div></div>
+    <div class="specs-grid">
+      <div class="spec-item"><div class="spec-label">Built</div><div class="spec-value">1985</div></div>
+      <div class="spec-item"><div class="spec-label">Type</div><div class="spec-value">One-story single-family</div></div>
+      <div class="spec-item"><div class="spec-label">Legal / APN</div><div class="spec-value">Lot 88, Tract 2803 · 097-0138-035</div></div>
+      <div class="spec-item"><div class="spec-label">Foundation</div><div class="spec-value">Poured concrete perimeter · crawlspace</div></div>
+      <div class="spec-item"><div class="spec-label">Roof</div><div class="spec-value">Comp shingle, ~30 yrs</div></div>
+      <div class="spec-item"><div class="spec-label">Electrical</div><div class="spec-value">200A main · 125A sub</div></div>
+      <div class="spec-item"><div class="spec-label">Heating / Cooling</div><div class="spec-value">Goodman gas furnace &amp; central A/C</div></div>
+      <div class="spec-item"><div class="spec-label">Water Heater</div><div class="spec-value">GE 40-gal gas · ~27 yrs</div></div>
+      <div class="spec-item"><div class="spec-label">Fireplace</div><div class="spec-value">Living room</div></div>
+      <div class="spec-item"><div class="spec-label">Garage</div><div class="spec-value">Attached (+ detached structure, not inspected)</div></div>
+      <div class="spec-item"><div class="spec-label">Occupancy</div><div class="spec-value">Seller not occupying</div></div>
+      <div class="spec-item"><div class="spec-label">HOA</div><div class="spec-value">None (TDS)</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">📄</div><div><h2>Documents Reviewed</h2></div></div>
+    <table class="doc-table">
+      <tr><th>Document</th><th>Prepared by</th><th>Date</th><th>Status</th></tr>
+      <tr><td>Transfer Disclosure Statement</td><td>Seller</td><td>Oct. 7, 2026</td><td class="priority-ok">Provided</td></tr>
+      <tr><td>Seller Property Questionnaire</td><td>Seller</td><td>Oct. 7, 2026</td><td class="priority-ok">Provided</td></tr>
+      <tr><td>Home Inspection (Rpt 685273)</td><td>HomeGuard — Anthony Perjanik</td><td>Oct. 7, 2026</td><td class="priority-ok">Provided</td></tr>
+      <tr><td>Termite / WDO Report</td><td>HomeGuard — Jene Clinkenbeard, FR55973</td><td>Oct. 7, 2026</td><td class="priority-ok">Provided</td></tr>
+      <tr><td>Roof Inspection</td><td>HomeGuard — Rafael Castaneda</td><td>Oct. 7, 2026</td><td class="priority-ok">Provided</td></tr>
+      <tr><td>Foundation proposal</td><td>Foundation Repair of CA — Fred Gonzalez</td><td>Oct. 13, 2026</td><td class="priority-ok">Provided</td></tr>
+      <tr><td>Second review (email) + listing agent letter</td><td>Grant DoBel · Guide Real Estate</td><td>Oct. 15, 2026</td><td class="priority-ok">Provided</td></tr>
+      <tr><td>Preliminary Title Report</td><td>Lawyers Title — Rob Delgado</td><td>Effective May 15, 2026</td><td class="priority-ok">Provided</td></tr>
+      <tr><td>Exceptions to Title Acknowledgement</td><td>Form</td><td>Unsigned</td><td class="priority-ok">Provided</td></tr>
+      <tr><td>AVID (referenced in TDS §III) · SPQ addendum (SPQ 19B)</td><td>—</td><td>—</td><td class="priority-med">Not in package</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-red">🔎</div><div><h2>Items Worth Prioritizing</h2></div></div>
+
+    <div class="finding-card critical"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-red">Roof</span><span class="finding-title">Roof is at end of life; the roofer recommends replacement over repair</span></div>
+      <div class="finding-body">
+        <p>HomeGuard's roofer rates the composition shingle roof at about 30 years of wear, "poor" overall, with <strong>zero years</strong> of remaining life. Large areas of field shingles are "severely cracked," and earlier repairs at the ridge, eaves, chimney, pipe flashings and skylight flashings are deteriorated or were done improperly. The report concludes the roof "appears to be vulnerable to leakage and is beyond practical repair." <strong>No replacement bid is included</strong>, and no certification is offered.</p>
+        <p>Related findings: the home inspector saw water stains in the attic and on the garage ceiling. The termite report lists fungus-damaged roof sheathing and blocking from "a failure of the roof covering" (1F, $980). The seller discloses a skylight that previously leaked and was resealed by a family member. The roofer also notes "a solar panel has been installed directly onto the roof surface" with fasteners needing sealing, while the SPQ answers "No" to solar.</p>
+        <div class="action-note">Consider getting a re-roof bid during the inspection period and treating the roof as a near-term replacement. Consider asking the seller what the roof-mounted panel is and whether it conveys.</div>
+        <div class="src">Roof Report p.2–3 · Home Inspection Structure #2, Exterior #1 · Termite 1F · TDS/SPQ 10A</div>
+      </div></div>
+
+    <div class="finding-card critical"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-red">Foundation</span><span class="finding-title">Horizontal foundation crack: repair proposal and second opinion</span></div>
+      <div class="finding-body">
+        <p><strong>Home inspector:</strong> "A horizontal crack was observed in the foundation wall at the front of the structure… We recommend further assessment by a licensed foundation contractor." Crack width is not stated.</p>
+        <p><strong>Foundation Repair of CA (Oct. 13):</strong> describes "2-sided horizontal cracking on left wall of garage." It proposes removing and replacing <strong>8 ft</strong> of foundation for <strong>$14,694</strong>, including permits and engineering. Stucco repair is excluded, and the price may change once engineering drawings are done. Note that the inspector places the crack at the front of the structure, while the proposal places it on the left garage wall.</p>
+        <p><strong>Second review (Grant DoBel, Oct. 15):</strong> "The observed crack is not a concern but could be monitored overtime prior to make any necessary repairs… The attached proposal is a very reasonable rate." The email says he reviewed the attachments; it does not indicate a site visit or list credentials, and notes "We do not service the Livermore area."</p>
+        <p>The inspector also notes efflorescence, a tree near the rear-left corner, and signs of expansive soil.</p>
+        <div class="action-note">Since the two opinions differ, consider a licensed structural engineer's site evaluation during the inspection period. That would settle the location, cause and whether repair is needed now. The $14,694 proposal is a useful reference figure for negotiation.</div>
+        <div class="src">Home Inspection p.3, Structure #1, #3; Exterior #8, #13 · Foundation Repair of CA p.3–4 · DoBel email</div>
+      </div></div>
+
+    <div class="finding-card critical"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-red">Termite</span><span class="finding-title">Drywood termites: whole-structure fumigation recommended</span></div>
+      <div class="finding-body">
+        <p>The termite inspector found drywood termite activity at door jambs, framing, rafters, roof sheathing and blocking. They recommend <strong>fumigating the entire structure with Vikane</strong> ($2,270, 3-year guarantee; the home must be vacant). Section 1 totals <strong>$9,231</strong> plus permits. The report notes damage may extend into inaccessible areas, in which case a supplemental bid would follow. The SPQ answers "No" to past or present pests.</p>
+        <div class="action-note">Section 1 work and fumigation are commonly requested of the seller before close. Consider asking for the fumigation and Section 1 repairs to be completed with a clearance.</div>
+      </div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-amber">🐜</div><div><h2>Termite Report Detail</h2><div class="subtitle">HomeGuard Report 685273 · Oct. 7, 2026 · drywood termites &amp; fungus</div></div></div>
+    <table class="pest-cost-table">
+      <tr><th>Item</th><th>Finding</th><th>Bid</th></tr>
+      <tr class="section1"><td>1A</td><td>Garage door jamb, right side — fungus</td><td class="cost">$660</td></tr>
+      <tr class="section1"><td>1B</td><td>Barge rafter(s) — fungus</td><td class="cost">$1,160</td></tr>
+      <tr class="section1"><td>1C</td><td>Rafter tails — fungus &amp; drywood termites</td><td class="cost">$345</td></tr>
+      <tr class="section1"><td>1D</td><td>Drywood termites — fumigate entire structure (Vikane)</td><td class="cost">$2,270</td></tr>
+      <tr class="section1"><td>1E</td><td>Termite pellets — remove or mask</td><td class="cost">$196</td></tr>
+      <tr class="section1"><td>1F</td><td>Roof sheathing &amp; blocking — fungus (roof covering failure)</td><td class="cost">$980</td></tr>
+      <tr class="section1"><td>1G</td><td>Garage vanity — fungus</td><td class="cost">$940</td></tr>
+      <tr class="section1"><td>1H</td><td>Jambs at chimney chase — drywood termites</td><td class="cost">$560</td></tr>
+      <tr class="section1"><td>1I</td><td>Rim joist, floor joist &amp; subfloor at chimney chase — fungus; remove/replace stucco</td><td class="cost">$2,120</td></tr>
+      <tr class="total-row"><td colspan="2">Section 1 total (plus permit fees)</td><td>$9,231</td></tr>
+      <tr class="section2"><td>2A–2D</td><td>Grout at hall and primary bath sinks/tub; cracked hall bath tile (owner); hall bath angle stops corroded with <strong>active leakage</strong></td><td class="cost">$732</td></tr>
+      <tr class="section2"><td>2E, 2I</td><td>Primary bath stall shower handle leak and shower drain leak</td><td class="cost">$1,320</td></tr>
+      <tr class="section2"><td>2F</td><td>Laundry valve fittings corroded — <strong>active leakage</strong></td><td class="cost">$525</td></tr>
+      <tr class="section2"><td>2G, 2H</td><td>Wet bar drain leak in crawlspace; wet bar supply fittings corroded (no active leak)</td><td class="cost">$945</td></tr>
+      <tr class="section2"><td>2J, 2K</td><td>Cellulose debris in subarea; hall bath tub drain leak</td><td class="cost">$838</td></tr>
+      <tr class="total-row"><td colspan="2">Section 2 total</td><td>$4,360</td></tr>
+      <tr class="fi"><td>3A</td><td>Stucco cracks, bulging and/or water stains at chimney chase — open test holes</td><td class="cost">$450</td></tr>
+      <tr class="fi"><td>3B–3C</td><td>Wet bar water off (could not test); subfloor insulation removal to inspect</td><td class="cost">$585</td></tr>
+      <tr class="total-row"><td colspan="2">Further inspection total</td><td>$1,035</td></tr>
+    </table>
+    <div class="info-banner">ℹ️ The termite report excludes the detached garage and patio cover as not connected to the house. It also notes "evidence of repairs by others to the interior" and recent paint. Section 2 items reflect the HomeGuard line prices; grouped rows add those lines together.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">🔍</div><div><h2>Home Inspection — Other Findings</h2><div class="subtitle">HomeGuard, Oct. 7, 2026</div></div></div>
+
+    <div class="finding-card caution"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Safety</span><span class="finding-title">Safety items the inspector flagged</span></div>
+      <div class="finding-body"><ul>
+        <li>Garage door opener auto-reverse <strong>did not activate</strong> in the test; photo-eyes mounted at the wrong height</li>
+        <li>No automatic self-closer on the garage-to-house door</li>
+        <li>Water heater strapped improperly. The TDS certifies strapping compliance at close of escrow.</li>
+        <li>No GFCI protection listed; seismic and excess-flow gas shut-offs not present</li>
+        <li>Smoke and CO detectors not tested by the inspector; the TDS indicates both are present</li>
+      </ul></div></div>
+
+    <div class="finding-card caution"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Plumbing</span><span class="finding-title">Water heater age and fixture leaks</span></div>
+      <div class="finding-body">The 40-gallon GE water heater is about 27 years old; the inspector says replacement "should be expected in the near future." Leaks noted: primary shower handles, a drain leaking into the crawlspace near the access, and the termite report items above. The wet bar was off and could not be tested. Older floor-member stains under the baths and kitchen were dry.
+        <div class="action-note">Consider a plumber's visit to handle the active leaks together, and pricing water heater replacement.</div></div></div>
+
+    <div class="finding-card"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-navy">HVAC · Chimney</span><span class="finding-title">HVAC review and chimney cleaning suggested</span></div>
+      <div class="finding-body">Both the furnace and A/C responded; the A/C showed a ~16°F split. The inspector recommends an HVAC contractor's further evaluation of both; ages are not stated. The chimney interior was not inspected, and the inspector suggests cleaning and inspection before close. The termite report separately notes stucco cracks, bulging or stains at the chimney chase (further inspection, $450).</div></div>
+
+    <div class="finding-card"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-navy">Exterior · Interior</span><span class="finding-title">Routine items</span></div>
+      <div class="finding-body"><ul>
+        <li>Crawlspace vents at or below grade at the rear steps</li>
+        <li>Torn vent screens; loose crawlspace insulation</li>
+        <li>Front windows not sealed properly</li>
+        <li>Driveway cracks</li>
+        <li>Garage side door latch</li>
+        <li>Missing dryer vent cap</li>
+        <li>Interior doors not latching or rubbing</li>
+        <li>Missing window screens</li>
+        <li>Water heater and gas lines not bonded</li>
+        <li>Crowded electrical panel; loose outlets</li>
+      </ul></div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-green">📝</div><div><h2>Seller Disclosures (TDS &amp; SPQ)</h2><div class="subtitle">Signed Oct. 7, 2026 by Teal P. McConn, Trustee, and Nicolette McConn, Attorney-in-fact</div></div></div>
+    <div class="finding-card ok"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-green">Disclosed</span><span class="finding-title">Everything the seller answered "Yes" to</span></div>
+      <div class="finding-body"><ul>
+        <li><strong>Skylight:</strong> "previously leaked and was sealed by the seller's father-in-law. No recurring issues have been observed since." Resealed "at various times."</li>
+        <li><strong>Sprinklers:</strong> a west-side sprinkler pipe "appears to possibly leak when the system is in use and may require repair."</li>
+        <li><strong>Shared fences.</strong></li>
+        <li><strong>Road noise</strong> "may be audible at various times throughout the day."</li>
+        <li><strong>Painted</strong> before marketing.</li>
+        <li><strong>Other:</strong> backyard lawn is dead; east-side gate needs repair.</li>
+        <li><strong>Reports:</strong> the HomeGuard home, termite and roof reports are listed as prepared for the seller.</li>
+      </ul>
+      <p>Everything else is answered "No," including significant defects, settling or soil problems, insurance claims, unpermitted work, HOA, and assessments not on the tax bill.</p></div></div>
+    <div class="finding-card"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-navy">For the file</span><span class="finding-title">Points to reconcile with the inspection reports</span></div>
+      <div class="finding-body">The disclosures were signed the same day as the inspections and before the foundation proposal. Consider asking the seller to update the TDS/SPQ to reference:
+        <ul>
+          <li>the foundation proposal and second review</li>
+          <li>the termite findings</li>
+          <li>the roof-mounted solar panel</li>
+          <li>the easement and CC&amp;Rs shown on title (the TDS answered "No" to both)</li>
+        </ul>
+        The AVID referenced in TDS §III and the addendum referenced in SPQ 19B were not in the package.</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">📜</div><div><h2>Preliminary Title Report</h2><div class="subtitle">Lawyers Title · FLNP-0042600489RD · effective May 15, 2026</div></div></div>
+    <table class="doc-table">
+      <tr><th>#</th><th>Item</th><th>What it means</th></tr>
+      <tr><td>1–3</td><td>2026–27 property taxes; supplemental and escaped assessments</td><td>Standard. FY 2025–26 is shown <strong>paid</strong> ($2,841.62 per installment). Expect a supplemental bill after purchase.</td></tr>
+      <tr><td>4</td><td>Public utilities easement, southerly &amp; easterly 5 ft (tract map)</td><td>Standard utility strip along the lot lines</td></tr>
+      <tr><td>5</td><td>CC&amp;Rs recorded 1966, modified 1968</td><td>Original tract restrictions; no HOA indicated</td></tr>
+      <tr><td>6</td><td>Deed of trust, $285,000 (2012), MERS / OA Mortgage Services</td><td>Seller's existing loan; paid off through escrow</td></tr>
+      <tr><td>7</td><td>Trust — Certification of Trust required</td><td>Routine trust paperwork</td></tr>
+    </table>
+    <div class="info-banner" style="margin-top:14px;">ℹ️ <strong>Ownership:</strong> title vests 50% in Arthur McConn and Sofia McConn as joint tenants, and 50% in Teal P. McConn, Trustee of the McConn Revocable Trust (Bypass Trust). The disclosures were signed by the trustee and by Nicolette McConn as attorney-in-fact. Consider confirming with escrow early that every owner's signature or authority is in place. The prelim is dated May 2026; an updated prelim is worth requesting.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-green">✅</div><div><h2>Suggested Next Steps</h2></div></div>
+    <ul class="check-list">
+      <li>Structural engineer site evaluation of the foundation crack</li>
+      <li>Re-roof bid, including the skylights and the roof-mounted panel</li>
+      <li>Ask the seller to complete Section 1 termite work, including fumigation, with a clearance — or credit</li>
+      <li>Plumber visit for the active leaks; price water heater replacement</li>
+      <li>Request the AVID and SPQ addendum (still not in the package), an updated prelim, and an updated TDS/SPQ reflecting the reports</li>
+      <li>Clarify what the roof-mounted solar panel is and whether it conveys</li>
+      <li>Confirm with escrow the signing authority for all title owners</li>
+    </ul>
+  </div>
+</div>
+</div>
+
+<!-- ================= TAB: CRATER ================= -->
+<div id="tab-crater" class="tab-content">
+<div class="wrapper">
+  <div class="exec-summary">
+    <h2>2784 Crater Road — Summary</h2>
+    <p>A two-story, four-bedroom home with 2 full and 2 half baths, a pool and an attached spa. The listing agent gives its age as about 53 years, and the tract map was filed in 1973. The mechanical systems are the newest of the three homes: furnace about 9 years old, A/C from 2018, a 2024 water heater, and newer vinyl windows. The inspector describes the foundation as having "performed well" and the home as "well insulated and energy efficient."</p>
+    <p>The larger items are wood and roof. The termite report has <strong>$10,320 in Section 1 fungus repairs</strong>, mostly beams ($6,600). The roofer suggests <strong>replacing the roof within 2–4 years</strong> and bids $1,400 for repairs now. The pool inspection lists a heater that is "no longer useable," a frozen suction valve, a rusted equipment sub-panel, a faulty light GFCI breaker, and a spa bench opening to evaluate before using the spa.</p>
+    <p>Title looks clean. No open deeds of trust were found, and the seller is the acting trustee of a family trust. As a trust sale, the seller completed the <strong>Exempt Seller Disclosure (ESD)</strong> instead of a TDS and answered "No" to every question. Nothing in the package documents whether the roof's electric solar panels are owned, leased or under a PPA.</p>
+  </div>
+
+  <div class="scorecard">
+    <div class="score-card red"><div class="count" style="font-size:28px;">$10,320</div><div class="label">Termite Section 1</div></div>
+    <div class="score-card amber"><div class="count" style="font-size:28px;">2–4 yrs</div><div class="label">Until Re-Roof</div></div>
+    <div class="score-card amber"><div class="count">4</div><div class="label">Pool Report Safety Items</div></div>
+    <div class="score-card green"><div class="count" style="font-size:28px;">2018+</div><div class="label">HVAC &amp; Water Heater</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">🏠</div><div><h2>Property Snapshot</h2></div></div>
+    <div class="specs-grid">
+      <div class="spec-item"><div class="spec-label">Age</div><div class="spec-value">~53 yrs (tract 1973)</div></div>
+      <div class="spec-item"><div class="spec-label">Type</div><div class="spec-value">Two-story · stucco</div></div>
+      <div class="spec-item"><div class="spec-label">Beds / Baths</div><div class="spec-value">4 BR · 2 full + 2 half</div></div>
+      <div class="spec-item"><div class="spec-label">Legal / APN</div><div class="spec-value">Lot 138, Tract 3407 · 99-456-44</div></div>
+      <div class="spec-item"><div class="spec-label">Foundation</div><div class="spec-value">Raised perimeter &amp; piers</div></div>
+      <div class="spec-item"><div class="spec-label">Roof</div><div class="spec-value">Comp shingle, ~25–30 yrs</div></div>
+      <div class="spec-item"><div class="spec-label">Furnace / A/C</div><div class="spec-value">~9 yrs, 80k BTU · 2018, 3-ton</div></div>
+      <div class="spec-item"><div class="spec-label">Water Heater</div><div class="spec-value">40-gal gas · 2024</div></div>
+      <div class="spec-item"><div class="spec-label">Plumbing</div><div class="spec-value">Copper supply · ABS drain</div></div>
+      <div class="spec-item"><div class="spec-label">Pool / Spa</div><div class="spec-value">Aggregate plaster · attached spa</div></div>
+      <div class="spec-item"><div class="spec-label">Fireplaces</div><div class="spec-value">2 gas</div></div>
+      <div class="spec-item"><div class="spec-label">Solar</div><div class="spec-value">Electric &amp; pool panels · not inspected</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">📄</div><div><h2>Documents Reviewed</h2></div></div>
+    <table class="doc-table">
+      <tr><th>Document</th><th>Prepared by</th><th>Date</th><th>Status</th></tr>
+      <tr><td>Home Inspection</td><td>Specialty Inspections — Perry Knowlton</td><td>Oct. 2, 2026</td><td class="priority-ok">Provided</td></tr>
+      <tr><td>Termite / WDO Report #97519</td><td>Specialty Inspections — Jaime Perez, FR70609</td><td>Oct. 2, 2026</td><td class="priority-ok">Provided</td></tr>
+      <tr><td>Roof Report</td><td>Specialty Inspections — Clayton Filson</td><td>Oct. 2, 2026</td><td class="priority-ok">Provided</td></tr>
+      <tr><td>Pool Inspection #10586</td><td>Del "Does" Pools — Del Miller, Lic. 938317</td><td>Oct. 1, 2026</td><td class="priority-ok">Provided</td></tr>
+      <tr><td>Preliminary Title Report</td><td>Old Republic Title — Order 1114012218-TM</td><td>Effective Sept. 30, 2026</td><td class="priority-ok">Provided</td></tr>
+      <tr><td>Exempt Seller Disclosure (ESD)</td><td>Seller — Scott Ard</td><td>Oct. 12, 2026</td><td class="priority-ok">Provided</td></tr>
+      <tr><td>TDS / SPQ</td><td>—</td><td>—</td><td>Not required of exempt seller</td></tr>
+      <tr><td>Natural Hazard Disclosure · City permit report</td><td>—</td><td>—</td><td class="priority-med">Not in package</td></tr>
+      <tr><td>Solar ownership / agreement</td><td>—</td><td>—</td><td class="priority-med">Not in package</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-red">🔎</div><div><h2>Items Worth Prioritizing</h2></div></div>
+
+    <div class="finding-card critical"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-red">Termite</span><span class="finding-title">$10,320 in Section 1 fungus repairs, mostly beams</span></div>
+      <div class="finding-body">
+        <p>No termites were reported; all Section 1 items are fungus (dry rot). The largest is <strong>beams damaged by fungus, $6,600</strong>. The others are garage door trim, a rafter, window trim, a barge rafter, and roof sheathing; the sheathing repair includes patching the shingles. A living room floor area damaged "from a previous flower pot" is referred to a tradesperson without a price. The report notes damage may extend into enclosed areas, which would mean a supplemental bid.</p>
+        <p>The home inspector separately notes "sections of the roof framing are damaged," and the roofer notes plywood lifting under the shingles at the front upper eave. These appear to describe the same area of the roof edge.</p>
+        <div class="action-note">Section 1 items are commonly requested of the seller. Consider asking for completion with a clearance, or a credit. The roof edge and sheathing work fits naturally with the roof repairs.</div>
+      </div></div>
+
+    <div class="finding-card caution"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Roof</span><span class="finding-title">Roof is nearing the end of its service life</span></div>
+      <div class="finding-body">
+        <p>Composition shingle, one layer, about 25–30 years old. The roofer writes it "is reaching the end of useful service and should be replaced within the next 2–4 years." Current repairs are bid at <strong>$1,400 with a one-year leak-free warranty</strong>: popping nails, vent collars, chimney and wall flashings, exposed fasteners, and re-securing plywood at the front eave. The warranty excludes leaks under solar panels and solar pool heating. The roof beneath the solar panels was not visible.</p>
+        <p>The home inspector found no active attic leaks. Water stains on the garage walls and under the kitchen sink are noted as items to ask the seller about.</p>
+        <div class="action-note">Consider asking the seller to complete the $1,400 repairs, and budgeting for a re-roof in the next few years. Panel removal and reinstall will be part of that cost.</div>
+      </div></div>
+
+    <div class="finding-card caution"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Pool &amp; Spa</span><span class="finding-title">Pool equipment repairs and safety items</span></div>
+      <div class="finding-body">
+        <p>The pool inspector lists these under "Safety Concerns" and "Immediate Repairs." No prices are quoted.</p>
+        <ul>
+          <li><strong>Heater:</strong> severely rusted and "no longer useable"; replace.</li>
+          <li><strong>Suction valve frozen:</strong> spa performance could not be tested; the inspector suggests replacing both original valves with the heater.</li>
+          <li><strong>Spa bench opening:</strong> purpose undetermined. "Do not use the spa until this orifice is evaluated and protected if deemed to be a suction line opening."</li>
+          <li><strong>Pool light:</strong> faulty GFI breaker; the inspector advises not using the light until it is replaced.</li>
+          <li><strong>Equipment sub-panel:</strong> rusted, latch missing, conduit deteriorated at ground level. Electrician to replace and repair.</li>
+          <li><strong>Bond wire:</strong> attach to the pump (and to the new heater).</li>
+          <li>Small leak at the filter-to-heater connection; fill line needs an anti-siphon valve; tile line needs sealing.</li>
+          <li>The inspector recommends removing the diving/jump board.</li>
+        </ul>
+        <p><strong>Good news from the same report:</strong> the variable-speed pump is "fairly new and was operational." Deck cracks "do not appear to affect the pool vessel." There are "no criteria… to suggest replastering." The water was clear and swimmable.</p>
+        <div class="action-note">Consider getting a pool contractor's and electrician's quote for the heater, valves, sub-panel and breaker, and requesting the safety items as seller repairs. A leak and pressure test is optional; the inspector suggests it.</div>
+      </div></div>
+
+    <div class="finding-card caution"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Safety</span><span class="finding-title">Home safety items the inspector flagged</span></div>
+      <div class="finding-body"><ul>
+        <li>Several smoke detectors missing (bedrooms and each floor)</li>
+        <li>No carbon monoxide detectors installed</li>
+        <li>Range not secured against tipping</li>
+        <li>No drowning-prevention safety features meeting Health &amp; Safety Code §115923 were present. The inspector recommends installing at least two of the seven listed features. This item is not on the report's summary page, and the pool inspector did not review fences or gates.</li>
+        <li>A pet door in the garage-to-house door breaches the fire separation; replace the door</li>
+        <li>Subpanel cover screws missing</li>
+      </ul>
+      <div class="action-note">Smoke/CO detectors and pool safety features are typical seller-side items at sale. Consider including them in a repair request.</div></div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-amber">🐜</div><div><h2>Termite Report Detail</h2><div class="subtitle">Specialty Inspections #97519 · Oct. 2, 2026 · fungus/dry rot only</div></div></div>
+    <table class="pest-cost-table">
+      <tr><th>Item</th><th>Finding</th><th>Bid</th></tr>
+      <tr class="section1"><td>3</td><td>Beams damaged by fungus — remove and replace</td><td class="cost">$6,600</td></tr>
+      <tr class="section1"><td>4</td><td>Garage door trim — fungus</td><td class="cost">$695</td></tr>
+      <tr class="section1"><td>5</td><td>Rafter — fungus</td><td class="cost">$425</td></tr>
+      <tr class="section1"><td>6</td><td>Window trim — fungus</td><td class="cost">$650</td></tr>
+      <tr class="section1"><td>7</td><td>Barge rafter — fungus</td><td class="cost">$850</td></tr>
+      <tr class="section1"><td>8</td><td>Roof sheathing — fungus (includes patching roof covering)</td><td class="cost">$1,100</td></tr>
+      <tr class="section1"><td>10</td><td>Living room floor — fungus from a previous flower pot</td><td>Tradesperson</td></tr>
+      <tr class="total-row"><td colspan="2">Section 1 total</td><td>$10,320</td></tr>
+      <tr class="section2"><td>1, 2</td><td>Plants against the structure; stucco at or below grade</td><td>Owner</td></tr>
+      <tr class="section2"><td>12</td><td>Plumbing leak at the dining room bar sink</td><td>Tradesperson</td></tr>
+      <tr class="fi"><td>9</td><td>High roof framing — inspect with extension ladder</td><td class="cost">$225</td></tr>
+      <tr class="fi"><td>11</td><td>Garage storage — return once cleared</td><td class="cost">$225</td></tr>
+      <tr class="fi"><td>13</td><td>Low-clearance subarea — lower earth to 12" and re-inspect</td><td>Time &amp; materials</td></tr>
+      <tr class="total-row"><td colspan="2">Further inspection total</td><td>$450</td></tr>
+    </table>
+    <div class="info-banner">ℹ️ The detached shed was not inspected. Prices are valid for four months from the inspection date.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">🔍</div><div><h2>Home Inspection — Other Findings</h2><div class="subtitle">Specialty Inspections, Oct. 2, 2026</div></div></div>
+
+    <div class="finding-card caution"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-amber">Crawlspace</span><span class="finding-title">Most of the crawlspace could not be reached</span></div>
+      <div class="finding-body">Low clearance, plumbing and ducting blocked most of the crawlspace and foundation perimeter. The inspector recommends excavating to provide access; the termite report says the same (item 13). In the areas seen:
+        <ul>
+          <li>Gas piping and fittings are corroded (monitor)</li>
+          <li>Some ducts touch the soil</li>
+          <li>Floor insulation batts have fallen and the vapor barrier is reversed</li>
+          <li>Torn vent screens</li>
+          <li>Evidence of rodent activity; a pest control referral is suggested</li>
+        </ul>
+        <div class="action-note">Consider asking that crawlspace access be opened up so the termite and home inspectors can finish their review during the inspection period.</div></div></div>
+
+    <div class="finding-card"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-navy">Electrical</span><span class="finding-title">Electrical items</span></div>
+      <div class="finding-body">
+        <ul>
+          <li><strong>Service capacity:</strong> undetermined.</li>
+          <li><strong>Aluminum branch circuits:</strong> present, without anti-oxidant paste at connections; the inspector recommends applying it.</li>
+          <li><strong>Older breakers:</strong> the report notes breakers 30+ years old are generally considered unreliable and suggests considering replacement.</li>
+          <li><strong>GFCI:</strong> present where required and tested functional.</li>
+        </ul>
+        <div class="action-note">Consider an electrician's review of the aluminum circuits and panels, alongside the pool sub-panel work.</div></div></div>
+
+    <div class="finding-card"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-navy">Interior · Exterior</span><span class="finding-title">Routine repair items</span></div>
+      <div class="finding-body"><ul>
+        <li>Wet bar drain line leak</li>
+        <li>Water-damaged wood bay window in the dining room</li>
+        <li>Downstairs half-bath exhaust fan not working</li>
+        <li>Upstairs hall toilet loose</li>
+        <li>Primary bath faucet handles spin without a stop</li>
+        <li>Stair and balcony railings not "grippable"</li>
+        <li>Garage door doesn't close fully; side door missing weather stripping</li>
+        <li>Family room ceiling patch, and water stains on garage walls and under the kitchen sink — ask the seller about these</li>
+        <li>Downspouts discharge next to the house</li>
+        <li>Disposal switch location</li>
+        <li>Stucco cracks (maintenance)</li>
+        <li>Pre-1978 lead paint advisory</li>
+      </ul></div></div>
+
+    <div class="finding-card ok"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-green">Positive</span><span class="finding-title">What the inspector found in good order</span></div>
+      <div class="finding-body"><ul>
+        <li>Furnace and A/C operating, with a normal temperature split</li>
+        <li>Water heater properly strapped, elevated and vented</li>
+        <li>Grading drains properly; roof drainage serviceable</li>
+        <li>Water pressure, supply and drain lines serviceable as visible</li>
+        <li>Garage firewall fire-resistive; opener auto-reverse working</li>
+        <li>Roof trusses and sheathing: no adverse conditions seen from the attic</li>
+        <li>Foundation "performed well and [was] in good condition, except as noted"</li>
+        <li>"This structure is well insulated and energy efficient"</li>
+      </ul></div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-green">📝</div><div><h2>Seller Disclosure (ESD)</h2><div class="subtitle">C.A.R. Exempt Seller Disclosure · signed by Scott Ard, Oct. 12, 2026</div></div></div>
+    <div class="finding-card ok"><div class="finding-header" onclick="toggle(this)"><span class="chevron">▶</span><span class="badge badge-green">Disclosed</span><span class="finding-title">Seller answered "No" to all eleven questions</span></div>
+      <div class="finding-body">
+        <p>Some trust sales are exempt from the TDS; the ESD is the form used in its place. The seller answered "No" to each of these:</p>
+        <ul>
+          <li>a death on the property within 3 years</li>
+          <li>methamphetamine or controlled-substance contamination</li>
+          <li>an industrial-use zone or nuisance</li>
+          <li>former military ordnance within 1 mile</li>
+          <li>condominium or planned development</li>
+          <li>insurance claims in the past 5 years</li>
+          <li>matters affecting title</li>
+          <li>non-compliant plumbing fixtures</li>
+          <li>any other material facts or defects</li>
+        </ul>
+        <p>No explanations were added.</p>
+        <div class="action-note">The ESD does not ask the system-by-system condition questions found on a TDS. Consider sending the seller written questions on the items the inspections raised: the family room ceiling patch, the garage and kitchen-sink water stains, permits for the newer windows, and the solar arrangement.</div>
+      </div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-navy">📜</div><div><h2>Preliminary Title Report</h2><div class="subtitle">Old Republic Title · Order 1114012218-TM · effective Sept. 30, 2026</div></div></div>
+    <table class="doc-table">
+      <tr><th>#</th><th>Item</th><th>What it means</th></tr>
+      <tr><td>1–2</td><td>2026–27 taxes: $1,409.20 per installment, not yet marked paid; supplemental taxes</td><td>The first installment is not due until November; it will be prorated in escrow. Expect a supplemental bill after purchase.</td></tr>
+      <tr><td>3</td><td>Within proposed boundaries of Community Facilities District 2014-1 "Clean Energy" (California Home Finance Authority)</td><td>Listed as within the district's proposed boundaries. The prelim does not show an amount or indicate that this parcel is participating.</td></tr>
+      <tr><td>4</td><td>Public utilities easement, westerly 6 ft</td><td>Standard utility strip shown on the tract map</td></tr>
+      <tr><td>5</td><td>CC&amp;Rs recorded 1973</td><td>Original tract restrictions</td></tr>
+      <tr><td>6–7</td><td>Trust terms; Certification of Trust and Owner's Declaration required</td><td>Routine trust and seller paperwork</td></tr>
+      <tr><td>Note A</td><td>"We find no open Deeds of Trust"</td><td>No recorded loan to pay off; seller to confirm in writing</td></tr>
+    </table>
+    <div class="info-banner" style="margin-top:14px;">ℹ️ Title vests in Scott Ard as acting trustee of the Ronald J. and Carole M. Ard 1995 Trust. Because he is acting as successor trustee, title may ask for the full trust and amendments in addition to the Certification of Trust. This is ordinary trust-sale paperwork. Consider asking the title officer to confirm that the parcel has no Clean Energy (CFD 2014-1) assessment, and checking the tax bill.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div class="section-icon icon-green">✅</div><div><h2>Suggested Next Steps</h2></div></div>
+    <ul class="check-list">
+      <li>Request solar documents showing whether the panels are owned, leased or under a PPA, plus the Natural Hazard Disclosure and a City permit report</li>
+      <li>Ask for Section 1 termite repairs ($10,320) with a clearance, or a credit</li>
+      <li>Ask the seller to complete the $1,400 roof repairs with the one-year warranty; budget for a re-roof in 2–4 years</li>
+      <li>Get pool contractor and electrician quotes for the heater, valves, sub-panel, light breaker and spa opening</li>
+      <li>Request smoke/CO detectors and pool drowning-prevention features as seller items</li>
+      <li>Ask that crawlspace access be improved so the subarea can be fully inspected</li>
+      <li>Ask the seller about the family room ceiling patch and the water stains; confirm permits for the newer windows and any remodeling</li>
+    </ul>
+  </div>
+</div>
+</div>
+<div class="report-footer">
+  <strong>1162 Aberdeen Avenue &nbsp;·&nbsp; 1314 Vancouver Way &nbsp;·&nbsp; 2784 Crater Road — Livermore, CA 94550</strong><br>
+  Prepared October 29, 2026 &nbsp;·&nbsp; Sources: <em>Aberdeen</em> — Addendum #1 to TDS &amp; SPQ (10/27/2026); HomeGuard Home Inspection, Roof and WDO Reports No. 678394 (June 2026); HomeGuard Notice of Work Completed (6/30/2026); SolarCity Power Purchase Agreement (12/1/2015); Solar Advisory &amp; Questionnaire (6/18/2026); Chicago Title Preliminary Report FWAC-5862600495 (eff. 4/30/2026); City of Livermore Report of Residential Building Record CR260441 (6/11/2026); General Disclosures package incl. Natural Hazard Disclosure Statement (6/5/2026). <em>Vancouver</em> — TDS and SPQ (10/7/2026); HomeGuard Home Inspection, Roof and WDO Reports No. 685273 (10/7/2026); Foundation Repair of CA proposal (10/13/2026); Guide Real Estate letter and G. DoBel email (10/15/2026); Lawyers Title Preliminary Report FLNP-0042600489RD (eff. 5/15/2026); Exceptions to Title Acknowledgement. <em>Crater</em> — Specialty Inspections Home Inspection, WDO Report #97519 and Roof Report (10/2/2026); Del "Does" Pools Inspection #10586 (10/1/2026); Old Republic Title Preliminary Report 1114012218-TM (eff. 9/30/2026); Exempt Seller Disclosure (10/12/2026).<br>
+  <strong>This advisory is not a substitute for, and is not provided in lieu of, the seller disclosure packages, inspection reports, or preliminary title reports.</strong> It is a convenience summary prepared for ease of reference only. Buyer is responsible for independently reviewing all source documents in their original form. Where this summary and a source document differ, the source document governs.
+</div>
+<script>
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({top: document.querySelector('.tab-bar').offsetTop, behavior: 'smooth'});
+}
+function goTab(id) {
+  const btn = [...document.querySelectorAll('.tab-btn')].find(b => (b.getAttribute('onclick')||'').indexOf("'"+id+"'") > -1);
+  showTab(id, btn);
+}
+function toggle(header) {
+  header.nextElementSibling.classList.toggle('open');
+  header.querySelector('.chevron').classList.toggle('open');
+}
+function closeModal() {
+  document.getElementById('disclaimerModal').classList.add('hidden');
+}
+</script>
+</body></html>
