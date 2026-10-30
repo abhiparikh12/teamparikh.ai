@@ -10893,21 +10893,26 @@ function rangeFor(v, cal){
    the comps model alone misses by 6.3%. The model's disagreement with the list price carries a small,
    measured weight (LIST_BETA): a model 10% above list moves the expected sale ~2% above the typical ratio. */
 const LIST_BETA=0.2;
-function listCalibration(store,{city,bt}){
-  const tg=typeGroup(bt), ck=`lcal|${city}|${tg}`; if(store._cache[ck]!==undefined) return store._cache[ck];
+function listCalibration(store,{city,bt,basis}){
+  const fld = basis==='lp' ? 'lp' : 'olp';     // 'lp' = sale ÷ last list price (used once a listing has been price-cut)
+  const tg=typeGroup(bt), ck=(fld==='lp'?'lcalLP|':'lcal|')+`${city}|${tg}`; if(store._cache[ck]!==undefined) return store._cache[ck];
   const asOf=store.asOf(city), from=addMonths(asOf,-6);
-  let rows=store.soldIdx('c|'+city+'|'+tg).filter(r=>r.olp&&r.cd>=from);
+  let rows=store.soldIdx('c|'+city+'|'+tg).filter(r=>r[fld]&&r.cd>=from);
   let scope=`${city} ${typeLabel(tg==='ATT'?'CO':tg).toLowerCase()} sales, last 6 months`;
-  if(rows.length<25){ rows=store.soldIdx('*|'+tg).filter(r=>r.olp&&r.cd>=from); scope='all loaded sales of this type, last 6 months'; }
+  if(rows.length<25){ rows=store.soldIdx('*|'+tg).filter(r=>r[fld]&&r.cd>=from); scope='all loaded sales of this type, last 6 months'; }
   if(rows.length<15) return store._cache[ck]=null;
-  const lr=rows.map(r=>Math.log(r.sp/r.olp)), m=med(lr), dev=lr.map(x=>x-m);
+  const lr=rows.map(r=>Math.log(r.sp/r[fld])), m=med(lr), dev=lr.map(x=>x-m);
   return store._cache[ck]={ratio:Math.exp(m), n:rows.length, scope, q10:quant(dev,.1), q25:quant(dev,.25), q75:quant(dev,.75), q90:quant(dev,.9), mdape:med(dev.map(x=>Math.abs(Math.exp(x)-1)))};
 }
 function expectedSale(store, subj, est){
-  const L=subj.olp||subj.lp; if(!L||!est) return null;
-  const cal=listCalibration(store,{city:subj.city,bt:subj.bt}); if(!cal) return null;
+  // A price cut resets the market's reference: forecast from today's list price with a sale ÷ last-list
+  // calibration, never from the abandoned original price (which the sale ÷ original-list ratio assumes).
+  const cur=subj.lp||null, orig=subj.olp||null;
+  const cut = !!(cur && orig && cur < orig*0.995);
+  const L = cut ? cur : (orig||cur); if(!L||!est) return null;
+  const cal=listCalibration(store,{city:subj.city,bt:subj.bt,basis:cut?'lp':'olp'}); if(!cal) return null;
   const x=Math.log(est/L), ex=L*cal.ratio*Math.exp(LIST_BETA*x);
-  return {expected:ex, list:L, ratio:cal.ratio, n:cal.n, scope:cal.scope, lo50:ex*Math.exp(cal.q25), hi50:ex*Math.exp(cal.q75), lo80:ex*Math.exp(cal.q10), hi80:ex*Math.exp(cal.q90), mdape:cal.mdape, modelGap:est/L-1};
+  return {expected:ex, list:L, cut, origList:cut?orig:null, cutPct:cut?cur/orig-1:null, basisLabel:cut?'last list price':'original list', ratio:cal.ratio, n:cal.n, scope:cal.scope, lo50:ex*Math.exp(cal.q25), hi50:ex*Math.exp(cal.q75), lo80:ex*Math.exp(cal.q10), hi80:ex*Math.exp(cal.q90), mdape:cal.mdape, modelGap:est/L-1};
 }
 
 /* ── 9. MARKET CONDITIONS ─────────────────────────────────────────────────── */
@@ -11462,10 +11467,10 @@ function renderValuation(res){
       <div class="cons-range-sub">Likely range (half of similar sales land here) · wide range ${fmtK(rg.lo80)}–${fmtK(rg.hi80)} · from ${rg.basis}</div>
       ${s.lp?`<div class="cons-delta" style="margin-bottom:8px">vs target ${fmt(s.lp)} (${((s.lp/r.est-1)*100).toFixed(1)}%)</div>`:''}
       ${r.exp?`<div style="margin:6px 0 10px;padding:9px 11px;border:1px solid rgba(201,168,76,.45);border-radius:6px;background:rgba(201,168,76,.06)">
-        <div style="font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--gold)">List Price Check · listed at ${fmt(r.exp.list)}</div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--gold)">List Price Check · listed at ${fmt(r.exp.list)}${r.exp.cut?` <span style="color:var(--org)">· cut ${(Math.abs(r.exp.cutPct)*100).toFixed(1)}% from ${fmt(r.exp.origList)}</span>`:''}</div>
         <div style="font-family:var(--fm);font-size:22px;color:${Math.abs(r.exp.modelGap)<0.03?'var(--txt)':r.exp.modelGap<0?'var(--red)':'var(--grn)'};margin-top:2px">List is ${pctS(-r.exp.modelGap/(1+r.exp.modelGap))} vs comps</div>
         <div style="font-size:11px;color:var(--txt2)">${listVerdict(r.exp.list,r)}</div>
-        <div style="font-size:10px;color:var(--txt3);margin-top:5px;border-top:1px solid var(--bdr);padding-top:5px">Sale forecast if it trades like recent listings: <strong style="color:var(--txt2)">${fmt(Math.round(r.exp.expected/1000)*1000)}</strong> (${r.exp.scope}: median ${(r.exp.ratio*100).toFixed(1)}% of original list). This leans ~80% on the list price itself, so it is <em>not</em> a valuation — use it for negotiation expectations only.</div></div>`:''}
+        <div style="font-size:10px;color:var(--txt3);margin-top:5px;border-top:1px solid var(--bdr);padding-top:5px">Sale forecast if it trades like recent listings: <strong style="color:var(--txt2)">${fmt(Math.round(r.exp.expected/1000)*1000)}</strong> (${r.exp.scope}: median ${(r.exp.ratio*100).toFixed(1)}% of ${r.exp.basisLabel}). This leans ~80% on the list price itself, so it is <em>not</em> a valuation — use it for negotiation expectations only.</div></div>`:''}
       <div class="conf-row"><div class="conf-bar"><div class="conf-fill ${cfCls}" style="width:${res.confPct}%"></div></div><span class="conf-txt ${cfTxt}">${res.conf} Confidence</span></div>
       <div style="font-size:10px;color:var(--txt3);margin-top:5px">${v.comps.length} comps used · ${v.poolN} candidates · typical miss for similar homes ${rg.mdape!=null?(rg.mdape*100).toFixed(1)+'%':'—'} · data through ${fmtDate(dayToLocal(r.asOf))}</div>
       <div class="cons-disclaimer">This figure is produced by an <strong>automated mathematical model</strong> applied to comparable MLS sales data. It is <strong>not an appraisal, not a formal opinion of value, and not a guarantee of sale price</strong>. Actual market value depends on property condition, market timing, buyer pool, and other factors the model does not capture.</div>
@@ -11760,7 +11765,7 @@ function valueListingStrict(target, _pool, opts={}){
   const x=_valueRecord(target,opts); if(!x) return null;
   const {rec,v}=x;
   const cal=TP.calibration(store,{city:rec.city,bt:rec.bt,sqft:rec.sqft}); let rg=TP.rangeFor(v,cal);
-  const ex=TP.expectedSale(store,{city:rec.city,bt:rec.bt,olp:target.olp||rec.olp||rec.lp},v.est);
+  const ex=TP.expectedSale(store,{city:rec.city,bt:rec.bt,olp:target.olp||rec.olp||rec.lp,lp:rec.lp||target.lp},v.est);
   // est is ALWAYS the comps value. The list-price forecast is ~80% list price by construction, so using it here
   // made every listing look 'fairly priced, a hair under list' and killed mispricing detection.
   const gross=v.comps.map(c=>(Math.abs(c.timeAdj)+Math.abs(c.sizeAdj)+Math.abs(c.featAdj||0))/c.sp*100);
@@ -11950,7 +11955,7 @@ function renderClientReport(){
     <div class="rp-hero"><div class="rp-hero-lbl">Estimated Market Value</div><div class="rp-hero-price">${fmt(c)}</div>
       <div class="rp-hero-range">Likely Range: <b>${fmt(Math.round(rg.lo50/1000)*1000)}</b> — <b>${fmt(Math.round(rg.hi50/1000)*1000)}</b></div>
       <div class="rp-hero-conf ${confCls}">${res.conf} Confidence</div>
-      ${r.exp?`<div class="rp-hero-range" style="margin-top:8px">Listed at <b>${fmt(r.exp.list)}</b> · Expected sale price <b>${fmt(Math.round(r.exp.expected/1000)*1000)}</b> (similar homes sold at a median ${(r.exp.ratio*100).toFixed(1)}% of original list)</div>`:''}
+      ${r.exp?`<div class="rp-hero-range" style="margin-top:8px">Listed at <b>${fmt(r.exp.list)}</b>${r.exp.cut?` (cut ${(Math.abs(r.exp.cutPct)*100).toFixed(1)}% from ${fmt(r.exp.origList)})`:''} · Expected sale price <b>${fmt(Math.round(r.exp.expected/1000)*1000)}</b> (similar homes sold at a median ${(r.exp.ratio*100).toFixed(1)}% of ${r.exp.basisLabel})</div>`:''}
       <div class="rp-hero-disclaimer">This figure is produced by an <strong>automated mathematical model</strong> applied to comparable sales data. It is <strong>not an appraisal and not a formal opinion of value</strong>. Actual market value may vary based on property condition, market timing, buyer pool, and factors not captured in this model.</div></div>
     <div class="rp-sec"><div class="rp-sec-h"><span class="rp-sec-h-num">1</span>Valuation Methodology</div><div class="rp-method-grid">${methodCards}</div>
       <div style="font-size:10px;color:#5F6577;margin-top:8px;line-height:1.7">The likely range reflects how closely this model's estimates have matched actual sale prices for similar homes in ${toTitle(subj.city)} over the past year. Comparable sales are drawn from the past three years and brought to present-day value using the local like-for-like price trend.</div></div>
@@ -12192,9 +12197,10 @@ function renderClientReport(){
       <span class="rq-conf ${confCls}">${res.conf==='HIGH'?'High':res.conf==='MEDIUM'?'Medium':'Low'} confidence</span></div>`;
   const lg=exp?exp.list/est-1:0;
   const heroExp=exp?`<div class="rq-hv rq-hv-exp"><div class="rq-hv-lbl">List Price</div><div class="rq-hv-price">${fmt(exp.list)}</div>
+      ${exp.cut?`<div class="rq-hv-sub">Reduced <b>${(Math.abs(exp.cutPct)*100).toFixed(1)}%</b> from ${fmt(exp.origList)}</div>`:''}
       <div class="rq-hv-sub">List is <b>${rqPct(lg)}</b> ${lg>=0?'above':'below'} the comparable-sales value</div>
       <div class="rq-hv-sub">${Math.abs(lg)<0.03?'In line with the comparable sales':lg>0?(exp.list>rg.hi50?'Above the likely range':'Within the likely range, on the high side'):(exp.list<rg.lo50?'Below the likely range':'Within the likely range, on the low side')}</div>
-      <span class="rq-conf nt">Local sales close at ${(exp.ratio*100).toFixed(1)}% of list</span></div>`:'';
+      <span class="rq-conf nt">Local sales close at ${(exp.ratio*100).toFixed(1)}% of ${exp.cut?'the last list price':'list'}</span></div>`:'';
   const kpis=[
     [t&&t.oneYr?rqPct(t.oneYr.pct):'—','12-month value trend',rqDir(t&&t.oneYr)],
     [t&&t.threeYr?rqPct(t.threeYr.pct):'—','3-year value trend',rqDir(t&&t.threeYr)],
