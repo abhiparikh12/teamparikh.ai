@@ -1085,6 +1085,35 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
 .opp-score-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--gold));border-radius:3px}
 .opp-score-num{font-family:var(--fm);font-size:13px;font-weight:600;color:var(--gold)}
 .opp-empty{padding:80px 24px;text-align:center;color:var(--txt3);line-height:2;grid-column:1/-1}
+/* ── OPPS v8: view filters, status badges, area map ── */
+.opp-meta{grid-template-columns:repeat(3,1fr)}
+.opp-chips{display:flex;gap:5px;flex-wrap:wrap}
+.opp-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--txt2);cursor:pointer;padding:3px 9px;border:1px solid var(--bdr);border-radius:14px;background:var(--sur);user-select:none}
+.opp-chip:has(input:checked){border-color:var(--gold);color:var(--txt);background:rgba(201,168,76,.12)}
+.opp-chip input{accent-color:var(--gold);margin:0}
+.opp-rng{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--txt3)}
+.opp-rng .fbi{width:86px;padding:4px 7px;font-size:12px}
+.opp-mapwrap{background:var(--sur2);border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden;flex-shrink:0;isolation:isolate}
+.opp-maphead{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:9px 13px;border-bottom:1px solid var(--bdr)}
+.opp-maptitle{font-size:12px;font-weight:600;color:var(--txt)}
+.opp-maptitle span{display:block;font-size:10.5px;font-weight:400;color:var(--txt2);margin-top:2px}
+.opp-maptools{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.opp-radius-grp{display:none;align-items:center;gap:5px;flex-wrap:wrap;font-size:11px;color:var(--txt2)}
+.opp-radius-grp .fbi{width:62px;padding:4px 6px;font-size:12px}
+.opp-radius-grp .btn{padding:3px 8px;font-size:11px}
+#opp-map{height:400px;width:100%;background:var(--sur)}
+.opp-maplegend{display:flex;gap:14px;flex-wrap:wrap;padding:7px 13px;font-size:10.5px;color:var(--txt2);border-top:1px solid var(--bdr)}
+.opp-maplegend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.opp-geo{display:none;align-items:center;justify-content:space-between;gap:10px;padding:7px 13px;font-size:11px;color:var(--org);border-top:1px solid var(--bdr)}
+.opp-handle div{width:18px;height:18px;border-radius:50%;background:var(--gold);border:3px solid #0C0F1A;box-shadow:0 0 0 1px var(--gold),0 2px 8px rgba(0,0,0,.5);cursor:move}
+.opp-card.flash{border-color:var(--gold);box-shadow:0 0 0 2px rgba(201,168,76,.4)}
+.opp-stbadge{display:inline-block;font-size:9.5px;font-weight:700;padding:1px 7px;border-radius:9px;text-transform:uppercase;letter-spacing:.4px;border:1px solid}
+.opp-stbadge.ok{color:var(--grn);border-color:rgba(56,198,139,.45);background:rgba(56,198,139,.10)}
+.opp-stbadge.warn{color:var(--org);border-color:rgba(245,162,58,.5);background:rgba(245,162,58,.12)}
+.opp-maplink{background:var(--sur);border:1px solid var(--bdr);border-radius:6px;padding:3px 7px;cursor:pointer;font-size:12px;line-height:1}
+.opp-maplink:hover{border-color:var(--gold)}
+.opp-integrity{font-size:11.5px;color:var(--txt2);padding:9px 13px;background:var(--sur2);border:1px solid var(--bdr);border-radius:var(--r);line-height:1.65}
+
 .opp-stats-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:0;background:var(--sur2);border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden}
 @media (max-width:880px){.opp-chart-grid{grid-template-columns:1fr !important}}
 /* Forensic tables — dark UI native, no eye-straining light/dark zebra. */
@@ -2480,7 +2509,12 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
         <div class="opp-tool-grp">
           <div class="opp-tool-lbl">Property Type</div>
           <div class="opp-tool-row">
-            <select id="opp-type" class="fbi-sel" onchange="runOpportunityScanner()" style="font-size:12px;padding:4px 7px"><option value="">Any</option><option value="DE">SFR</option><option value="CO">Condo</option><option value="TH">Townhome</option></select>
+            <div class="opp-chips">
+              <label class="opp-chip"><input type="checkbox" id="opp-t-DE" checked onchange="oppApplyView()"> SFR</label>
+              <label class="opp-chip"><input type="checkbox" id="opp-t-CO" checked onchange="oppApplyView()"> Condo</label>
+              <label class="opp-chip"><input type="checkbox" id="opp-t-TH" checked onchange="oppApplyView()"> Townhome</label>
+              <label class="opp-chip" title="Duplex, multi-family, mobile, land and any other building type"><input type="checkbox" id="opp-t-OT" checked onchange="oppApplyView()"> Other</label>
+            </div>
           </div>
         </div>
         <div class="opp-tool-grp">
@@ -2510,10 +2544,61 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
             <label style="display:flex;align-items:center;gap:5px;font-size:11px;cursor:pointer;color:var(--txt2)"><input type="checkbox" id="opp-hideRisk" style="accent-color:var(--gold)" onchange="runOpportunityScanner()"> Filter out</label>
           </div>
         </div>
+        <div class="opp-tool-grp">
+          <div class="opp-tool-lbl">Listing Status</div>
+          <div class="opp-tool-row">
+            <select id="opp-status" class="fbi-sel" onchange="runOpportunityScanner()" style="font-size:12px;padding:4px 7px" title="Which 'Active' listings count as open to offers">
+              <option value="avail" selected>Available only</option>
+              <option value="cs">+ Contingent-show (CS)</option>
+            </select>
+          </div>
+        </div>
         <div class="opp-tool-grp" style="flex:1"></div>
         <button class="btn btn-gold" onclick="runOpportunityScanner({refine:true})">🔍 Scan</button>
         <button class="btn btn-blue" onclick="runOpportunityBacktest()" title="Replay history: of listings the model would have flagged as deals, how many actually sold at or above the model's estimate?">🧪 Backtest accuracy</button>
         <button class="btn btn-g" onclick="exportOpportunities()">⬇ Export</button>
+      </div>
+      <div class="opp-toolbar opp-filterbar" id="opp-filterbar" style="align-items:flex-end">
+        <div class="opp-tool-grp">
+          <div class="opp-tool-lbl">Beds</div>
+          <select id="opp-minbr" class="fbi-sel" onchange="oppApplyView()" style="font-size:12px;padding:4px 7px"><option value="">Any</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option><option value="5">5+</option></select>
+        </div>
+        <div class="opp-tool-grp">
+          <div class="opp-tool-lbl">Baths</div>
+          <select id="opp-minbth" class="fbi-sel" onchange="oppApplyView()" style="font-size:12px;padding:4px 7px"><option value="">Any</option><option value="1">1+</option><option value="1.5">1.5+</option><option value="2">2+</option><option value="2.5">2.5+</option><option value="3">3+</option><option value="4">4+</option></select>
+        </div>
+        <div class="opp-tool-grp">
+          <div class="opp-tool-lbl">List Price</div>
+          <div class="opp-rng"><input class="fbi" id="opp-pmin" placeholder="Min  e.g. 800k" oninput="oppViewDebounced()" onchange="oppApplyView()" inputmode="text"> – <input class="fbi" id="opp-pmax" placeholder="Max  e.g. 1.2m" oninput="oppViewDebounced()" onchange="oppApplyView()" inputmode="text"></div>
+        </div>
+        <div class="opp-tool-grp">
+          <div class="opp-tool-lbl">Lot Size <span style="text-transform:none;letter-spacing:0;font-weight:400">(blank lot data is excluded when set)</span></div>
+          <div class="opp-rng"><input class="fbi" id="opp-lmin" placeholder="Min" oninput="oppViewDebounced()" onchange="oppApplyView()" inputmode="decimal"> – <input class="fbi" id="opp-lmax" placeholder="Max" oninput="oppViewDebounced()" onchange="oppApplyView()" inputmode="decimal">
+            <select id="opp-lot-unit" class="fbi-sel" onchange="oppApplyView()" style="font-size:12px;padding:4px 5px"><option value="sf" selected>sq ft</option><option value="ac">acres</option></select></div>
+        </div>
+        <div class="opp-tool-grp" style="flex:1"></div>
+        <button class="btn btn-g" onclick="oppResetFilters()">Reset filters</button>
+      </div>
+      <div class="opp-mapwrap" id="opp-mapwrap">
+        <div class="opp-maphead">
+          <div class="opp-maptitle">📍 Search area<span id="opp-area-status">Whole selection — draw a circle to zero in on a neighbourhood</span></div>
+          <div class="opp-maptools">
+            <button class="btn btn-blue" id="opp-draw-btn" onclick="oppToggleDraw()">◯ Draw circle</button>
+            <span class="opp-radius-grp" id="opp-radius-grp">Radius
+              <input class="fbi" id="opp-radius" type="number" min="0.1" max="25" step="0.05" value="0.5" oninput="oppRadiusInput()"> mi
+              <button class="btn btn-g" onclick="oppQuickRadius(0.25)">¼</button><button class="btn btn-g" onclick="oppQuickRadius(0.5)">½</button><button class="btn btn-g" onclick="oppQuickRadius(1)">1</button><button class="btn btn-g" onclick="oppQuickRadius(2)">2</button>
+            </span>
+            <button class="btn btn-g" id="opp-clear-btn" style="display:none" onclick="oppClearArea()">✕ Clear area</button>
+            <button class="btn btn-g" onclick="oppFitMap()">⤢ Fit</button>
+            <button class="btn btn-g" id="opp-map-toggle" onclick="oppToggleMap()">Hide map</button>
+          </div>
+        </div>
+        <div id="opp-map"></div>
+        <div class="opp-geo" id="opp-geo"></div>
+        <div class="opp-maplegend" id="opp-maplegend">
+          <span><i style="background:#38C68B"></i>Deep Discount</span><span><i style="background:#3E8EF7"></i>Strong</span><span><i style="background:#2BC0CB"></i>Buyer Advantage</span><span><i style="background:#7A8BAE"></i>Fair</span><span><i style="background:#5C6E94;opacity:.5"></i>Outside the circle</span>
+          <span style="margin-left:auto">Drag the gold dot to move the circle · click a pin to jump to its card</span>
+        </div>
       </div>
       <div id="opp-bt-progress" class="bt-prog" style="display:none;margin:0">
         <div class="bt-prog-bar"><div class="bt-prog-fill" id="opp-bt-prog-fill"></div></div>
@@ -7362,16 +7447,19 @@ async function runOpportunityScanner(opts={}){
   const doRefine = false; // v7: neighborhood matching is built into the valuation — no geocode pass needed
   if(!A.listings.length){toast('Load MLS data first','err');return;}
   const cityFilt = el('opp-city').value || '';
-  const typeFilt = el('opp-type').value || '';
   const minTagPct = parseFloat(el('opp-mintag').value) || 0;
   const minComps = parseInt(el('opp-mincomp').value) || 5;
   const hideRisk = el('opp-hideRisk').checked;
+  const statusPolicy = (el('opp-status') && el('opp-status').value) || 'avail';
+  const integrity = {looked:0, cs:0, underContract:0, superseded:0, dirty:0};
 
   const candidates = A.listings.filter(l=>{
     if(l.status !== 'ACTV') return false;
     if(cityFilt && l.city !== cityFilt) return false;
-    if(typeFilt && l.bt !== typeFilt) return false;
     if(!l.lp || !l.sqft) return false;
+    integrity.looked++;
+    const why = oppNotAvailableReason(l, statusPolicy);   // CS / pending-dated / replaced-by-newer-record / has sale price
+    if(why){ integrity[why]++; return false; }
     return true;
   });
 
@@ -7475,6 +7563,9 @@ async function runOpportunityScanner(opts={}){
     const risks = assessRisk(target, v);
     if(!v.proximityProven) risks.push({type:'proximity', sev:'med', desc:`Few same-street / same-HOA comps — value leans on zip or city-wide sales; verify the comps are truly comparable locations`});
     if(parseFloat(v.medGrossAdj) >= 15) risks.push({type:'adj', sev:'med', desc:`Comps needed large adjustments (${v.medGrossAdj}% gross) — limited truly-similar inventory nearby`});
+    const _raw = (target._r && target._r.statusRaw) || '';
+    if(_raw==='CS') risks.push({type:'contingent', sev:'hi', desc:`Contingent-show: the seller already has an accepted offer — this is only available if that contract falls through`});
+    if(_raw==='BOM' || _raw==='RACT') risks.push({type:'bom', sev:'med', desc:`Back on market after a prior contract — find out why it fell through (inspection, financing, appraisal) before relying on the discount`});
 
     // Opportunity score
     const gapComponent = 50 * (1 - Math.exp(-gapPct/9));
@@ -7489,51 +7580,365 @@ async function runOpportunityScanner(opts={}){
   });
 
   results.sort((a,b)=>b.oppScore - a.oppScore);
-  A.opportunities = results;
+  A.oppAll = results;
+  A.oppScan = {scanned:candidates.length, valuedBelowTag, filteredNoComps, minTagPct, integrity, statusPolicy};
+  _oppGeo.paused = false; _oppGeo.fail.clear();       // fresh scan → fresh geocoding allowance
+  oppMapOnShow();
+  oppApplyView({fit:true});
+  const _shown = (A.opportunities||[]).length;
+  if(!results.length) toast(`Scan complete — 0 deals · ${valuedBelowTag} valued at/above market · ${filteredNoComps} thin comps`,'inf');
+  else toast(`Scan complete — ${results.length} opportunit${results.length===1?'y':'ies'}${_shown!==results.length?` (${_shown} after filters)`:''} · ${integrity.cs+integrity.underContract+integrity.superseded+integrity.dirty} not-open listing(s) removed · ${filteredNoComps} skipped for thin comps`,'ok');
+}
 
-  // Stats bar
-  const sb = el('opp-stats');
-  if(results.length){
-    const deep = results.filter(r=>r.tag==='Deep Discount').length;
-    const strong = results.filter(r=>r.tag==='Strong Opportunity').length;
-    const buyer = results.filter(r=>r.tag==='Buyer Advantage').length;
-    const fair  = results.filter(r=>r.tag==='Fair Deal').length;
-    const totalEqty = results.reduce((s,r)=>s+(r.v.est - r.target.lp), 0);
-    sb.innerHTML = `<div class="opp-stats-bar">
-      <div class="opp-stat"><div class="opp-stat-num">${results.length}</div><div class="opp-stat-lbl">Total Opportunities</div></div>
-      <div class="opp-stat"><div class="opp-stat-num" style="color:var(--grn)">${deep}</div><div class="opp-stat-lbl">Deep Discount</div></div>
-      <div class="opp-stat"><div class="opp-stat-num" style="color:var(--blue)">${strong}</div><div class="opp-stat-lbl">Strong</div></div>
-      <div class="opp-stat"><div class="opp-stat-num" style="color:var(--teal)">${buyer}</div><div class="opp-stat-lbl">Buyer Advantage</div></div>
-      <div class="opp-stat"><div class="opp-stat-num">${fmt(totalEqty)}</div><div class="opp-stat-lbl">Aggregate Day-1 Equity</div></div>
-    </div>`;
-  } else {
-    sb.innerHTML = '';
+/* ══════════════════════════════════════════════════════════════════════════
+   OPPORTUNITIES v8 — listing-status integrity · instant view filters · area map
+   ──────────────────────────────────────────────────────────────────────────
+   The scan (valuation) runs once per Scan click. Everything else — property
+   type, beds, baths, price, lot, and the drawn circle — is a VIEW filter over
+   the scan results (A.oppAll), so it updates instantly with no re-valuation.
+   ══════════════════════════════════════════════════════════════════════════ */
+const _oe = s => String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const OPP_TAG_COLOR = {'opp-tag-deep':'#38C68B','opp-tag-strong':'#3E8EF7','opp-tag-buyer':'#2BC0CB','opp-tag-fair':'#7A8BAE'};
+const OPPMAP = {map:null, pins:null, ctx:null, byMls:new Map(), circle:null, handle:null, draw:null, hidden:false};
+const _oppGeo = {busy:false, paused:false, done:0, fail:new Set()};
+
+/* ── 1. LISTING-STATUS INTEGRITY ───────────────────────────────────────────
+   "Active" in the store is only as good as the last export. A record is
+   treated as NOT open to offers when any of these is true:
+     cs            status code CS (contingent-show): seller has an accepted offer
+     underContract a pending date or scheduled-COE is on file (unless the code
+                   is BOM / RACT, i.e. explicitly back on market)
+     dirty         an "active" record that carries a sale price
+     superseded    the SAME property has a newer SOLD / PENDING / re-listed
+                   record under a different MLS# (the old Active row is stale)   */
+function oppSuperseded(r){
+  const sib = store.props().get(r.pkey);
+  if(!sib || sib.length<2 || r.ld==null) return false;
+  for(const x of sib){
+    if(x===r || x.id===r.id) continue;
+    if(x.status==='SOLD'    && ((x.cd!=null && x.cd>=r.ld) || (x.ld!=null && x.ld>=r.ld))) return true;
+    if(x.status==='PENDING' &&  x.ld!=null && x.ld>=r.ld) return true;
+    if(x.status==='ACTIVE'  &&  x.ld!=null && x.ld>r.ld)  return true;
   }
+  return false;
+}
+function oppNotAvailableReason(l, policy){
+  const r = l._r; if(!r) return null;
+  const raw = r.statusRaw||'';
+  if(raw==='CS' && policy!=='cs') return 'cs';
+  const backOnMkt = raw==='BOM' || raw==='RACT';
+  const csIncluded = raw==='CS' && policy==='cs';
+  if((r.pend!=null || r.coe!=null) && !backOnMkt && !csIncluded) return 'underContract';
+  if(r.sp>0) return 'dirty';
+  if(oppSuperseded(r)) return 'superseded';
+  return null;
+}
 
-  const grid = el('opp-grid');
-  if(!results.length){
-    grid.innerHTML = `<div class="opp-empty">No opportunities cleared your filters.<br><br><strong>${candidates.length}</strong> active listing(s) scanned: <strong>${valuedBelowTag}</strong> were valued but priced at/above market (no discount ≥ ${minTagPct}%)${filteredNoComps>0?`, and <strong>${filteredNoComps}</strong> were skipped for lack of tight comps`:''}.${A.biasModel&&A.biasModel.enabled?`<br><br><span style="color:var(--gold)">Bias correction is ON</span> — estimates are pulled toward actual sale levels, so fewer phantom discounts appear. Toggle it off to compare.`:''}<br><br>Try lowering <strong>Min Tag</strong> (currently ${minTagPct}%+), relaxing <strong>Min Comps</strong>, or widening the city scope.</div>`;
-    toast(`Scan complete — 0 deals · ${valuedBelowTag} valued at/above market · ${filteredNoComps} thin comps`,'inf');
-    return;
+/* ── 2. VIEW FILTERS ──────────────────────────────────────────────────── */
+function oppParseMoney(s){
+  s = String(s==null?'':s).trim().toLowerCase().replace(/[$,\s]/g,''); if(!s) return null;
+  let m = 1; if(s.endsWith('m')){ m=1e6; s=s.slice(0,-1); } else if(s.endsWith('k')){ m=1e3; s=s.slice(0,-1); }
+  const n = parseFloat(s); return isNaN(n) ? null : n*m;
+}
+function oppTypeKey(bt){ return (bt==='DE'||bt==='CO'||bt==='TH') ? bt : 'OT'; }
+function oppFilterSpec(){
+  const g = id=>el(id);
+  const sel = id=>{ const e=g(id); if(!e||e.value==='') return null; const n=parseFloat(e.value); return isNaN(n)?null:n; };
+  const mul = (g('opp-lot-unit')&&g('opp-lot-unit').value==='ac') ? 43560 : 1;
+  const lot = id=>{ const e=g(id); if(!e||e.value.trim()==='') return null; const n=parseFloat(e.value.replace(/,/g,'')); return isNaN(n)?null:n*mul; };
+  const money = id=> g(id) ? oppParseMoney(g(id).value) : null;
+  const types = new Set(['DE','CO','TH','OT'].filter(k=>{ const e=g('opp-t-'+k); return !e || e.checked; }));
+  return {types, minBr:sel('opp-minbr'), minBth:sel('opp-minbth'), pmin:money('opp-pmin'), pmax:money('opp-pmax'), lmin:lot('opp-lmin'), lmax:lot('opp-lmax')};
+}
+function oppPassView(t, s){
+  if(!s.types.has(oppTypeKey(t.bt))) return false;
+  if(s.minBr  !=null && (t.br ||0) < s.minBr)  return false;
+  if(s.minBth !=null && (t.bth||0) < s.minBth) return false;
+  if(s.pmin!=null && (t.lp||0) < s.pmin) return false;
+  if(s.pmax!=null && (t.lp||0) > s.pmax) return false;
+  if(s.lmin!=null && (t.lotSqFt||0) < s.lmin) return false;          // no lot data → excluded once a lot filter is on
+  if(s.lmax!=null && (!t.lotSqFt || t.lotSqFt > s.lmax)) return false;
+  return true;
+}
+function oppFilterSummary(s){
+  const p=[];
+  if(s.types.size<4){ const nm={DE:'SFR',CO:'Condo',TH:'Townhome',OT:'Other'}; p.push([...s.types].map(k=>nm[k]).join('+')||'no type'); }
+  if(s.minBr!=null)  p.push(s.minBr+'+ bd');
+  if(s.minBth!=null) p.push(s.minBth+'+ ba');
+  if(s.pmin!=null || s.pmax!=null) p.push((s.pmin!=null?fmtK(s.pmin):'any')+'–'+(s.pmax!=null?fmtK(s.pmax):'any'));
+  if(s.lmin!=null || s.lmax!=null) p.push('lot '+(s.lmin!=null?fmtN(s.lmin):'any')+'–'+(s.lmax!=null?fmtN(s.lmax):'any')+' sf');
+  return p.join(' · ');
+}
+function oppResetFilters(){
+  ['DE','CO','TH','OT'].forEach(k=>{ const e=el('opp-t-'+k); if(e) e.checked=true; });
+  ['opp-minbr','opp-minbth','opp-pmin','opp-pmax','opp-lmin','opp-lmax'].forEach(id=>{ const e=el(id); if(e) e.value=''; });
+  oppApplyView();
+}
+let _oppVT=null;
+function oppViewDebounced(){ clearTimeout(_oppVT); _oppVT=setTimeout(()=>oppApplyView(),350); }
+
+/* ── 3. GEOGRAPHY ─────────────────────────────────────────────────────── */
+function oppMi(la1,lo1,la2,lo2){
+  const R=3958.8, rad=x=>x*Math.PI/180, dLa=rad(la2-la1), dLo=rad(lo2-lo1);
+  const a=Math.sin(dLa/2)**2 + Math.cos(rad(la1))*Math.cos(rad(la2))*Math.sin(dLo/2)**2;
+  return 2*R*Math.asin(Math.min(1,Math.sqrt(a)));
+}
+function oppGeoSane(city, g){                       // reject geocodes that land far from the city
+  const c = (typeof CA_CITY_COORDS!=='undefined') && CA_CITY_COORDS[city];
+  return !c || oppMi(c[0],c[1],g.lat,g.lng) <= 20;
+}
+function oppCoords(t){
+  if(t.lat && t.lng) return {lat:t.lat, lng:t.lng};
+  const g = A.geoCache[`${t.address}, ${t.city}, CA`.toLowerCase()];
+  if(g && oppGeoSane(t.city,g)){ t.lat=g.lat; t.lng=g.lng; if(t._r){ t._r.lat=g.lat; t._r.lng=g.lng; } return {lat:g.lat, lng:g.lng}; }
+  return null;
+}
+function oppGeoNeeded(){
+  return (A.oppPreArea||[]).filter(r=>!oppCoords(r.target) && !_oppGeo.fail.has(r.target.mlsNo));
+}
+function oppGeoKick(){
+  if(_oppGeo.busy || _oppGeo.paused) return;
+  if(typeof navigator!=='undefined' && navigator.onLine===false) return;
+  if(!oppGeoNeeded().length) return;
+  oppGeoRun();
+}
+async function oppGeoRun(){
+  _oppGeo.busy = true; _oppGeo.done = 0;
+  const cap = A.oppCircle ? 400 : 60;               // be polite to the free geocoder; results are cached afterwards
+  let since = 0;
+  try{
+    while(!_oppGeo.paused){
+      if(_oppGeo.done>=cap){ _oppGeo.paused = true; break; }
+      const need = oppGeoNeeded(); if(!need.length) break;
+      oppGeoStatus();
+      const t = need[0].target;
+      const cached = !!A.geoCache[`${t.address}, ${t.city}, CA`.toLowerCase()];
+      const g = await geocodeOne(t.address, t.city);
+      if(g && oppGeoSane(t.city,g)){ t.lat=g.lat; t.lng=g.lng; if(t._r){ t._r.lat=g.lat; t._r.lng=g.lng; } }
+      else _oppGeo.fail.add(t.mlsNo);
+      _oppGeo.done++; since++;
+      if(since>=4){ since=0; oppApplyView({fromGeo:true}); }
+      if(!cached) await new Promise(res=>setTimeout(res,1100));   // Nominatim: max 1 request/second
+    }
+  } finally {
+    _oppGeo.busy = false;
+    try{ saveGeo(); save(); }catch(e){}
+    oppGeoStatus();
+    oppApplyView({fromGeo:true});
   }
+}
+function oppGeoStop(){ _oppGeo.paused = true; oppGeoStatus(); oppAreaText(); }
+function oppGeoStatus(){
+  const e = el('opp-geo'); if(!e) return;
+  if(!_oppGeo.busy){ e.style.display='none'; return; }
+  e.style.display = 'flex';
+  e.innerHTML = `<span>⏳ Locating addresses for the map — ${_oppGeo.done} done, ${oppGeoNeeded().length} to go. New addresses take about a second each, then they are remembered.</span><button class="btn btn-g" onclick="oppGeoStop()">Stop</button>`;
+}
 
-  grid.innerHTML = results.map(r=>{
-    const t = r.target;
-    const meta = `
+/* ── 4. MAP + CIRCLE ──────────────────────────────────────────────────── */
+function oppCityView(){
+  const c = el('opp-city') && el('opp-city').value;
+  const xy = c && typeof CA_CITY_COORDS!=='undefined' && CA_CITY_COORDS[c];
+  return xy ? {ll:xy, z:13} : {ll:[37.93,-122.0], z:11};
+}
+function oppMapOnShow(){
+  if(typeof L==='undefined' || !el('opp-map') || OPPMAP.hidden) return;
+  if(!OPPMAP.map){
+    const v = oppCityView();
+    OPPMAP.map = L.map('opp-map',{preferCanvas:true}).setView(v.ll, v.z);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors', maxZoom:19}).addTo(OPPMAP.map);
+    OPPMAP.ctx  = L.layerGroup().addTo(OPPMAP.map);
+    OPPMAP.pins = L.layerGroup().addTo(OPPMAP.map);
+    if(A.oppAll) oppDrawPins(A.opportunities||[]);
+  }
+  setTimeout(()=>{ if(OPPMAP.map) OPPMAP.map.invalidateSize(); }, 60);
+}
+function oppToggleMap(){
+  OPPMAP.hidden = !OPPMAP.hidden;
+  el('opp-map').style.display = OPPMAP.hidden ? 'none' : '';
+  el('opp-maplegend').style.display = OPPMAP.hidden ? 'none' : '';
+  el('opp-map-toggle').textContent = OPPMAP.hidden ? 'Show map' : 'Hide map';
+  if(!OPPMAP.hidden) oppMapOnShow();
+}
+function oppFitMap(){
+  if(!OPPMAP.map) return;
+  if(OPPMAP.circle){ OPPMAP.map.fitBounds(OPPMAP.circle.getBounds().pad(0.2)); return; }
+  const pts = (A.opportunities||[]).map(r=>oppCoords(r.target)).filter(Boolean).map(c=>[c.lat,c.lng]);
+  if(pts.length) OPPMAP.map.fitBounds(L.latLngBounds(pts).pad(0.15), {maxZoom:15});
+  else { const v=oppCityView(); OPPMAP.map.setView(v.ll, v.z); }
+}
+function oppDrawPins(view){
+  if(!OPPMAP.map) return;
+  OPPMAP.pins.clearLayers(); OPPMAP.ctx.clearLayers(); OPPMAP.byMls.clear();
+  const inView = new Set(view.map(r=>r.target.mlsNo));
+  // context: scan results hidden by the circle show as small grey dots so you can see what lies outside it
+  (A.oppPreArea||[]).forEach(r=>{
+    if(inView.has(r.target.mlsNo)) return; const c=oppCoords(r.target); if(!c) return;
+    L.circleMarker([c.lat,c.lng],{radius:4,weight:1,color:'#5C6E94',fillColor:'#5C6E94',fillOpacity:.45,interactive:false}).addTo(OPPMAP.ctx);
+  });
+  view.forEach(r=>{
+    const t=r.target, c=oppCoords(t); if(!c) return;
+    const m = L.circleMarker([c.lat,c.lng],{radius:8,weight:2,color:'#0C0F1A',fillColor:OPP_TAG_COLOR[r.cls]||'#7A8BAE',fillOpacity:.95});
+    m.bindTooltip(`${_oe(t.address)} · ${_oe(fmtK(t.lp))} · +${r.gapPct.toFixed(1)}%`);
+    m.bindPopup(`<div style="font-size:12px;line-height:1.55"><strong>${_oe(t.address)}${t.unit?' #'+_oe(t.unit):''}</strong><br>${_oe(toTitle(t.city))} · MLS# ${_oe(t.mlsNo)}<br>List <strong>${_oe(fmt(t.lp))}</strong> · Expected <strong>${_oe(fmt(r.v.est))}</strong> (+${r.gapPct.toFixed(1)}%)<br>${t.br||'—'} bd / ${t.bth||'—'} ba · ${t.sqft?fmtN(t.sqft):'—'} sf${t.lotSqFt?' · lot '+fmtN(t.lotSqFt)+' sf':''}<br><em>${_oe(r.tag)} · score ${r.oppScore}</em></div>`);
+    m.on('click',()=>oppFocusCard(t.mlsNo));
+    m.addTo(OPPMAP.pins); OPPMAP.byMls.set(t.mlsNo, m);
+  });
+}
+function oppFocusCard(mls){
+  const card = [...document.querySelectorAll('#opp-grid .opp-card')].find(c=>c.dataset.mls===String(mls));
+  if(!card) return;
+  card.scrollIntoView({behavior:'smooth', block:'center'});
+  card.classList.add('flash'); setTimeout(()=>card.classList.remove('flash'), 1800);
+}
+function oppShowOnMap(mls){
+  if(OPPMAP.hidden) oppToggleMap();
+  oppMapOnShow();
+  const m = OPPMAP.byMls.get(String(mls));
+  if(!m){ toast('Still locating this address — its pin will appear shortly','inf'); oppGeoKick(); return; }
+  el('opp-mapwrap').scrollIntoView({behavior:'smooth', block:'nearest'});
+  OPPMAP.map.setView(m.getLatLng(), Math.max(OPPMAP.map.getZoom(), 16));
+  m.openPopup();
+}
+
+/* circle: draw / move / resize / clear */
+function oppSetCircle(latlng, mi){
+  const m = OPPMAP.map; if(!m) return;
+  const rM = mi*1609.344;
+  if(!OPPMAP.circle){
+    OPPMAP.circle = L.circle(latlng,{radius:rM,color:'#C9A84C',weight:2,fillColor:'#C9A84C',fillOpacity:.09,interactive:false}).addTo(m);
+    OPPMAP.handle = L.marker(latlng,{draggable:true, title:'Drag to move the area',
+      icon:L.divIcon({className:'opp-handle', html:'<div></div>', iconSize:[18,18], iconAnchor:[9,9]})}).addTo(m);
+    OPPMAP.handle.on('drag', e=>OPPMAP.circle.setLatLng(e.latlng));
+    OPPMAP.handle.on('dragend', e=>{ const ll=e.target.getLatLng(); A.oppCircle.lat=ll.lat; A.oppCircle.lng=ll.lng; oppAreaChanged(); });
+  } else { OPPMAP.circle.setLatLng(latlng); OPPMAP.circle.setRadius(rM); OPPMAP.handle.setLatLng(latlng); }
+  A.oppCircle = {lat:latlng.lat, lng:latlng.lng, mi};
+  el('opp-radius').value = mi;
+  el('opp-radius-grp').style.display = 'flex';
+  el('opp-clear-btn').style.display = '';
+}
+function oppAreaChanged(){
+  _oppGeo.paused = false;                           // a new area gets a fresh geocoding allowance
+  oppAreaText();
+  if(A.oppAll) oppApplyView(); else runOpportunityScanner();
+}
+let _oppRT=null;
+function oppRadiusInput(){
+  if(!A.oppCircle) return;
+  let mi = parseFloat(el('opp-radius').value); if(isNaN(mi)) return;
+  mi = Math.min(25, Math.max(0.1, mi));
+  OPPMAP.circle.setRadius(mi*1609.344); A.oppCircle.mi = mi;
+  clearTimeout(_oppRT); _oppRT=setTimeout(oppAreaChanged, 250);
+}
+function oppQuickRadius(mi){ if(!A.oppCircle) return; el('opp-radius').value=mi; oppRadiusInput(); }
+function oppClearArea(){
+  if(OPPMAP.circle){ OPPMAP.map.removeLayer(OPPMAP.circle); OPPMAP.map.removeLayer(OPPMAP.handle); OPPMAP.circle=null; OPPMAP.handle=null; }
+  A.oppCircle = null;
+  el('opp-radius-grp').style.display = 'none'; el('opp-clear-btn').style.display = 'none';
+  oppAreaChanged();
+}
+function oppToggleDraw(){ OPPMAP.draw ? oppCancelDraw() : oppStartDraw(); }
+function oppStartDraw(){
+  if(OPPMAP.hidden) oppToggleMap();
+  oppMapOnShow(); const m = OPPMAP.map; if(!m) return;
+  oppCancelDraw();
+  const d = {stage:0, center:null, tmp:null, dragged:false, justStarted:false};
+  OPPMAP.draw = d;
+  m.dragging.disable(); m.getContainer().style.cursor = 'crosshair';
+  el('opp-draw-btn').textContent = '✕ Cancel drawing';
+  d.down  = e=>{ if(d.stage!==0) return; d.center=e.latlng; d.stage=1; d.justStarted=true; d.dragged=false;
+                 d.tmp = L.circle(e.latlng,{radius:1,color:'#C9A84C',weight:2,dashArray:'5 4',fillOpacity:.09,interactive:false}).addTo(m); };
+  d.move  = e=>{ if(d.stage!==1) return; const r=d.center.distanceTo(e.latlng); d.tmp.setRadius(Math.max(r,1)); if(r>200) d.dragged=true; };
+  d.up    = e=>{ if(d.stage===1 && d.dragged) oppFinishDraw(e.latlng); };
+  d.click = e=>{ if(d.stage!==1) return; if(d.justStarted){ d.justStarted=false; return; } oppFinishDraw(e.latlng); };
+  d.key   = ev=>{ if(ev.key==='Escape') oppCancelDraw(); };
+  m.on('mousedown',d.down).on('mousemove',d.move).on('mouseup',d.up).on('click',d.click);
+  document.addEventListener('keydown', d.key);
+  oppAreaText();
+}
+function oppCancelDraw(){
+  const d = OPPMAP.draw, m = OPPMAP.map;
+  const b = el('opp-draw-btn'); if(b) b.textContent = '◯ Draw circle';
+  if(!d || !m){ OPPMAP.draw=null; return; }
+  m.off('mousedown',d.down).off('mousemove',d.move).off('mouseup',d.up).off('click',d.click);
+  document.removeEventListener('keydown', d.key);
+  if(d.tmp) m.removeLayer(d.tmp);
+  m.dragging.enable(); m.getContainer().style.cursor = '';
+  OPPMAP.draw = null; oppAreaText();
+}
+function oppFinishDraw(latlng){
+  const d = OPPMAP.draw; if(!d) return;
+  let mi = d.center.distanceTo(latlng)/1609.344;
+  if(mi<0.05) mi = 0.5;
+  mi = Math.min(25, Math.max(0.1, Math.round(mi*20)/20));
+  const c = d.center;
+  oppCancelDraw();
+  oppSetCircle(c, mi);
+  OPPMAP.map.fitBounds(OPPMAP.circle.getBounds().pad(0.2));
+  oppAreaChanged();
+}
+function oppAreaText(){
+  const e = el('opp-area-status'); if(!e) return;
+  if(OPPMAP.draw){ e.textContent = 'Drawing — click the centre, then drag out (or click again) to set the radius. Esc cancels.'; return; }
+  const c = A.oppCircle, st = A.oppAreaStats;
+  if(!c){ e.textContent = 'Whole selection — draw a circle to zero in on a neighbourhood'; return; }
+  let s = `${c.mi} mi radius`;
+  if(st){
+    s += ` · ${st.inside} of ${st.pre} opportunities inside`;
+    if(st.pending) s += (_oppGeo.paused ? ` · ${st.pending} not located yet (stopped)` : ` · locating ${st.pending} more…`);
+    if(st.failed)  s += ` · ${st.failed} could not be located`;
+  }
+  e.textContent = s;
+}
+
+/* ── 5. VIEW PIPELINE + RENDER ─────────────────────────────────────────── */
+function oppApplyView(o){
+  o = o || {};
+  const all = A.oppAll || [], spec = oppFilterSpec();
+  const pre = all.filter(r=>oppPassView(r.target, spec));
+  A.oppPreArea = pre;
+  let view = pre, pending = 0, failed = 0;
+  const c = A.oppCircle;
+  if(c){
+    view = [];
+    pre.forEach(r=>{
+      const p = oppCoords(r.target);
+      if(!p){ _oppGeo.fail.has(r.target.mlsNo) ? failed++ : pending++; return; }
+      if(oppMi(c.lat,c.lng,p.lat,p.lng) <= c.mi) view.push(r);
+    });
+  }
+  A.opportunities = view;
+  A.oppAreaStats = {all:all.length, pre:pre.length, inside:view.length, pending, failed};
+  oppRender(view);
+  oppDrawPins(view);
+  if(o.fit) oppFitMap();
+  if(!o.fromGeo || !_oppGeo.busy) oppGeoKick();
+}
+function oppCardHTML(r){
+  const t = r.target, raw = (t._r && t._r.statusRaw) || '';
+  const meta = `
       <div><span>${t.sqft?fmtN(t.sqft):'—'}</span> sqft</div>
       <div><span>${t.br||'—'}</span> bd / <span>${t.bth||'—'}</span> ba</div>
       <div>Built <span>${t.yrBlt||'—'}</span></div>
-      <div>${t.cdom||t.dom||0} <span>cdom</span></div>`;
-    const riskHTML = r.risks.length
-      ? r.risks.map(rk=>`<div class="opp-risk-bullet sev-${rk.sev}">${rk.desc}</div>`).join('')
-      : `<div class="opp-risk-bullet sev-low">No flagged risks from available data — verify in person and via disclosures</div>`;
-    return `<div class="opp-card">
+      <div>${t.cdom||t.dom||0} <span>cdom</span></div>
+      <div>Lot <span>${t.lotSqFt?fmtN(t.lotSqFt):'—'}</span> sf</div>`;
+  const riskHTML = r.risks.length
+    ? r.risks.map(rk=>`<div class="opp-risk-bullet sev-${rk.sev}">${rk.desc}</div>`).join('')
+    : `<div class="opp-risk-bullet sev-low">No flagged risks from available data — verify in person and via disclosures</div>`;
+  const stLbl = raw==='CS' ? 'Contingent-show' : (raw==='BOM'||raw==='RACT') ? 'Back on market' : 'Active';
+  const stCls = raw==='CS' ? 'warn' : 'ok';
+  const listed = t.listDate ? ` · listed ${t.listDate.toLocaleDateString('en-US',{month:'short',day:'numeric'})}` : '';
+  return `<div class="opp-card" data-mls="${_oe(t.mlsNo)}">
       <div class="opp-head">
         <div>
           <div class="opp-addr">${t.address}${t.unit?' #'+t.unit:''}</div>
-          <div class="opp-city">${toTitle(t.city)} · ${t.bt==='DE'?'SFR':t.bt==='CO'?'Condo':t.bt==='TH'?'Townhome':t.bt}</div>
+          <div class="opp-city">${toTitle(t.city)} · ${t.bt==='DE'?'SFR':t.bt==='CO'?'Condo':t.bt==='TH'?'Townhome':t.bt} · MLS# ${_oe(t.mlsNo)}</div>
+          <div class="opp-city" style="margin-top:3px"><span class="opp-stbadge ${stCls}">${stLbl}</span>${listed}</div>
         </div>
-        <span class="opp-tag ${r.cls}">${r.tag}</span>
+        <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
+          <span class="opp-tag ${r.cls}">${r.tag}</span>
+          <button class="opp-maplink" title="Show on map" onclick="oppShowOnMap(this.closest('.opp-card').dataset.mls)">📍</button>
+        </div>
       </div>
       <div class="opp-prices">
         <div class="opp-pr-cell"><div class="opp-pr-lbl">List Price</div><div class="opp-pr-val">${fmt(t.lp)}</div></div>
@@ -7551,9 +7956,47 @@ async function runOpportunityScanner(opts={}){
       <div class="opp-section">Risk Flags</div>
       ${riskHTML}
     </div>`;
-  }).join('');
+}
+function oppRender(view){
+  const sb = el('opp-stats'), grid = el('opp-grid'); if(!sb || !grid) return;
+  const all = A.oppAll || [], info = A.oppScan || null, spec = oppFilterSpec();
+  let html = '';
+  if(view.length){
+    const deep   = view.filter(r=>r.tag==='Deep Discount').length;
+    const strong = view.filter(r=>r.tag==='Strong Opportunity').length;
+    const buyer  = view.filter(r=>r.tag==='Buyer Advantage').length;
+    const eq     = view.reduce((s,r)=>s+(r.v.est - r.target.lp), 0);
+    html += `<div class="opp-stats-bar">
+      <div class="opp-stat"><div class="opp-stat-num">${view.length}</div><div class="opp-stat-lbl">Total Opportunities</div></div>
+      <div class="opp-stat"><div class="opp-stat-num" style="color:var(--grn)">${deep}</div><div class="opp-stat-lbl">Deep Discount</div></div>
+      <div class="opp-stat"><div class="opp-stat-num" style="color:var(--blue)">${strong}</div><div class="opp-stat-lbl">Strong</div></div>
+      <div class="opp-stat"><div class="opp-stat-num" style="color:var(--teal)">${buyer}</div><div class="opp-stat-lbl">Buyer Advantage</div></div>
+      <div class="opp-stat"><div class="opp-stat-num">${fmt(eq)}</div><div class="opp-stat-lbl">Aggregate Day-1 Equity</div></div>
+    </div>`;
+  }
+  if(info){
+    const ig = info.integrity, ex = ig.cs + ig.underContract + ig.dirty + ig.superseded, why = [];
+    if(ig.cs)            why.push(`${ig.cs} contingent-show (CS)`);
+    if(ig.underContract) why.push(`${ig.underContract} with a pending / COE date on file`);
+    if(ig.superseded)    why.push(`${ig.superseded} replaced by a newer pending, sold or re-listed record for the same property`);
+    if(ig.dirty)         why.push(`${ig.dirty} carrying a sale price`);
+    const fs = oppFilterSummary(spec), c = A.oppCircle;
+    const hidden = all.length - view.length;
+    html += `<div class="opp-integrity"><strong style="color:var(--grn)">✔ Status check</strong> — ${fmtN(ig.looked)} listings are marked Active in the data; ${ex ? `<strong>${ex}</strong> removed as not actually open to offers (${why.join(' · ')})` : 'none needed removing'}. ${fmtN(info.scanned)} were valued and ${all.length} cleared the Min Tag threshold${hidden>0 ? `; <strong>${view.length}</strong> shown after ${[fs, c?`${c.mi}-mile circle`:''].filter(Boolean).join(' · ')||'filters'}` : ''}.</div>`;
+  }
+  sb.innerHTML = html;
 
-  toast(`Scan complete — ${results.length} opportunit${results.length===1?'y':'ies'} · ${filteredNoComps} skipped for thin comps`,'ok');
+  if(view.length){ grid.innerHTML = view.map(oppCardHTML).join(''); oppAreaText(); return; }
+  if(!info){
+    grid.innerHTML = `<div class="opp-empty">Click <strong>Scan</strong> to find mispriced active listings.<br>Each opportunity is valued against local sold comps with risk flags.</div>`;
+  } else if(!all.length){
+    const {scanned, valuedBelowTag, filteredNoComps, minTagPct} = info;
+    grid.innerHTML = `<div class="opp-empty">No opportunities cleared your filters.<br><br><strong>${scanned}</strong> active listing(s) scanned: <strong>${valuedBelowTag}</strong> were valued but priced at/above market (no discount ≥ ${minTagPct}%)${filteredNoComps>0?`, and <strong>${filteredNoComps}</strong> were skipped for lack of tight comps`:''}.<br><br>Try lowering <strong>Min Tag</strong> (currently ${minTagPct}%+), relaxing <strong>Min Comps</strong>, or widening the city scope.</div>`;
+  } else {
+    const st = A.oppAreaStats || {};
+    grid.innerHTML = `<div class="opp-empty"><strong>${all.length}</strong> opportunit${all.length===1?'y':'ies'} found, but none match your current filters${A.oppCircle?' and drawn area':''}.${st.pending?`<br>Still locating ${st.pending} address(es) on the map…`:''}<br><br>Loosen a filter, enlarge the circle, or <a href="#" onclick="oppResetFilters();return false" style="color:var(--gold)">reset filters</a>.</div>`;
+  }
+  oppAreaText();
 }
 
 function exportOpportunities(){
@@ -7594,7 +8037,7 @@ function exportOpportunities(){
 async function runOpportunityBacktest(){
   if(!A.listings.length){toast('Load MLS data first','err');return;}
   const cityFilt = el('opp-city').value || '';
-  const typeFilt = el('opp-type').value || '';
+  const typeSet = oppFilterSpec().types;
   const minTagPct = parseFloat(el('opp-mintag').value) || 0;
   const minComps = parseInt(el('opp-mincomp').value) || 5;
 
@@ -7603,7 +8046,7 @@ async function runOpportunityBacktest(){
     if(l.status!=='SLD') return false;
     if(!l.sp || !l.sqft || !l.closeDate) return false;
     if(cityFilt && l.city!==cityFilt) return false;
-    if(typeFilt && l.bt!==typeFilt) return false;
+    if(!typeSet.has(oppTypeKey(l.bt))) return false;
     // Need a list price to know what a buyer would have paid at the time.
     if(!l.lp || l.lp<=0) return false;
     return true;
@@ -11532,6 +11975,7 @@ function showTab(id){
   document.querySelectorAll('.tab-pane').forEach(p=>p.classList.toggle('active',p.id==='pane-'+id));
   if(id==='intel') renderMarketIntel();
   else if(id==='tune') initTunePane();
+  else if(id==='opps') setTimeout(oppMapOnShow, 60);
   else if(id!=='cma'&&id!=='opps'){ if(el('ctbody-'+id)) renderCityPane(id); }
 }
 async function init(){
