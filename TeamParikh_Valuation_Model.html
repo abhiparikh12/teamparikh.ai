@@ -2551,6 +2551,7 @@ html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--txt
               <option value="avail" selected>Available only</option>
               <option value="cs">+ Contingent-show (CS)</option>
             </select>
+            <label style="display:flex;align-items:center;gap:5px;font-size:11px;cursor:pointer;color:var(--txt2);margin-left:8px" title="Listings last updated before a gap in your MLS imports may have since gone pending or sold"><input type="checkbox" id="opp-stale" style="accent-color:var(--gold)" onchange="runOpportunityScanner()"> Show unverified</label>
           </div>
         </div>
         <div class="opp-tool-grp" style="flex:1"></div>
@@ -7451,15 +7452,17 @@ async function runOpportunityScanner(opts={}){
   const minComps = parseInt(el('opp-mincomp').value) || 5;
   const hideRisk = el('opp-hideRisk').checked;
   const statusPolicy = (el('opp-status') && el('opp-status').value) || 'avail';
-  const integrity = {looked:0, cs:0, underContract:0, superseded:0, dirty:0};
+  const integrity = {looked:0, cs:0, underContract:0, superseded:0, dirty:0, unverified:0, staleShown:0};
+  const cov = oppCoverage(), includeStale = !!(el('opp-stale') && el('opp-stale').checked);
 
   const candidates = A.listings.filter(l=>{
     if(l.status !== 'ACTV') return false;
     if(cityFilt && l.city !== cityFilt) return false;
     if(!l.lp || !l.sqft) return false;
     integrity.looked++;
-    const why = oppNotAvailableReason(l, statusPolicy);   // CS / pending-dated / replaced-by-newer-record / has sale price
+    const why = oppNotAvailableReason(l, statusPolicy, {cov, includeStale});   // CS / pending-dated / replaced-by-newer-record / has sale price / unverified
     if(why){ integrity[why]++; return false; }
+    if(includeStale && oppIsUnverified(l._r, cov)) integrity.staleShown++;
     return true;
   });
 
@@ -7581,13 +7584,13 @@ async function runOpportunityScanner(opts={}){
 
   results.sort((a,b)=>b.oppScore - a.oppScore);
   A.oppAll = results;
-  A.oppScan = {scanned:candidates.length, valuedBelowTag, filteredNoComps, minTagPct, integrity, statusPolicy};
+  A.oppScan = {scanned:candidates.length, valuedBelowTag, filteredNoComps, minTagPct, integrity, statusPolicy, cov, includeStale};
   _oppGeo.paused = false; _oppGeo.fail.clear();       // fresh scan → fresh geocoding allowance
   oppMapOnShow();
   oppApplyView({fit:true});
   const _shown = (A.opportunities||[]).length;
   if(!results.length) toast(`Scan complete — 0 deals · ${valuedBelowTag} valued at/above market · ${filteredNoComps} thin comps`,'inf');
-  else toast(`Scan complete — ${results.length} opportunit${results.length===1?'y':'ies'}${_shown!==results.length?` (${_shown} after filters)`:''} · ${integrity.cs+integrity.underContract+integrity.superseded+integrity.dirty} not-open listing(s) removed · ${filteredNoComps} skipped for thin comps`,'ok');
+  else toast(`Scan complete — ${results.length} opportunit${results.length===1?'y':'ies'}${_shown!==results.length?` (${_shown} after filters)`:''} · ${integrity.cs+integrity.underContract+integrity.superseded+integrity.dirty+integrity.unverified} not-open listing(s) removed · ${filteredNoComps} skipped for thin comps`,'ok');
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -7622,7 +7625,35 @@ function oppSuperseded(r){
   }
   return false;
 }
-function oppNotAvailableReason(l, policy){
+/* ── DATA-COVERAGE GUARD ─────────────────────────────────────────────────
+   MLS exports are incremental: a listing that does not change is not re-exported,
+   and one that went Pending/Sold is only learned about if the export covering
+   that day was imported. If imports skip a stretch of days, every Active row last
+   touched BEFORE the gap is unverifiable: it may have gone pending/sold inside it.
+   The gap is read from the data itself: >=5 consecutive calendar days on which no
+   record anywhere carries an update date. Without update dates, nothing is flagged. */
+function oppCoverage(){
+  const key = store.version + '|' + store.all.length;
+  if(A._oppCov && A._oppCov.key===key) return A._oppCov;
+  const today = Math.floor(Date.now()/864e5), days = new Set();
+  let mx = 0;
+  for(const r of store.all){ const t = r.ud; if(t!=null && t<=today+1){ days.add(t); if(t>mx) mx = t; } }
+  const cov = {key, gapStart:null, gapEnd:null, lastTouch:mx||null, behindDays:mx?Math.max(0,today-mx):null};
+  if(mx && days.size>=30){
+    let run = 0, end = null;
+    for(let d=mx; d>=mx-150; d--){
+      if(!days.has(d)){ if(run===0) end = d; run++; }
+      else { if(run>=5){ cov.gapStart = d+1; cov.gapEnd = end+1; break; } run = 0; }
+    }
+  }
+  return A._oppCov = cov;
+}
+function oppIsUnverified(r, cov){
+  if(!r || !cov || cov.gapEnd==null) return false;
+  const t = Math.max(r.ud||0, r.sd||0, r.cd||0, r.offm||0, r.pend||0, r.ld||0);
+  return t < cov.gapEnd;
+}
+function oppNotAvailableReason(l, policy, opts){
   const r = l._r; if(!r) return null;
   const raw = r.statusRaw||'';
   if(raw==='CS' && policy!=='cs') return 'cs';
@@ -7631,6 +7662,7 @@ function oppNotAvailableReason(l, policy){
   if((r.pend!=null || r.coe!=null) && !backOnMkt && !csIncluded) return 'underContract';
   if(r.sp>0) return 'dirty';
   if(oppSuperseded(r)) return 'superseded';
+  if(opts && opts.cov && !opts.includeStale && oppIsUnverified(r, opts.cov)) return 'unverified';
   return null;
 }
 
@@ -7925,15 +7957,16 @@ function oppCardHTML(r){
   const riskHTML = r.risks.length
     ? r.risks.map(rk=>`<div class="opp-risk-bullet sev-${rk.sev}">${rk.desc}</div>`).join('')
     : `<div class="opp-risk-bullet sev-low">No flagged risks from available data — verify in person and via disclosures</div>`;
-  const stLbl = raw==='CS' ? 'Contingent-show' : (raw==='BOM'||raw==='RACT') ? 'Back on market' : 'Active';
-  const stCls = raw==='CS' ? 'warn' : 'ok';
+  const unv = A.oppScan && A.oppScan.includeStale && oppIsUnverified(t._r, A.oppScan.cov);
+  const stLbl = unv ? 'Unverified' : raw==='CS' ? 'Contingent-show' : (raw==='BOM'||raw==='RACT') ? 'Back on market' : 'Active';
+  const stCls = (raw==='CS'||unv) ? 'warn' : 'ok';
   const listed = t.listDate ? ` · listed ${t.listDate.toLocaleDateString('en-US',{month:'short',day:'numeric'})}` : '';
   return `<div class="opp-card" data-mls="${_oe(t.mlsNo)}">
       <div class="opp-head">
         <div>
           <div class="opp-addr">${t.address}${t.unit?' #'+t.unit:''}</div>
           <div class="opp-city">${toTitle(t.city)} · ${t.bt==='DE'?'SFR':t.bt==='CO'?'Condo':t.bt==='TH'?'Townhome':t.bt} · MLS# ${_oe(t.mlsNo)}</div>
-          <div class="opp-city" style="margin-top:3px"><span class="opp-stbadge ${stCls}">${stLbl}</span>${listed}</div>
+          <div class="opp-city" style="margin-top:3px"><span class="opp-stbadge ${stCls}">${stLbl}</span>${listed}${unv && t._r && (t._r.ud||t._r.sd) ? ` · last MLS update ${TP.fmtDay(Math.max(t._r.ud||0,t._r.sd||0))} — confirm status` : ''}</div>
         </div>
         <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
           <span class="opp-tag ${r.cls}">${r.tag}</span>
@@ -7975,14 +8008,21 @@ function oppRender(view){
     </div>`;
   }
   if(info){
-    const ig = info.integrity, ex = ig.cs + ig.underContract + ig.dirty + ig.superseded, why = [];
+    const ig = info.integrity, ex = ig.cs + ig.underContract + ig.dirty + ig.superseded + ig.unverified, why = [];
     if(ig.cs)            why.push(`${ig.cs} contingent-show (CS)`);
     if(ig.underContract) why.push(`${ig.underContract} with a pending / COE date on file`);
     if(ig.superseded)    why.push(`${ig.superseded} replaced by a newer pending, sold or re-listed record for the same property`);
     if(ig.dirty)         why.push(`${ig.dirty} carrying a sale price`);
-    const fs = oppFilterSummary(spec), c = A.oppCircle;
+    if(ig.unverified)    why.push(`${ig.unverified} unverified — last updated before the gap in your MLS imports`);
+    const cv = info.cov, fs = oppFilterSummary(spec), c = A.oppCircle;
+    let covNote = '';
+    if(cv && cv.gapEnd!=null){
+      covNote = `<div style="margin-top:6px;color:#E8B84A"><strong>⚠ Data gap:</strong> no MLS updates were imported for ${TP.fmtDay(cv.gapStart)} – ${TP.fmtDay(cv.gapEnd-1)}. Any listing last updated before ${TP.fmtDay(cv.gapEnd)} may have gone pending or sold in that window and the data would not know. ${info.includeStale ? `<strong>${ig.staleShown}</strong> such listing(s) are shown and badged <em>Unverified</em>.` : `<strong>${ig.unverified}</strong> such listing(s) are hidden.`} To close the gap, import an MLS export covering those dates, or a full Active-listings export, then rescan.</div>`;
+    } else if(cv && cv.behindDays>7){
+      covNote = `<div style="margin-top:6px;color:#E8B84A"><strong>⚠ Data is ${cv.behindDays} days old</strong> (newest update ${TP.fmtDay(cv.lastTouch)}). Import the latest MLS export before relying on these.</div>`;
+    }
     const hidden = all.length - view.length;
-    html += `<div class="opp-integrity"><strong style="color:var(--grn)">✔ Status check</strong> — ${fmtN(ig.looked)} listings are marked Active in the data; ${ex ? `<strong>${ex}</strong> removed as not actually open to offers (${why.join(' · ')})` : 'none needed removing'}. ${fmtN(info.scanned)} were valued and ${all.length} cleared the Min Tag threshold${hidden>0 ? `; <strong>${view.length}</strong> shown after ${[fs, c?`${c.mi}-mile circle`:''].filter(Boolean).join(' · ')||'filters'}` : ''}.</div>`;
+    html += `<div class="opp-integrity"><strong style="color:var(--grn)">✔ Status check</strong> — ${fmtN(ig.looked)} listings are marked Active in the data; ${ex ? `<strong>${ex}</strong> removed as not actually open to offers (${why.join(' · ')})` : 'none needed removing'}. ${fmtN(info.scanned)} were valued and ${all.length} cleared the Min Tag threshold${hidden>0 ? `; <strong>${view.length}</strong> shown after ${[fs, c?`${c.mi}-mile circle`:''].filter(Boolean).join(' · ')||'filters'}` : ''}.${covNote}</div>`;
   }
   sb.innerHTML = html;
 
