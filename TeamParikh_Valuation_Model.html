@@ -10303,6 +10303,8 @@ function renderABResults(rb){
 // CLIENT REPORT — Print-optimized branded one-pager
 // ───────────────────────────────────────────────────────
 function openClientReport(){
+  // On the Opportunities tab this button opens the opportunity report (no CMA needed — comps are run for every opportunity automatically)
+  if(typeof activeTab!=='undefined' && activeTab==='opps' && typeof openOppReport==='function'){ openOppReport(); return; }
   if(!A.lastValuation || !A.subject){
     toast('Run a CMA from the CMA tab first','err');return;
   }
@@ -10337,6 +10339,9 @@ function updateClientReportFields(){
 // Client Report (which requires a CMA) and then prints once rendered.
 function smartPrint(){
   const overlay=el('report-overlay');
+  if(typeof activeTab!=='undefined' && activeTab==='opps' && A.reportMode!=='opps' && !(overlay && !overlay.classList.contains('hidden'))){
+    openOppReport(); setTimeout(()=>printClientReport(),2500); return;
+  }
   if(overlay && !overlay.classList.contains('hidden')){
     // Report is already open — just print it
     printClientReport();
