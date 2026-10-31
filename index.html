@@ -421,6 +421,10 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--bl
       San Ramon 2-Home Comparison
       <span class="lock-dot"></span>
     </button>
+    <button class="nav-sub-item" data-property="lighthouse" onclick="selectProperty('lighthouse', this)">
+      Lighthouse Marina &amp; Resort
+      <span class="lock-dot"></span>
+    </button>
   </div>
 
   <button class="nav-item" id="nav-valuation" onclick="showPage('valuation', this)">
@@ -565,6 +569,10 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--bl
       <button class="sub-tab-btn" data-property="sanramon2" onclick="selectProperty('sanramon2', this)">
         <div class="sub-tab-dot"></div>
         Blue Fox &middot; Haven &middot; San Ramon, CA 94583
+      </button>
+      <button class="sub-tab-btn" data-property="lighthouse" onclick="selectProperty('lighthouse', this)">
+        <div class="sub-tab-dot"></div>
+        Lighthouse Marina &amp; Resort &middot; Isleton, CA 95641
       </button>
     </div>
 
@@ -823,6 +831,37 @@ html, body { height: 100%; font-family: 'Jost', sans-serif; background: var(--bl
       <iframe class="advisory-frame" id="frame-sanramon2" data-src="buyer-sanramon-compare.html" title="San Ramon Two-Property Comparison"></iframe>
     </div>
 
+    <!-- ── PROPERTY: LIGHTHOUSE MARINA & RESORT ── -->
+    <div id="subtab-lighthouse" class="sub-page">
+      <div class="pw-gate" id="gate-lighthouse">
+        <div class="pw-box">
+          <div class="pw-lock">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <div class="pw-eyebrow">Confidential Property Report</div>
+          <div class="pw-title">Buyer <em>Advisory</em></div>
+          <div class="pw-sub">Access restricted to the prospective buyer for this property.</div>
+          <div class="pw-property">Lighthouse Marina &amp; Resort &middot; 151 Brannan Island Rd &middot; Isleton</div>
+          <div class="pw-input-wrap">
+            <input class="pw-input" id="pw-input-lighthouse" type="password" maxlength="12" placeholder="&middot; &middot; &middot; &middot;" autocomplete="off" onkeydown="if(event.key==='Enter') checkPW('lighthouse')">
+            <button class="pw-toggle" onclick="togglePWVis('lighthouse')" title="Show/hide">
+              <svg id="eye-lighthouse" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+          <button class="pw-btn" onclick="checkPW('lighthouse')">Unlock Report</button>
+          <div class="pw-error-msg" id="pw-error-lighthouse">Incorrect access code. Please try again.</div>
+          <div class="pw-hint">Enter your access code to continue</div>
+        </div>
+      </div>
+      <iframe class="advisory-frame" id="frame-lighthouse" data-src="buyer-lighthouse.html" title="Lighthouse Marina &amp; Resort Buyer Advisory"></iframe>
+    </div>
+
   </div>
 
 
@@ -943,6 +982,7 @@ const PROPERTY_CODES = {
   byron: '6373',
   livermore3: '1162',
   sanramon2: '7527',
+  lighthouse: '2575',
   valuation: '3083',
   openhouse: '6035'
 };
